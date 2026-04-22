@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluación Conductual PRIMA — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-primary: #27214d;
+      --brand-accent:  #8750f6;
+      --brand-accent-50: #f2ecfe;
+      --brand-accent-100: #e8ddfd;
+      --positive-500: #22c55e;
+      --positive-50: #f0fdf4;
+      --positive-600: #16a34a;
+      --warning-100: #fef9c3;
+      --warning-700: #a16207;
+      --text-primary: #252432;
+      --text-muted: #6b6a6e;
+      --border: #d4d4d5;
+      --font: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: #ffffff;
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Shared page shell ── */
+    .page-shell {
+      min-height: 100vh;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-banner {
+      position: absolute;
+      left: 15%; top: 40px;
+      width: 70%; height: 320px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+      background: linear-gradient(120deg, #fad4cc 0%, #fcefc5 20%, #c8ecd9 40%, #b8e8e4 60%, #c6e8f3 80%, #e8ddfd 100%);
+      border-radius: 24px;
+      filter: blur(32px);
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 60px;
+      gap: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 0 22.4px 0 rgba(0,0,0,0.06);
+      padding: 32px 42px;
+      width: 100%;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 28px;
+      border-radius: 12px;
+      background: var(--brand-primary);
+      border: none;
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { background: #c5c2d4; cursor: default; opacity: 0.65; pointer-events: none; }
+
+    /* ── Logos ── */
+    .logo-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .company-logo { height: 56px; width: auto; object-fit: contain; }
+    .powered-by { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #151515; }
+    .unio-logo { height: 22px; width: auto; }
+
+    /* ─────────────────────────────────────────────
+       SCREEN 1 — Bienvenida
+    ───────────────────────────────────────────── */
+    #screen-bienvenida .main-card { max-width: 702px; }
+
+    .eval-title {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .eval-subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-primary);
+      text-align: center;
+      letter-spacing: 0.02em;
+      margin-bottom: 20px;
+    }
+
+    .candidate-card {
+      border: 1px solid #afaeb0;
+      border-radius: 16px;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      max-width: 440px;
+      margin: 0 auto 8px;
+    }
+
+    .candidate-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #d4dbe0;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #e8ddfd, #c6e8f3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 800; color: var(--brand-accent);
+    }
+
+    .candidate-name { font-weight: 800; font-size: 18px; color: #363539; margin-bottom: 4px; }
+    .candidate-location { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #363539; margin-bottom: 6px; }
+    .vacancy-chip {
+      background: var(--brand-accent-50);
+      border-radius: 36px;
+      padding: 2px 10px;
+      display: inline-flex;
+      font-size: 12px; font-weight: 600; color: var(--brand-accent);
+    }
+
+    .callout {
+      border-left: 4px solid var(--brand-accent);
+      width: 100%; max-width: 570px;
+    }
+    .callout-inner {
+      background: var(--brand-accent-50);
+      border-radius: 0 25px 25px 0;
+      padding: 14px 20px;
+    }
+    .callout-title { font-weight: 700; font-size: 14px; color: var(--brand-accent); margin-bottom: 4px; }
+    .callout-list { margin: 0; padding-left: 18px; color: #5c11f3; }
+    .callout-list li { font-size: 14px; line-height: 24px; }
+
+    .time-row { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: #363539; }
+
+    .description-text {
+      font-size: 14px; line-height: 24px; color: #030712;
+      text-align: center; letter-spacing: 0.02em;
+      max-width: 560px;
+    }
+
+    /* ─────────────────────────────────────────────
+       SCREEN 2 — Test
+    ───────────────────────────────────────────── */
+    #screen-test .main-card { max-width: 946px; }
+
+    .progress-bar-track {
+      width: 100%; max-width: 364px;
+      height: 8px; border-radius: 12px;
+      background: var(--brand-accent-100);
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 12px;
+      background: var(--brand-accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .progress-label {
+      font-size: 15px; font-weight: 700;
+      color: var(--brand-accent);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* Sticky progress bar */
+    .sticky-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid #e5e5e6;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 12px 40px;
+      display: none;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      z-index: 100;
+    }
+    .sticky-bar.visible { display: flex; }
+    .sticky-bar-inner { display: flex; align-items: center; gap: 16px; width: 100%; max-width: 680px; }
+    .sticky-bar-label { font-weight: 700; font-size: 13px; color: var(--text-primary); white-space: nowrap; }
+
+    /* Questions */
+    .questions-container { display: flex; flex-direction: column; gap: 40px; align-items: center; }
+
+    .question-block { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 702px; }
+    .question-label { font-weight: 700; font-size: 16px; color: #afaeb0; text-align: center; }
+    .question-text { font-weight: 600; font-size: 15px; line-height: 24px; color: var(--text-primary); }
+
+    .options-list { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Radio card */
+    .radio-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .radio-card:hover { border-color: var(--brand-accent); background: var(--brand-accent-50); }
+    .radio-card.selected {
+      border-color: var(--brand-accent);
+      background: var(--brand-accent-50);
+    }
+
+    .radio-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s;
+    }
+    .radio-card.selected .radio-dot {
+      border-color: var(--brand-accent);
+    }
+    .radio-dot-inner {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--brand-accent);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .radio-card.selected .radio-dot-inner { opacity: 1; }
+
+    /* Submit bar */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 80px; background: #fff;
+      border-top: 1px solid #e5e5e6;
+      box-shadow: -2px -4px 20px 0 rgba(0,0,0,0.07);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 10%;
+      z-index: 50;
+    }
+
+    /* ─────────────────────────────────────────────
+       SCREEN 3 — Éxito
+    ───────────────────────────────────────────── */
+    #screen-exito .main-card { max-width: 946px; }
+
+    .success-icon {
+      width: 100px; height: 100px; object-fit: contain;
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      font-size: 32px; font-weight: 800;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .success-subtitle {
+      font-size: 15px; font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      max-width: 560px;
+    }
+
+    .confidential-badge {
+      background: var(--brand-accent-50);
+      border-radius: 25px;
+      padding: 0 24px;
+      height: 68px;
+      display: flex; align-items: center; gap: 10px;
+      max-width: 420px;
+    }
+    .confidential-text { font-weight: 700; font-size: 17px; color: var(--brand-accent); }
+
+    .next-steps-box {
+      border: 1px solid #c0c0c1;
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 566px;
+      width: 100%;
+    }
+    .next-steps-title { font-size: 22px; font-weight: 800; color: var(--brand-primary); margin-bottom: 10px; }
+    .next-steps-text { font-size: 15px; line-height: 1.7; color: #030712; }
+
+    /* ── Shared footer ── */
+    .page-footer {
+      background: rgba(255,255,255,0.5);
+      border-radius: 16px;
+      padding: 28px 48px;
+      width: 100%; max-width: 1050px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .footer-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .footer-text { font-size: 13px; color: #151515; max-width: 900px; }
+
+    .linkedin-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      border: 1.5px solid var(--brand-primary);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--brand-primary);
+      font-size: 13px; font-weight: 700;
+      transition: background 0.15s;
+    }
+    .linkedin-btn:hover { background: var(--brand-primary); color: #fff; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .card { padding: 24px 20px; }
+      .eval-title { font-size: 24px; }
+      .candidate-card { flex-direction: column; text-align: center; padding: 16px; }
+      .submit-bar { padding-right: 5%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     SCREEN 1 — BIENVENIDA
+═════════════════════════════════════════════════ -->
+<div id="screen-bienvenida" class="screen active">
+  <div class="page-shell">
+    <div class="bg-banner"></div>
+
+    <div class="page-content">
+      <!-- Main card -->
+      <div class="card main-card">
+        <!-- Logo row -->
+        <div class="logo-row">
+          <div class="company-logo" style="display:flex;align-items:center;justify-content:center;background:#f7f7f8;border-radius:12px;padding:8px 16px;font-weight:800;font-size:18px;color:#27214d;height:56px;">
+            etex
+          </div>
+          <div class="powered-by">
+            <span>Powered by</span>
+            <span style="font-weight:800;font-size:16px;color:#8750f6;">unio</span>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="eval-title">Evaluación Conductual PRIMA</h1>
+        <p class="eval-subtitle">Te ayudaremos a conocerte mejor para encontrar el mejor match con este rol.</p>
+
+        <!-- Candidate card -->
+        <div class="candidate-card">
+          <div class="candidate-avatar">MA</div>
+          <div>
+            <div class="candidate-name">Maria Alicia Espinosa</div>
+            <div class="candidate-location">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.79 1.5 4 3.29 4 5.5C4 8.5 8 14 8 14C8 14 12 8.5 12 5.5C12 3.29 10.21 1.5 8 1.5ZM8 7C7.17 7 6.5 6.33 6.5 5.5C6.5 4.67 7.17 4 8 4C8.83 4 9.5 4.67 9.5 5.5C9.5 6.33 8.83 7 8 7Z" fill="#363539"/></svg>
+              Bogotá, Colombia
+            </div>
+            <span class="vacancy-chip">Vacante: Supervisor de Almacén</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Callout -->
+      <div class="callout">
+        <div class="callout-inner">
+          <p class="callout-title">Antes de empezar:</p>
+          <ul class="callout-list">
+            <li>No hay respuestas buenas o malas</li>
+            <li>Sé lo más honesto posible contigo mismo</li>
+            <li>Responde según cómo realmente eres, no cómo crees que deberías ser</li>
+            <li>Tus respuestas son confidenciales</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="time-row">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#363539" stroke-width="1.5"/><path d="M8 4.5V8L10.5 9.5" stroke="#363539" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Tiempo estimado: 3–5 minutos
+      </div>
+
+      <!-- Description -->
+      <p class="description-text">
+        Esta evaluación nos ayuda a entender tu estilo de trabajo y cómo encajas con el rol. No afecta negativamente tu candidatura — es una herramienta para encontrar el mejor match.
+      </p>
+
+      <!-- CTA -->
+      <button class="btn-primary" onclick="showScreen('test')">
+        Iniciar evaluación
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <!-- Footer -->
+      <div class="page-footer">
+        <div class="footer-row">
+          <div class="powered-by">
+            <span>Powered by</span>
+            <span style="font-weight:800;font-size:16px;color:#8750f6;">unio</span>
+          </div>
+          <a href="https://www.linkedin.com/company/unio-latam" target="_blank" class="linkedin-btn">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.78 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"/></svg>
+            Síguenos en Linkedin
+          </a>
+        </div>
+        <p class="footer-text">Reimaginamos los procesos de reclutamiento, selección y contratación para roles UXUI, Growth y Product, potenciando y optimizando procesos con IA.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     SCREEN 2 — TEST
+═════════════════════════════════════════════════ -->
+<div id="screen-test" class="screen">
+  <!-- Sticky progress bar -->
+  <div id="sticky-bar" class="sticky-bar">
+    <div class="sticky-bar-inner">
+      <span class="sticky-bar-label">Evaluación Conductual PRIMA</span>
+      <div class="progress-bar-track" style="max-width:unset;flex:1;">
+        <div id="sticky-fill" class="progress-bar-fill"></div>
+      </div>
+      <span id="sticky-pct" style="font-weight:700;font-size:13px;color:#8750f6;white-space:nowrap;">0% completado</span>
+    </div>
+  </div>
+
+  <div class="page-shell">
+    <div class="bg-banner"></div>
+
+    <div class="page-content" style="padding-top:40px;padding-bottom:100px;">
+      <div class="card main-card">
+        <!-- Header -->
+        <div class="logo-row">
+          <div class="company-logo" style="display:flex;align-items:center;justify-content:center;background:#f7f7f8;border-radius:12px;padding:8px 16px;font-weight:800;font-size:18px;color:#27214d;height:56px;">
+            etex
+          </div>
+          <div class="powered-by">
+            <span>Powered by</span>
+            <span style="font-weight:800;font-size:16px;color:#8750f6;">unio</span>
+          </div>
+        </div>
+
+        <h1 class="eval-title">Evaluación Conductual PRIMA</h1>
+
+        <!-- Progress bar -->
+        <div id="main-progress" class="progress-bar-track" style="margin:12px auto 6px;">
+          <div id="main-fill" class="progress-bar-fill"></div>
+        </div>
+        <p id="main-pct" class="progress-label">0% completado</p>
+
+        <!-- Questions -->
+        <div class="questions-container" style="margin-top:32px;" id="questions-container">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit bar -->
+  <div class="submit-bar">
+    <button id="submit-btn" class="btn-primary" disabled onclick="showScreen('exito')">
+      Enviar respuestas
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     SCREEN 3 — ÉXITO
+═════════════════════════════════════════════════ -->
+<div id="screen-exito" class="screen">
+  <div class="page-shell">
+    <div class="bg-banner"></div>
+
+    <div class="page-content">
+      <div class="card main-card" style="align-items:center;display:flex;flex-direction:column;gap:24px;text-align:center;">
+
+        <!-- Logo row -->
+        <div class="logo-row" style="width:100%;">
+          <div class="company-logo" style="display:flex;align-items:center;justify-content:center;background:#f7f7f8;border-radius:12px;padding:8px 16px;font-weight:800;font-size:18px;color:#27214d;height:56px;">
+            etex
+          </div>
+          <div class="powered-by">
+            <span>Powered by</span>
+            <span style="font-weight:800;font-size:16px;color:#8750f6;">unio</span>
+          </div>
+        </div>
+
+        <!-- Success icon -->
+        <div style="width:100px;height:100px;border-radius:50%;background:var(--brand-accent-50);display:flex;align-items:center;justify-content:center;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+            <circle cx="26" cy="26" r="25" stroke="#8750f6" stroke-width="2"/>
+            <path d="M14 27L22 35L38 17" stroke="#8750f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h1 class="success-title">¡Evaluación enviada con éxito!</h1>
+
+        <p class="success-subtitle">
+          Gracias por completar la evaluación conductual PRIMA. Tus respuestas nos ayudan a entender mejor cómo encajas con el rol.
+        </p>
+
+        <!-- Confidential badge -->
+        <div class="confidential-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="5" y="11" width="14" height="10" rx="2" stroke="#8750f6" stroke-width="1.8"/>
+            <path d="M8 11V7C8 4.79 9.79 3 12 3C14.21 3 16 4.79 16 7V11" stroke="#8750f6" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="12" cy="16" r="1.5" fill="#8750f6"/>
+          </svg>
+          <span class="confidential-text">Tus respuestas son confidenciales</span>
+        </div>
+
+        <!-- Next steps -->
+        <div class="next-steps-box">
+          <h2 class="next-steps-title">¿Qué sigue?</h2>
+          <p class="next-steps-text">
+            Nuestro equipo revisará tu perfil completo junto con esta evaluación. Te contactaremos pronto con los siguientes pasos del proceso.
+            Recuerda revisar tu correo electrónico (incluyendo spam) en las próximas 48–72 horas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     JAVASCRIPT
+═════════════════════════════════════════════════ -->
+<script>
+  // ── Screen navigation ──────────────────────────
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ── Questions data ─────────────────────────────
+  const QUESTIONS = [
+    {
+      id: 1,
+      label: 'Pregunta 1 de 10',
+      text: 'Llegas a un hospital en Barranquilla para una demostración con un cardiólogo que tiene poco tiempo y muestra escepticismo. ¿Qué haces primero?',
+      options: [
+        'Adapto la demo al tiempo disponible, priorizo lo clínicamente más relevante para generar confianza rápido',
+        'Le pido reagendar para tener tiempo adecuado y hacer una presentación completa',
+        'Involucro al representante comercial para que gestione la relación y expectativa',
+        'Inicio con los puntos más técnicos para demostrar expertise y credibilidad',
+      ],
+    },
+    {
+      id: 2,
+      label: 'Pregunta 2 de 10',
+      text: 'Durante una capacitación, un médico te hace una pregunta técnica compleja que no sabes responder en el momento. ¿Cómo reaccionas?',
+      options: [
+        'Reconozco que no tengo la respuesta en este momento, me comprometo a investigar y respondo en 24 horas',
+        'Intento dar una respuesta aproximada basándome en mi conocimiento general',
+        'Escalo la pregunta al equipo técnico inmediatamente para dar una respuesta precisa',
+        'Redirijo la conversación hacia temas donde tengo más certeza',
+      ],
+    },
+    {
+      id: 3,
+      label: 'Pregunta 3 de 10',
+      text: 'Tienes 3 implementaciones programadas en la misma semana en ciudades diferentes. Una de ellas se complica y requiere más tiempo del planeado. ¿Qué haces?',
+      options: [
+        'Resuelvo la implementación complicada aunque signifique reprogramar las otras dos',
+        'Optimizo tiempos para cumplir con las tres, aunque cada una reciba menos atención de la ideal',
+        'Delego la implementación complicada a un colega para cumplir con mi agenda',
+        'Coordino con los clientes para ajustar expectativas y priorizar según impacto clínico',
+      ],
+    },
+    {
+      id: 4,
+      label: 'Pregunta 4 de 10',
+      text: 'Un cliente solicita una modificación en el protocolo de uso del equipo que técnicamente es posible pero no está en las guías oficiales. ¿Qué haces?',
+      options: [
+        'Consulto con el fabricante antes de dar cualquier orientación sobre modificaciones',
+        'Explico por qué seguir las guías oficiales es la mejor práctica y ofrezco alternativas dentro del protocolo',
+        'Si técnicamente es viable y el cliente asume la responsabilidad, le doy orientación práctica',
+        'Documento la solicitud y la escalo al área técnica para decisión formal',
+      ],
+    },
+    {
+      id: 5,
+      label: 'Pregunta 5 de 10',
+      text: 'Estás en medio de una capacitación y recibes una llamada urgente de otro cliente con un problema técnico crítico. ¿Cómo respondes?',
+      options: [
+        'Pido una pausa breve en la capacitación, atiendo la llamada y resuelvo rápidamente',
+        'Termino la capacitación y devuelvo la llamada inmediatamente después',
+        'Respondo brevemente y redirijo al cliente con un colega disponible',
+        'Ignoro la llamada durante la capacitación para mantener profesionalismo con el cliente presente',
+      ],
+    },
+    {
+      id: 6,
+      label: 'Pregunta 6 de 10',
+      text: 'Un cliente te pide que elabores una ficha técnica comparativa entre tu equipo y el de la competencia para una licitación. ¿Cómo lo abordas?',
+      options: [
+        'Hago la comparativa destacando nuestras ventajas de forma objetiva y con datos verificables',
+        'Me enfoco solo en las especificaciones de nuestro equipo y evito mencionar a la competencia',
+        'Coordino con el equipo comercial para que ellos manejen la comparativa',
+        'Solicito al fabricante los documentos oficiales de comparativa técnica',
+      ],
+    },
+    {
+      id: 7,
+      label: 'Pregunta 7 de 10',
+      text: 'Después de una implementación, el cliente te reporta que el equipo no está dando los resultados esperados. Al revisar, descubres que no están siguiendo el protocolo que enseñaste. ¿Qué haces?',
+      options: [
+        'Programo una sesión de refuerzo inmediata para corregir el uso y asegurar que entiendan el protocolo',
+        'Les explico las consecuencias de no seguir el protocolo y les envío material de referencia',
+        'Documento la situación y escalo al representante comercial para gestión de cuenta',
+        'Adapto el protocolo a cómo lo están usando si técnicamente es viable',
+      ],
+    },
+    {
+      id: 8,
+      label: 'Pregunta 8 de 10',
+      text: 'Tu jefe te asigna liderar una capacitación en un congreso médico con audiencia de más de 100 especialistas. ¿Cómo te preparas?',
+      options: [
+        'Armo una presentación enfocada en casos clínicos reales y resultados medibles',
+        'Solicito apoyo de un colega con más experiencia en eventos grandes para co-presentar',
+        'Preparo una demo técnica detallada con todas las funcionalidades del equipo',
+        'Investigo al público objetivo y adapto contenido a sus necesidades específicas',
+      ],
+    },
+    {
+      id: 9,
+      label: 'Pregunta 9 de 10',
+      text: 'Recibes feedback negativo de un cliente sobre tu última capacitación. Dice que fue "muy técnica y poco práctica". ¿Cómo respondes?',
+      options: [
+        'Agradezco el feedback, programo una sesión de seguimiento más práctica y ajusto mi enfoque',
+        'Explico que el contenido técnico es necesario para el uso correcto del equipo',
+        'Escalo el feedback a mi jefe para definir estrategia de seguimiento',
+        'Reviso mi metodología de capacitación y pido feedback a otros clientes para identificar patrones',
+      ],
+    },
+    {
+      id: 10,
+      label: 'Pregunta 10 de 10',
+      text: 'Estás en campo hace 2 semanas seguidas con agenda completa. Tu familia te pide que reserves el fin de semana. El lunes recibes una solicitud urgente de demostración para un cliente clave el sábado. ¿Qué haces?',
+      options: [
+        'Acepto la demostración porque es cliente clave y reprogramo con mi familia',
+        'Ofrezco una alternativa para primera hora del lunes o delego a un colega',
+        'Negocio con el cliente para el viernes tarde y mantengo el fin de semana libre',
+        'Consulto con mi jefe sobre la prioridad antes de comprometerme',
+      ],
+    },
+  ];
+
+  // ── Answers state ──────────────────────────────
+  const answers = {};
+
+  // ── Build questions DOM ─────────────────────────
+  function buildQuestions() {
+    const container = document.getElementById('questions-container');
+    QUESTIONS.forEach((q) => {
+      const block = document.createElement('div');
+      block.className = 'question-block';
+      block.innerHTML = `
+        <p class="question-label">${q.label}</p>
+        <p class="question-text">${q.text}</p>
+        <div class="options-list" id="options-${q.id}">
+          ${q.options.map((opt, i) => `
+            <div class="radio-card" id="opt-${q.id}-${i}" onclick="selectOption(${q.id}, ${i}, '${escapeAttr(opt)}')">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span>${opt}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      container.appendChild(block);
+    });
+  }
+
+  function escapeAttr(s) {
+    return s.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  }
+
+  function selectOption(qId, optIdx, value) {
+    // Deselect all options for this question
+    QUESTIONS.find(q => q.id === qId).options.forEach((_, i) => {
+      const el = document.getElementById(`opt-${qId}-${i}`);
+      if (el) el.classList.remove('selected');
+    });
+    // Select chosen option
+    const chosen = document.getElementById(`opt-${qId}-${optIdx}`);
+    if (chosen) chosen.classList.add('selected');
+
+    answers[qId] = value;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const count = Object.keys(answers).length;
+    const pct   = Math.round((count / QUESTIONS.length) * 100);
+
+    document.getElementById('main-fill').style.width   = pct + '%';
+    document.getElementById('main-pct').textContent    = pct + '% completado';
+    document.getElementById('sticky-fill').style.width = pct + '%';
+    document.getElementById('sticky-pct').textContent  = pct + '% completado';
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = count < QUESTIONS.length;
+    submitBtn.style.background = count < QUESTIONS.length ? '#c5c2d4' : '#27214d';
+  }
+
+  // ── Sticky bar on scroll ────────────────────────
+  function handleScroll() {
+    const progressEl = document.getElementById('main-progress');
+    if (!progressEl) return;
+    const rect = progressEl.getBoundingClientRect();
+    const stickyBar = document.getElementById('sticky-bar');
+    if (rect.bottom < 0) {
+      stickyBar.classList.add('visible');
+    } else {
+      stickyBar.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  // ── Init ───────────────────────────────────────
+  buildQuestions();
+</script>
+</body>
+</html>

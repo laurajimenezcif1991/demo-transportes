@@ -1,0 +1,45 @@
+---
+description: Automatically commit and push changes after major updates or groups of minor changes
+alwaysApply: true
+---
+
+# Auto-Commit Workflow
+
+After completing a major update OR a meaningful set of minor changes, proactively commit and push to the remote repository **without waiting to be asked**.
+
+## When to Commit
+
+- After any single major feature, refactor, or bug fix
+- After a group of smaller changes that together form a logical unit
+- After finishing a task or subtask from the user's request
+
+## Commit Process
+
+1. Run `git status` and `git diff` to review all changes
+2. Run `git log -5 --oneline` to match the repo's existing commit style
+3. Stage relevant files with `git add`
+4. Write a concise, descriptive commit message following the repo's style
+5. **Update `CHANGELOG.md`** — Before committing, update the changelog file at the repo root (`/Users/lauravanessa/Desktop/Vibecoding/Unio b2b/CHANGELOG.md`):
+   - Move the pending items from the `[Sin commitear]` section into a new dated section with the commit hash and today's date (format: `DD Mmm YYYY`)
+   - Reset the `[Sin commitear]` section to empty (keep the header)
+   - Stage `CHANGELOG.md` along with the other files
+6. Commit using a HEREDOC to preserve formatting
+7. Push to the remote with `git push`
+
+## Changelog Location
+
+The changelog lives at `CHANGELOG.md` in the repo root. It is the single source of truth for what has changed and when. Always keep it in sync with every commit.
+
+## Commit Message Guidelines
+
+- Use imperative mood: "Add login form" not "Added login form"
+- Be specific about what changed and why (not just what)
+- Keep subject line under 72 characters
+- If needed, add a short body after a blank line
+
+## Safety Rules
+
+- NEVER force push unless the user explicitly requests it
+- NEVER skip hooks (--no-verify)
+- NEVER amend a commit that has already been pushed
+- If no remote is configured, inform the user and commit locally only

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4. Prueba Psicológica — Unio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:        #27214d;
+      --accent:       #8750f6;
+      --accent-50:    #f2ecfe;
+      --accent-100:   #e8ddfd;
+      --positive-50:  #f0fdf4;
+      --positive-200: #bbf7d0;
+      --positive-600: #16a34a;
+      --warning-100:  #fef9c3;
+      --warning-700:  #a16207;
+      --danger-100:   #fee2e2;
+      --danger-700:   #b91c1c;
+      --border:       #d4d4d5;
+      --muted:        #6b6a6e;
+      --text:         #252432;
+      --font:         'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: #f4f4f8;
+      color: var(--text);
+      padding: 40px 20px 80px;
+    }
+
+    .wrapper {
+      max-width: 920px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Accordion header ─────────────────────── */
+    .accordion-header {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px 16px 0 0;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .accordion-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .accordion-title {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #16a34a;
+    }
+
+    .score-badge {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: var(--accent-50);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    /* ── Accordion body ───────────────────────── */
+    .accordion-body {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      padding: 24px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* ── Insight banner ───────────────────────── */
+    .insight-banner {
+      display: flex;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--accent-50);
+      border-radius: 12px;
+      border: 1px solid var(--accent-100);
+      font-size: 14px;
+      color: #3d2b7a;
+      line-height: 1.6;
+    }
+
+    .insight-icon { flex-shrink: 0; margin-top: 2px; }
+
+    /* ── Section heading ──────────────────────── */
+    .section-heading { margin-bottom: 14px; }
+    .section-heading h3 { font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 3px; }
+    .section-heading p  { font-size: 13px; color: var(--muted); }
+
+    /* ── Fit cards grid ───────────────────────── */
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .fit-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Single fit card ──────────────────────── */
+    .fit-card {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .fit-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+    .fit-card-header {
+      padding: 16px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .fit-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .fit-card-axis {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .match-badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .match-badge.match_perfecto, .match-badge.match_fuerte {
+      background: var(--positive-50);
+      color: var(--positive-600);
+    }
+    .match-badge.gap_menor {
+      background: var(--warning-100);
+      color: var(--warning-700);
+    }
+    .match-badge.gap_detectado {
+      background: var(--danger-100);
+      color: var(--danger-700);
+    }
+
+    /* Bar */
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .bar-candidate { color: var(--accent); }
+    .bar-ideal     { color: #afaeb0; }
+
+    .bar-track {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent-100);
+      overflow: visible;
+    }
+    .bar-fill {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    .bar-ideal-marker {
+      position: absolute;
+      top: -1px;
+      width: 2px;
+      height: 10px;
+      background: #afaeb0;
+      border-radius: 1px;
+      transform: translateX(-50%);
+    }
+
+    .fit-card-summary {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Toggle button */
+    .fit-card-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+
+    /* Expanded detail */
+    .fit-card-detail {
+      border-top: 1px solid #f0eefe;
+      padding: 14px 20px 16px;
+      background: var(--accent-50);
+      font-size: 13px;
+      color: #3d2b7a;
+      line-height: 1.65;
+      display: none;
+    }
+    .fit-card-detail.open { display: block; }
+
+    /* ── Radar container ──────────────────────── */
+    .radar-container {
+      padding: 32px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--accent-100);
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .radar-svg-wrap {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .prima-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 20px;
+      align-items: center;
+      justify-content: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #434245;
+    }
+    .legend-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Veredicto ────────────────────────────── */
+    .veredicto-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .veredicto-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .veredicto-icon { flex-shrink: 0; margin-top: 2px; }
+    .veredicto-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .veredicto-body  { font-size: 14px; color: #434245; line-height: 1.65; }
+
+    /* ── Preguntas ────────────────────────────── */
+    .preguntas-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .preguntas-title   { font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 3px; }
+    .preguntas-subtitle{ font-size: 13px; color: var(--muted); }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      color: #434245;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--accent-50); border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { background: var(--positive-50); border-color: var(--positive-200); color: var(--positive-600); }
+
+    .preguntas-list { display: flex; flex-direction: column; gap: 12px; }
+    .pregunta-card {
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--accent-100);
+      background: #ffffff;
+      display: flex;
+      gap: 12px;
+    }
+    .pregunta-icon { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+
+    .pregunta-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .pregunta-number {
+      font-size: 11px; font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .pregunta-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-100);
+      color: #6a3fbb;
+      font-size: 11px; font-weight: 600;
+    }
+    .pregunta-text {
+      font-size: 14px; font-weight: 500; color: #3d2b7a;
+      line-height: 1.55; margin-bottom: 6px;
+    }
+    .pregunta-validates { font-size: 12px; color: #8a7bbf; }
+    .pregunta-validates strong { font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── Accordion header ──────────────────── -->
+  <div class="accordion-header" onclick="toggleBody()">
+    <div class="accordion-left">
+      <div class="accordion-title">
+        <span>4.</span>
+        <span>Prueba Psicológica</span>
+      </div>
+      <div class="status-chip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#16a34a" stroke-width="1.5"/>
+          <path d="M5 8.5L7 10.5L11 6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Continúa
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="score-badge">84</div>
+      <svg id="chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" style="transition:transform 0.2s;transform:rotate(180deg);">
+        <path d="M5 8L10 13L15 8" stroke="#6b6a6e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── Accordion body ────────────────────── -->
+  <div class="accordion-body" id="accordion-body">
+
+    <!-- Insight banner -->
+    <div class="insight-banner">
+      <svg class="insight-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="#8750f6" stroke-width="1.5"/>
+        <path d="M8 5V8M8 11H8.01" stroke="#8750f6" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Perfil con alta Propulsión y Autonomía, alineado con ejes críticos del rol. Brecha menor en Impronta manejable con onboarding estructurado.
+    </div>
+
+    <!-- ── 1. FIT CON EL ROL ────────────────── -->
+    <div>
+      <div class="section-heading">
+        <h3>Fit con el Rol</h3>
+        <p>Derivado del RCP — no es un perfil genérico</p>
+      </div>
+
+      <div class="fit-grid">
+
+        <!-- CARD 1 — Match fuerte -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Autonomía en campo</span>
+              <span class="match-badge match_fuerte">Match fuerte</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 85</span>
+                <span class="bar-ideal">Ideal: 82</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:85%;"></div>
+                <div class="bar-ideal-marker" style="left:82%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Autonomía operativa alineada con la autonomía de campo crítica del rol.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            El candidato toma decisiones técnicas sin validación constante y resuelve problemas en campo de forma independiente. El rol opera en territorio extenso sin soporte presencial donde escalar detiene la operación del cliente. Alineación directa en capacidad de operar sin supervisión y ownership en implementaciones complejas.
+          </div>
+        </div>
+
+        <!-- CARD 2 — Match perfecto -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Credibilidad técnica</span>
+              <span class="match-badge match_perfecto">Match perfecto</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 68</span>
+                <span class="bar-ideal">Ideal: 68</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:68%;"></div>
+                <div class="bar-ideal-marker" style="left:68%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Capacidad de explicar conceptos técnicos a audiencias médicas.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            Dominio técnico del producto suficiente para generar confianza en interlocutores clínicos. La credibilidad no depende solo del conocimiento sino de la capacidad de traducirlo al lenguaje del cliente.
+          </div>
+        </div>
+
+        <!-- CARD 3 — Match fuerte -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Orientación a resultados</span>
+              <span class="match-badge match_fuerte">Match fuerte</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 88</span>
+                <span class="bar-ideal">Ideal: 84</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:88%;"></div>
+                <div class="bar-ideal-marker" style="left:84%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Impulso constante hacia el cumplimiento y superación de metas.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            El candidato muestra un historial consistente de superación de metas en entornos de alta presión. Su orientación al logro está alineada con el modelo de compensación variable del rol y la dinámica de cuentas industriales de alto valor.
+          </div>
+        </div>
+
+        <!-- CARD 4 — Gap menor -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Drive comercial</span>
+              <span class="match-badge gap_menor">Gap menor</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 78</span>
+                <span class="bar-ideal">Ideal: 80</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:78%;"></div>
+                <div class="bar-ideal-marker" style="left:80%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Ownership en implementaciones alineado con modelo one-man show.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            Capacidad de identificar oportunidades de negocio durante la implementación y gestionar la relación con el cliente de forma autónoma. Perfil orientado a resultados con historial de cierre de oportunidades adicionales en cuentas activas.
+          </div>
+        </div>
+
+        <!-- CARD 5 — Gap menor -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Orientación a procesos</span>
+              <span class="match-badge gap_menor">Gap menor</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 68</span>
+                <span class="bar-ideal">Ideal: 72</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:68%;"></div>
+                <div class="bar-ideal-marker" style="left:72%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Ownership en implementaciones alineado con modelo one-man show.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            Capacidad de seguir protocolos establecidos de implementación y documentación técnica. El rol requiere adherencia a procesos regulatorios del sector salud y trazabilidad de acciones en campo.
+          </div>
+        </div>
+
+        <!-- CARD 6 — Gap detectado -->
+        <div class="fit-card">
+          <div class="fit-card-header">
+            <div class="fit-card-top">
+              <span class="fit-card-axis">Ritmo acelerado</span>
+              <span class="match-badge gap_detectado">Gap detectado</span>
+            </div>
+            <div>
+              <div class="bar-labels">
+                <span class="bar-candidate">Candidato: 42</span>
+                <span class="bar-ideal">Ideal: 50</span>
+              </div>
+              <div class="bar-track" style="margin-top:4px;">
+                <div class="bar-fill" style="width:42%;"></div>
+                <div class="bar-ideal-marker" style="left:50%;"></div>
+              </div>
+            </div>
+            <p class="fit-card-summary">Ritmo acelerado vs manejo de clientes pausados.</p>
+            <button class="fit-card-toggle" onclick="toggleCard(this)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Conocer detalle
+            </button>
+          </div>
+          <div class="fit-card-detail">
+            El eje evalúa la capacidad de modular el ritmo de trabajo según las necesidades del cliente. Un ritmo muy acelerado puede generar fricciones con stakeholders que requieren validación pausada y procesos formales de aprobación.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 2. RADAR DE COMPETENCIAS ──────────── -->
+    <div class="radar-container">
+      <div class="section-heading" style="margin-bottom:4px;">
+        <h3>Radar de competencias</h3>
+        <p>16 competencias derivadas de los 5 ejes PRIMA</p>
+      </div>
+
+      <div class="radar-svg-wrap">
+        <svg id="radar-svg" viewBox="0 0 460 460" style="width:100%;height:auto;overflow:visible;"></svg>
+      </div>
+
+      <!-- PRIMA legend -->
+      <div style="text-align:center;font-weight:800;font-size:13px;color:#434245;margin-bottom:4px;">Leyenda de ejes:</div>
+      <div class="prima-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#fad4cc;"></div>P (Propulsión)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fcefc5;"></div>R (Resonancia)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c8ecd9;"></div>I (Impronta)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b8e8e4;"></div>M (Método)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c6e8f3;"></div>A (Autonomía)</div>
+      </div>
+    </div>
+
+    <!-- ── 3. VEREDICTO CONDUCTUAL ─────────── -->
+    <div>
+      <div class="section-heading">
+        <h3>Veredicto conductual</h3>
+      </div>
+      <div class="veredicto-list">
+        <div class="veredicto-item">
+          <svg class="veredicto-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#22c55e" stroke-width="1.5"/>
+            <path d="M5 8.5L7 10.5L11 6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p class="veredicto-title">Quién es conductualmente</p>
+            <p class="veredicto-body">Este candidato muestra un perfil de alta autonomía y orientación a la acción. Opera con iniciativa propia, toma decisiones sin validación constante, y prioriza la velocidad de ejecución sobre el análisis exhaustivo. Su estilo natural es resolver problemas técnicos de forma independiente, con un ritmo acelerado que puede generar tensión en contextos donde se requiere validación pausada o coordinación detallada con stakeholders.</p>
+          </div>
+        </div>
+        <div class="veredicto-item">
+          <svg class="veredicto-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#22c55e" stroke-width="1.5"/>
+            <path d="M5 8.5L7 10.5L11 6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p class="veredicto-title">Fit con este rol específico</p>
+            <p class="veredicto-body">El RCP definió autonomía de campo y toma de decisiones sin supervisión como non_negotiables — este candidato los cumple de forma sobresaliente. Los ejes críticos del cargo (Propulsión y Autonomía) están fuertemente alineados. En entrevista HM se confirmó: "Resuelve sin escalar, ownership claro en implementaciones previas". La brecha en Impronta (ritmo acelerado vs clientes pausados) no afecta los requerimientos core del rol, pero requiere atención en onboarding para evitar fricciones con stakeholders senior o procesos formales de validación.</p>
+          </div>
+        </div>
+        <div class="veredicto-item">
+          <svg class="veredicto-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#22c55e" stroke-width="1.5"/>
+            <path d="M5 8.5L7 10.5L11 6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p class="veredicto-title">Recomendación de gestión</p>
+            <p class="veredicto-body">El eje de Impronta (ritmo acelerado vs clientes pausados) no afecta los requerimientos core del rol, pero requiere atención en onboarding. Sugerimos acompañamiento en los primeros 60 días con foco en gestión de tiempos de validación del cliente y escalamiento adecuado en situaciones de alta complejidad regulatoria.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. PREGUNTAS PARA EXPLORAR ─────── -->
+    <div>
+      <div class="preguntas-header">
+        <div>
+          <p class="preguntas-title">Preguntas para explorar</p>
+          <p class="preguntas-subtitle">Para validar en próximas etapas</p>
+        </div>
+        <button class="copy-btn" id="copy-btn" onclick="copyPreguntas()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 9.5V2.5A1 1 0 013 1.5h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Copiar preguntas
+        </button>
+      </div>
+      <div class="preguntas-list">
+        <div class="pregunta-card">
+          <svg class="pregunta-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5A1.5 1.5 0 013.5 2h9A1.5 1.5 0 0114 3.5v6A1.5 1.5 0 0112.5 11H9l-3 2.5V11H3.5A1.5 1.5 0 012 9.5v-6z" stroke="#8750f6" stroke-width="1.3"/></svg>
+          <div>
+            <div class="pregunta-meta">
+              <span class="pregunta-number">Pregunta 1</span>
+              <span class="pregunta-tag">Para: HR</span>
+            </div>
+            <p class="pregunta-text">"Cuéntame de una implementación que tomó más tiempo del esperado — ¿cómo manejaste la frustración y adaptaste tu ritmo?"</p>
+            <p class="pregunta-validates">Valida eje: <strong>I (Impronta)</strong></p>
+          </div>
+        </div>
+        <div class="pregunta-card">
+          <svg class="pregunta-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5A1.5 1.5 0 013.5 2h9A1.5 1.5 0 0114 3.5v6A1.5 1.5 0 0112.5 11H9l-3 2.5V11H3.5A1.5 1.5 0 012 9.5v-6z" stroke="#8750f6" stroke-width="1.3"/></svg>
+          <div>
+            <div class="pregunta-meta">
+              <span class="pregunta-number">Pregunta 2</span>
+              <span class="pregunta-tag">Para: HM</span>
+            </div>
+            <p class="pregunta-text">"Dame un ejemplo donde tuviste que adaptar tu ritmo a un cliente muy pausado o meticuloso en sus validaciones"</p>
+            <p class="pregunta-validates">Valida eje: <strong>I + R</strong></p>
+          </div>
+        </div>
+        <div class="pregunta-card">
+          <svg class="pregunta-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5A1.5 1.5 0 013.5 2h9A1.5 1.5 0 0114 3.5v6A1.5 1.5 0 0112.5 11H9l-3 2.5V11H3.5A1.5 1.5 0 012 9.5v-6z" stroke="#8750f6" stroke-width="1.3"/></svg>
+          <div>
+            <div class="pregunta-meta">
+              <span class="pregunta-number">Pregunta 3</span>
+              <span class="pregunta-tag">Para: HM</span>
+            </div>
+            <p class="pregunta-text">"¿Cómo prioriza cuando tienes múltiples implementaciones críticas al mismo tiempo y un cliente requiere más atención de lo esperado?"</p>
+            <p class="pregunta-validates">Valida eje: <strong>A + P</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /accordion-body -->
+</div><!-- /wrapper -->
+
+<script>
+  // ── Accordion toggle ─────────────────────────
+  function toggleBody() {
+    const body    = document.getElementById('accordion-body');
+    const chevron = document.getElementById('chevron');
+    const open    = body.style.display !== 'none';
+    body.style.display    = open ? 'none' : '';
+    chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  // ── Fit card expand ──────────────────────────
+  function toggleCard(btn) {
+    const detail = btn.closest('.fit-card').querySelector('.fit-card-detail');
+    const isOpen = detail.classList.toggle('open');
+    const arrow  = btn.querySelector('svg');
+    btn.lastChild.textContent = isOpen ? ' Ocultar detalle' : ' Conocer detalle';
+    arrow.style.transform = isOpen ? 'rotate(180deg)' : '';
+  }
+
+  // ── Copy preguntas ───────────────────────────
+  function copyPreguntas() {
+    const text = [
+      '1. "Cuéntame de una implementación que tomó más tiempo del esperado — ¿cómo manejaste la frustración y adaptaste tu ritmo?"\n   Valida eje: I (Impronta)',
+      '2. "Dame un ejemplo donde tuviste que adaptar tu ritmo a un cliente muy pausado o meticuloso en sus validaciones"\n   Valida eje: I + R',
+      '3. "¿Cómo prioriza cuando tienes múltiples implementaciones críticas al mismo tiempo y un cliente requiere más atención de lo esperado?"\n   Valida eje: A + P',
+    ].join('\n\n');
+    navigator.clipboard.writeText(text);
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copiado`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 9.5V2.5A1 1 0 013 1.5h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copiar preguntas`;
+    }, 2000);
+  }
+
+  // ── Radar chart (SVG, drawn via JS) ─────────
+  (function buildRadar() {
+    const svg  = document.getElementById('radar-svg');
+    const size = 460, cx = 230, cy = 230, R = 165, arcR = R * 1.18, arcW = R * 0.10;
+    const innerR = arcR - arcW;
+
+    const points = [
+      { label: 'Iniciativa',          value: 74 },
+      { label: 'Agente cambio',       value: 82 },
+      { label: 'Proactividad',        value: 75 },
+      { label: 'Inteligencia Social', value: 70 },
+      { label: 'Influencia',          value: 68 },
+      { label: 'Actitud de servicio', value: 65 },
+      { label: 'Autonomía',           value: 85 },
+      { label: 'Agilidad',            value: 80 },
+      { label: 'Mentoreo',            value: 78 },
+      { label: 'Empatía',             value: 55 },
+      { label: 'Disponibilidad',      value: 42 },
+      { label: 'Atención Activa',     value: 45 },
+      { label: 'Precisión',           value: 72 },
+      { label: 'Excelencia técnica',  value: 75 },
+      { label: 'P. Analítico',        value: 68 },
+      { label: 'Implementación',      value: 70 },
+    ];
+
+    const segColors = [
+      '#fad4cc','#fad4cc','#fad4cc',
+      '#fcefc5','#fcefc5','#fcefc5',
+      '#c8ecd9','#c8ecd9','#c8ecd9',
+      '#b8e8e4','#b8e8e4','#b8e8e4','#b8e8e4',
+      '#c6e8f3','#c6e8f3','#c6e8f3',
+    ];
+
+    const n = points.length;
+    const angle = (i) => (2 * Math.PI * i) / n - Math.PI / 2;
+    const sliceA = (2 * Math.PI) / n;
+
+    const vx = (i, r) => cx + r * Math.cos(angle(i));
+    const vy = (i, r) => cy + r * Math.sin(angle(i));
+
+    function ns(tag, attrs = {}) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      return el;
+    }
+
+    // Outer arc segments
+    points.forEach((_, i) => {
+      const a1 = angle(i) - sliceA / 2, a2 = angle(i) + sliceA / 2;
+      const d = `M ${(cx + arcR * Math.cos(a1)).toFixed(1)} ${(cy + arcR * Math.sin(a1)).toFixed(1)} A ${arcR} ${arcR} 0 0 1 ${(cx + arcR * Math.cos(a2)).toFixed(1)} ${(cy + arcR * Math.sin(a2)).toFixed(1)} L ${(cx + innerR * Math.cos(a2)).toFixed(1)} ${(cy + innerR * Math.sin(a2)).toFixed(1)} A ${innerR} ${innerR} 0 0 0 ${(cx + innerR * Math.cos(a1)).toFixed(1)} ${(cy + innerR * Math.sin(a1)).toFixed(1)} Z`;
+      svg.appendChild(ns('path', { d, fill: segColors[i], opacity: '0.9' }));
+    });
+
+    // Grid polygons
+    [0.2, 0.4, 0.6, 0.8, 1.0].forEach((lvl, gi) => {
+      const pts = Array.from({ length: n }, (_, i) => `${i === 0 ? 'M' : 'L'} ${vx(i, R * lvl).toFixed(1)} ${vy(i, R * lvl).toFixed(1)}`).join(' ') + ' Z';
+      svg.appendChild(ns('path', { d: pts, fill: gi === 4 ? 'rgba(0,0,0,0.025)' : 'none', stroke: '#d8d8d8', 'stroke-width': '0.8' }));
+    });
+
+    // Axis lines
+    Array.from({ length: n }, (_, i) => {
+      const line = ns('line', { x1: cx, y1: cy, x2: vx(i, R).toFixed(1), y2: vy(i, R).toFixed(1), stroke: '#d8d8d8', 'stroke-width': '0.8' });
+      svg.appendChild(line);
+    });
+
+    // Candidate polygon
+    const candPts = points.map((p, i) => ({ x: vx(i, (p.value / 100) * R), y: vy(i, (p.value / 100) * R) }));
+    const candPath = candPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ' Z';
+
+    svg.appendChild(ns('path', { d: candPath, fill: 'rgba(60,60,60,0.07)' }));
+    svg.appendChild(ns('path', { d: candPath, fill: 'none', stroke: '#555', 'stroke-width': '1.5', 'stroke-linejoin': 'round' }));
+
+    // Vertex dots
+    candPts.forEach((p) => {
+      svg.appendChild(ns('circle', { cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: '3.5', fill: '#555' }));
+    });
+
+    // Labels
+    const labelR = arcR + 14;
+    points.forEach((p, i) => {
+      const a = angle(i);
+      const lx = cx + labelR * Math.cos(a), ly = cy + labelR * Math.sin(a);
+      const anchor = Math.abs(Math.cos(a)) < 0.15 ? 'middle' : Math.cos(a) > 0 ? 'start' : 'end';
+
+      const tName = ns('text', { x: lx.toFixed(1), y: (ly - 7).toFixed(1), 'text-anchor': anchor, 'dominant-baseline': 'middle', 'font-size': '11', 'font-family': "'Plus Jakarta Sans',sans-serif", fill: '#252432', 'font-weight': '600' });
+      tName.textContent = p.label;
+      svg.appendChild(tName);
+
+      const tVal = ns('text', { x: lx.toFixed(1), y: (ly + 8).toFixed(1), 'text-anchor': anchor, 'dominant-baseline': 'middle', 'font-size': '12', 'font-family': "'Plus Jakarta Sans',sans-serif", fill: '#afaeb0', 'font-weight': '500' });
+      tVal.textContent = p.value;
+      svg.appendChild(tVal);
+    });
+  })();
+</script>
+</body>
+</html>

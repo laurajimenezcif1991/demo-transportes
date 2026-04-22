@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guía de Demo — Unio B2B</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f8;
+      color: #1a1a2e;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 40px auto 60px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #1a1a2e;
+      padding: 44px 52px 36px;
+      color: #fff;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .logo-dot {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #8750F6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: #fff;
+    }
+    .header h1 {
+      font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .header .subtitle {
+      font-size: 13px; color: #a78bfa; font-weight: 500;
+      margin-top: 2px;
+    }
+    .header-desc {
+      font-size: 13px; color: #94a3b8;
+      max-width: 560px; line-height: 1.7;
+      margin-top: 16px;
+    }
+
+    /* ── Body ── */
+    .body { padding: 44px 52px; display: flex; flex-direction: column; gap: 36px; }
+
+    /* ── Section ── */
+    .section {}
+    .section-label {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: #8750F6; color: #fff;
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 15px; font-weight: 700; color: #1a1a2e;
+    }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 14px; }
+    .step {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: #f8f7ff; border-radius: 10px; padding: 14px 16px;
+      border-left: 3px solid #8750F6;
+    }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #8750F6; color: #fff;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-weight: 700; color: #1a1a2e; margin-bottom: 4px; font-size: 13px; }
+    .step-body { color: #475569; font-size: 12px; line-height: 1.7; }
+    .step-body strong { color: #1a1a2e; }
+
+    /* ── Code ── */
+    code, pre {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #1a1a2e;
+      color: #a78bfa;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    code { padding: 2px 7px; }
+    pre {
+      padding: 12px 16px;
+      margin: 8px 0;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+    pre .hl { color: #a78bfa; font-weight: 600; }
+    pre .dim { color: #64748b; }
+
+    /* ── Table ── */
+    .vacantes-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .vacantes-table th {
+      background: #1a1a2e; color: #a78bfa;
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .vacantes-table th:first-child { border-radius: 8px 0 0 0; }
+    .vacantes-table th:last-child  { border-radius: 0 8px 0 0; }
+    .vacantes-table td {
+      padding: 10px 14px; border-bottom: 1px solid #f1f0f9;
+      color: #334155; vertical-align: top;
+    }
+    .vacantes-table tr:last-child td { border-bottom: none; }
+    .vacantes-table tr:nth-child(even) td { background: #faf9ff; }
+    .badge {
+      display: inline-block;
+      background: #ede9fe; color: #6d28d9;
+      padding: 2px 9px; border-radius: 100px;
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* ── Script bullets ── */
+    .script { display: flex; flex-direction: column; gap: 10px; }
+    .script-item {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .script-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #8750F6; flex-shrink: 0; margin-top: 5px;
+    }
+    .script-text { flex: 1; color: #334155; font-size: 12.5px; line-height: 1.7; }
+    .script-text strong { color: #1a1a2e; }
+
+    /* ── Info boxes ── */
+    .info-box {
+      background: #f0fdf4; border-left: 3px solid #22c55e;
+      border-radius: 8px; padding: 12px 16px;
+      font-size: 12px; color: #166534; margin-top: 10px;
+    }
+    .warn-box {
+      background: #fff7ed; border-left: 3px solid #f97316;
+      border-radius: 8px; padding: 12px 16px;
+      font-size: 12px; color: #9a3412; margin-top: 10px;
+    }
+    .warn-box strong, .info-box strong { font-weight: 700; }
+
+    /* ── FAQ ── */
+    .faq { display: flex; flex-direction: column; gap: 14px; }
+    .faq-item { border: 1px solid #ede9fe; border-radius: 10px; overflow: hidden; }
+    .faq-q { background: #f8f7ff; padding: 12px 16px; font-weight: 600; color: #1a1a2e; font-size: 12.5px; }
+    .faq-a { padding: 12px 16px; color: #475569; font-size: 12px; line-height: 1.7; border-top: 1px solid #ede9fe; }
+    .faq-a code { background: #f1f0f9; color: #6d28d9; }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid #f1f0f9; margin: 0; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f8f7ff; border-top: 1px solid #ede9fe;
+      padding: 18px 52px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer span { font-size: 11px; color: #94a3b8; }
+    .footer-logo { font-size: 13px; font-weight: 800; color: #8750F6; letter-spacing: -0.3px; }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .page { box-shadow: none; margin: 0; border-radius: 0; max-width: 100%; }
+      .print-hide { display: none; }
+    }
+
+    /* ── Print button (screen only) ── */
+    .print-btn {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #8750F6; color: #fff;
+      border: none; border-radius: 12px;
+      padding: 12px 22px; font-size: 13px; font-weight: 600;
+      cursor: pointer; box-shadow: 0 4px 20px rgba(135,80,246,0.35);
+      display: flex; align-items: center; gap: 8px;
+      font-family: inherit;
+    }
+    .print-btn:hover { background: #7c3aed; }
+    @media print { .print-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-dot">U</div>
+      <div>
+        <h1>Guía de Demo — Unio B2B</h1>
+        <div class="subtitle">Para uso interno del equipo · Versión local en Windows</div>
+      </div>
+    </div>
+    <p class="header-desc">
+      Esta guía explica cómo instalar y correr la app de Unio en modo demo en un computador Windows desde cero,
+      y cómo realizar una presentación completa del pipeline a empresas clientes.
+    </p>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Sección 1: Instalación -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">1</div>
+        <div class="section-title">Preparación inicial <span style="font-weight:400;color:#64748b;font-size:13px">(solo la primera vez)</span></div>
+      </div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Instalar Node.js</div>
+            <div class="step-body">
+              Ve a <strong>nodejs.org</strong> en el navegador. Descarga el instalador con la etiqueta <strong>LTS</strong>.
+              Abre el archivo <code>.msi</code> y sigue el asistente (siguiente → siguiente → instalar).
+              Cuando termine, <strong>reinicia el computador</strong>.<br><br>
+              Para verificar, abre la terminal y escribe:
+              <pre><span class="hl">node --version</span>   <span class="dim"># debe mostrar algo como v20.x.x</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Abrir la terminal de Windows</div>
+            <div class="step-body">
+              Busca <strong>PowerShell</strong> en el menú Inicio → clic derecho → <strong>Ejecutar como administrador</strong>.<br>
+              <em>Alternativa:</em> presiona <code>Windows + R</code>, escribe <code>cmd</code> y Enter.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Descomprimir el .zip del proyecto</div>
+            <div class="step-body">
+              Haz clic derecho sobre el archivo <code>unio-demo.zip</code> → <strong>Extraer todo...</strong> →
+              elige una carpeta fácil de encontrar, por ejemplo:<br>
+              <code>C:\Users\TuNombre\Desktop\unio-demo</code><br><br>
+              Dentro de esa carpeta debe aparecer una subcarpeta llamada <strong>unio-app</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Navegar a la carpeta en la terminal</div>
+            <div class="step-body">
+              En la terminal, escribe el siguiente comando con la ruta donde descomprimiste el zip:
+              <pre><span class="hl">cd C:\Users\TuNombre\Desktop\unio-demo\unio-app</span></pre>
+              <strong>Tip:</strong> puedes arrastrar la carpeta <code>unio-app</code> desde el Explorador
+              de archivos directamente a la ventana de la terminal — escribirá la ruta sola. Luego presiona Enter.<br><br>
+              Para confirmar, escribe <code>dir</code> y Enter. Debes ver archivos como <code>package.json</code>.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Instalar las dependencias</div>
+            <div class="step-body">
+              <pre><span class="hl">npm install</span>   <span class="dim"># puede tardar 1–3 minutos, espera hasta que vuelva el cursor</span></pre>
+              Este paso solo es necesario la primera vez.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 2: Levantar la app -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">2</div>
+        <div class="section-title">Levantar la app <span style="font-weight:400;color:#64748b;font-size:13px">(cada vez que hagas demo)</span></div>
+      </div>
+      <p style="color:#475569;margin-bottom:12px">Con la terminal abierta y ubicada en la carpeta <code>unio-app</code>, corre:</p>
+      <pre><span class="hl">npm run dev</span></pre>
+      <p style="color:#475569;margin-top:10px;margin-bottom:10px">La terminal mostrará:</p>
+      <pre><span class="dim">  VITE v5.x  ready in xxx ms</span>
+  ➜  Local:   <span class="hl">http://localhost:5173/</span></pre>
+      <p style="color:#475569;margin-top:10px">Abre <strong>Chrome o Edge</strong>, escribe <code>http://localhost:5173</code> en la barra de direcciones y presiona Enter.</p>
+      <div class="warn-box"><strong>Importante:</strong> mantén la terminal abierta durante toda la demo. Si la cierras, la app deja de funcionar.</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 3: Vacantes -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">3</div>
+        <div class="section-title">Las 5 vacantes demo</div>
+      </div>
+      <p style="color:#475569;margin-bottom:14px">Todas aparecen en la pantalla de inicio <strong>"Tus vacantes"</strong>. Cada una cubre una etapa distinta del pipeline.</p>
+      <table class="vacantes-table">
+        <thead>
+          <tr>
+            <th>Vacante</th>
+            <th>Etapa activa</th>
+            <th>Candidatos</th>
+            <th>Qué mostrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Recepcionista</strong></td>
+            <td><span class="badge">Scoring IA</span></td>
+            <td>15</td>
+            <td>Semáforo de resultados, no negociables, hoja de vida</td>
+          </tr>
+          <tr>
+            <td><strong>Auxiliar de Bodega</strong></td>
+            <td><span class="badge">Pre-screening IA</span></td>
+            <td>15</td>
+            <td>Entrevista IA, resumen generado, análisis de perfil</td>
+          </tr>
+          <tr>
+            <td><strong>Analista de TH</strong></td>
+            <td><span class="badge">Entrevistas</span></td>
+            <td>10</td>
+            <td>Formularios de entrevista, notas del evaluador</td>
+          </tr>
+          <tr>
+            <td><strong>Jefe de Finanzas</strong></td>
+            <td><span class="badge">Evaluaciones</span></td>
+            <td>6</td>
+            <td>Prueba psicológica, radar de competencias, prueba técnica</td>
+          </tr>
+          <tr>
+            <td><strong>Gerente de Ventas</strong></td>
+            <td><span class="badge">Finalistas</span></td>
+            <td>3</td>
+            <td>Grid comparativo de finalistas, scorecard completo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 4: Guión -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">4</div>
+        <div class="section-title">Guión de demo recomendado <span style="font-weight:400;color:#64748b;font-size:13px">(15–20 min)</span></div>
+      </div>
+      <div class="script">
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Dashboard:</strong> señala las 5 vacantes, el progreso por etapa y los indicadores generales.</div>
+        </div>
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Recepcionista → Scoring IA:</strong> muestra el semáforo de candidatos. Abre un perfil y señala no negociables, logros y señales por validar. Haz clic en <strong>Hoja de vida</strong> — se abre en pestaña nueva como un documento real.</div>
+        </div>
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Auxiliar de Bodega → Pre-screening IA:</strong> muestra cómo la IA entrevistó a los candidatos. Abre un perfil y despliega el acordeón de Pre-entrevista IA.</div>
+        </div>
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Analista de TH → Entrevistas:</strong> muestra formularios con respuestas del candidato. Señala la progresión del embudo (menos candidatos que en etapas anteriores).</div>
+        </div>
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Jefe de Finanzas → Evaluaciones:</strong> despliega la prueba psicológica (radar, veredicto, gaps). Señala quiénes contestaron la prueba técnica y quiénes no. <strong>Demo interactiva:</strong> selecciona 3 candidatos → "Pasar etapa" → Finalistas se desbloquea en tiempo real.</div>
+        </div>
+        <div class="script-item">
+          <div class="script-dot"></div>
+          <div class="script-text"><strong>Gerente de Ventas → Finalistas:</strong> muestra el grid comparativo de los 3 finalistas. Abre el perfil de uno y recorre todos los acordeones (scoring → prescreening → entrevistas → psico → técnica).</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 5: Pasar etapa -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">5</div>
+        <div class="section-title">Función "Pasar etapa" — demo interactiva</div>
+      </div>
+      <p style="color:#475569;margin-bottom:14px">La función más impactante para mostrar en vivo. Úsala en <strong>Jefe de Finanzas → Evaluaciones</strong>:</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-body">Selecciona <strong>exactamente 3 candidatos</strong> usando los checkbox de la izquierda.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-body">Haz clic en el botón <strong>"Pasar etapa"</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-body">Los candidatos aparecen en Finalistas con el chip <strong>"Pendiente"</strong> en gris.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-body">El sidebar izquierdo desbloquea <strong>Finalistas</strong> automáticamente. Navega ahí para mostrar la vista comparativa.</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box"><strong>Tip:</strong> si seleccionas menos de 3 o más de 3, aparece un modal explicativo. Es parte del flujo — muéstralo para reforzar la lógica de negocio.</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 6: Resetear -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">6</div>
+        <div class="section-title">Resetear la demo</div>
+      </div>
+      <p style="color:#475569;margin-bottom:14px">Para volver al estado inicial antes de una nueva demo:</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content"><div class="step-body">En Chrome o Edge, presiona <code>F12</code> para abrir las herramientas de desarrollo.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content"><div class="step-body">Ve a la pestaña <strong>Application</strong> (si no la ves, haz clic en <code>»</code>). Luego en el panel izquierdo: <strong>Local Storage → http://localhost:5173</strong>.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content"><div class="step-body">Elimina todas las entradas que comiencen con <code>mock_stage_</code> (clic derecho → Delete).</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content"><div class="step-body">Recarga la página con <code>F5</code>. Todo vuelve al estado original.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sección 7: FAQ -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-num">7</div>
+        <div class="section-title">Preguntas frecuentes</div>
+      </div>
+      <div class="faq">
+        <div class="faq-item">
+          <div class="faq-q">¿Necesito internet para la demo?</div>
+          <div class="faq-a">No. Una vez que corriste <code>npm install</code> por primera vez, todo funciona sin conexión. Solo necesitas la terminal abierta.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">¿Los datos son reales?</div>
+          <div class="faq-a">No. Todos los candidatos, vacantes y empresas son completamente ficticios e inventados para propósitos de presentación.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">¿Puedo hacer la demo desde proyector o pantalla externa?</div>
+          <div class="faq-a">Sí. Conecta el proyector antes de abrir el navegador y usa <code>localhost:5173</code> en pantalla completa (<code>F11</code>).</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">¿Qué hago si npm install da error de permisos?</div>
+          <div class="faq-a">Cierra la terminal, ábrela de nuevo con clic derecho → <strong>Ejecutar como administrador</strong> y repite el comando.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">La app no carga o da error, ¿qué hago?</div>
+          <div class="faq-a">Verifica que la terminal esté abierta y muestre el mensaje de Vite. Si no, navega a la carpeta <code>unio-app</code> con <code>cd</code> y corre <code>npm run dev</code> de nuevo. Para recargar forzado usa <code>Ctrl + Shift + R</code>.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">El cliente pregunta por una funcionalidad que no está en demo, ¿qué hago?</div>
+          <div class="faq-a">Toma nota y avísale al equipo. No improvises mostrando rutas fuera del flujo de las 5 vacantes demo.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Guía de uso interno · equipo Unio · Abril 2025</span>
+    <span class="footer-logo">unio</span>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Botón imprimir/guardar PDF -->
+<button class="print-btn print-hide" onclick="window.print()">
+  &#x1F4BE; Guardar como PDF
+</button>
+
+</body>
+</html>
