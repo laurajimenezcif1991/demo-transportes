@@ -782,33 +782,37 @@ export default function CandidateOnepage() {
               Lanzar pre-entrevista
             </button>
           )}
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => {
-              setStatus(candidateId, stage, 'continua');
-              const idx = ONEPAGE_PIPELINE_STAGES.indexOf(stage);
-              if (idx >= 0 && idx < ONEPAGE_PIPELINE_STAGES.length - 1) {
-                const next = ONEPAGE_PIPELINE_STAGES[idx + 1];
-                navigate(`/pipeline/${jobId}/candidate/${candidateId}?stage=${next}`, { replace: true });
-              }
-              showToast('¡Candidato marcado como Continúa!');
-            }}
-          >
-            <CheckCircle2 size={16} />
-            Pasar etapa
-          </Button>
-          <Button
-            variant="ghost"
-            size="md"
-            onClick={() => {
-              setStatus(candidateId, stage, 'por_validar');
-              showToast('¡Marcado como pendiente!');
-            }}
-          >
-            <HelpCircle size={16} />
-            Marcar pendiente
-          </Button>
+          {stage !== 'scoring' && (
+            <>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  setStatus(candidateId, stage, 'continua');
+                  const idx = ONEPAGE_PIPELINE_STAGES.indexOf(stage);
+                  if (idx >= 0 && idx < ONEPAGE_PIPELINE_STAGES.length - 1) {
+                    const next = ONEPAGE_PIPELINE_STAGES[idx + 1];
+                    navigate(`/pipeline/${jobId}/candidate/${candidateId}?stage=${next}`, { replace: true });
+                  }
+                  showToast('¡Candidato marcado como Continúa!');
+                }}
+              >
+                <CheckCircle2 size={16} />
+                Pasar etapa
+              </Button>
+              <Button
+                variant="ghost"
+                size="md"
+                onClick={() => {
+                  setStatus(candidateId, stage, 'por_validar');
+                  showToast('¡Marcado como pendiente!');
+                }}
+              >
+                <HelpCircle size={16} />
+                Marcar pendiente
+              </Button>
+            </>
+          )}
           <Button
             variant="danger-outline"
             size="md"
