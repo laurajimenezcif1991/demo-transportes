@@ -465,14 +465,16 @@ export default function CandidateList() {
               Iniciar pre-entrevista IA
             </button>
           )}
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => handleBulkAction('pasar')}
-          >
-            <CheckCircle2 size={18} />
-            Pasar etapa
-          </Button>
+          {currentStage !== 'scoring' && (
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => handleBulkAction('pasar')}
+            >
+              <CheckCircle2 size={18} />
+              Pasar etapa
+            </Button>
+          )}
           <Button
             variant="danger-outline"
             size="lg"
