@@ -11,6 +11,18 @@ _Sin cambios pendientes._
 
 ---
 
+## [pendiente] — 11 May 2026
+
+### Vacantes reales Comfandi
+- **`mock-comfandi.ts`** — Reemplazadas las 4 vacantes ficticias por 3 vacantes reales basadas en RCPs de Comfandi:
+  - **Gestor(a) Comercial Convenios y Alianzas Crédito** (Medellín, COP 6M, pipeline en Entrevistas)
+  - **Gestor(a) Calidad de Vida Crédito** (Cali, COP 4M, pipeline en Pre-screening IA)
+  - **Científico(a) Comportamental** (Bogotá, COP 6M, pipeline en Evaluaciones)
+- Cada vacante tiene 30 candidatos: 5 con perfil real completo (scoringAI, prescreeningAI, psychTest según etapa) y 25 shells en scoring para volumen de demo
+- VConfig diseñados con datos reales de cada RCP: no-negociables, logros, señales, empresas, preguntas de entrevista y ejes conductuales
+
+---
+
 ## [a58c5da] — 04 Abr 2026
 
 ### Datos mock para demos
