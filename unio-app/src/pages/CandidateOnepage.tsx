@@ -40,6 +40,7 @@ import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
 import PruebaTecnicaContent from '../components/ui/PruebaTecnicaContent';
 import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
+import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
 import {
   interviewData,
   type InterviewFeedback,
@@ -222,6 +223,7 @@ export default function CandidateOnepage() {
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
   const [pruebaTecnicaOpen, setPruebaTecnicaOpen] = useState(false);
   const [antecedentesOpen, setAntecedentesOpen] = useState(false);
+  const [waModalOpen, setWaModalOpen] = useState(false);
 
   const scoringSectionRef = useRef<HTMLDivElement>(null);
   const prescreeningSectionRef = useRef<HTMLDivElement>(null);
@@ -756,7 +758,23 @@ export default function CandidateOnepage() {
             Score: {candidate.score}/100
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Pre-entrevista WhatsApp: visible en etapa scoring */}
+          {stage === 'scoring' && (
+            <button
+              onClick={() => setWaModalOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '8px 16px', borderRadius: '10px',
+                background: '#25D366', border: 'none', cursor: 'pointer',
+                fontWeight: 700, fontSize: '13px', color: '#fff',
+                boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
+              }}
+            >
+              <WaIcon size={16} />
+              Lanzar pre-entrevista
+            </button>
+          )}
           <Button
             variant="primary"
             size="md"
@@ -802,6 +820,14 @@ export default function CandidateOnepage() {
         message={toastMessage}
         visible={toastVisible}
         onClose={() => setToastVisible(false)}
+      />
+
+      {/* WhatsApp pre-entrevista modal */}
+      <WhatsAppPreEntrevistaModal
+        isOpen={waModalOpen}
+        onClose={() => setWaModalOpen(false)}
+        candidates={candidate ? [candidate] : []}
+        jobTitle={candidate?.role}
       />
 
     </div>

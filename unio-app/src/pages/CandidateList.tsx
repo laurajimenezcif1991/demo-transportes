@@ -13,6 +13,7 @@ import { useCandidates } from '../hooks/useCandidates';
 import { useVacantes } from '../hooks/useVacantes';
 import { mockCandidatesByStage, mockCandidatesById } from '../data/mock';
 import { useMockStageState } from '../hooks/useMockStageState';
+import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
 
 type FilterTab = 'todos' | 'high' | 'mid' | 'low';
 
@@ -113,6 +114,10 @@ export default function CandidateList() {
   // Modals for finalist selection (evaluaciones stage)
   const [fewFinalistsModal, setFewFinalistsModal] = useState(false);
   const [manyFinalistsModal, setManyFinalistsModal] = useState(false);
+
+  // WhatsApp pre-entrevista modal
+  const [waModalOpen, setWaModalOpen] = useState(false);
+  const [waCandidates, setWaCandidates] = useState<typeof candidates>([]);
 
   const statusPriority = (id: string) => {
     const s = getStatus(id, currentStage);
@@ -439,7 +444,27 @@ export default function CandidateList() {
             {selected.size} candidato{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Pre-entrevista WhatsApp: solo en etapa scoring */}
+          {currentStage === 'scoring' && (
+            <button
+              onClick={() => {
+                const sel = filteredCandidates.filter(c => selected.has(c.id));
+                setWaCandidates(sel);
+                setWaModalOpen(true);
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 18px', borderRadius: '10px',
+                background: '#25D366', border: 'none', cursor: 'pointer',
+                fontWeight: 700, fontSize: '14px', color: '#fff',
+                boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
+              }}
+            >
+              <WaIcon size={18} />
+              Iniciar pre-entrevista IA
+            </button>
+          )}
           <Button
             variant="primary"
             size="lg"
@@ -458,6 +483,14 @@ export default function CandidateList() {
           </Button>
         </div>
       </WizardBar>
+
+      {/* WhatsApp pre-entrevista modal */}
+      <WhatsAppPreEntrevistaModal
+        isOpen={waModalOpen}
+        onClose={() => setWaModalOpen(false)}
+        candidates={waCandidates}
+        jobTitle={vacante?.title ?? 'la vacante'}
+      />
 
       <Toast
         message={toastMessage}

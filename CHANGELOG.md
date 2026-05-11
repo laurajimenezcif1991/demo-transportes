@@ -7,6 +7,15 @@
 
 ## [Sin commitear]
 
+### Simulación pre-entrevista IA por WhatsApp
+- **`WhatsAppPreEntrevistaModal.tsx`** (nuevo) — Modal de simulación de pre-entrevista estilo WhatsApp con Alex IA: vista de confirmación con lista de candidatos seleccionados, chat auto-play con indicador de escritura, 7 fases del guión adaptado (Apertura → Cierre), panel de progreso lateral y resultado final
+- **`CandidateList.tsx`** — Nuevo botón verde "Iniciar pre-entrevista IA" (icono WhatsApp) en el WizardBar de selección masiva, solo visible en etapa Scoring IA
+- **`CandidateOnepage.tsx`** — Nuevo botón "Lanzar pre-entrevista" en el WizardBar del perfil individual, visible en etapa Scoring
+
+---
+
+## [d92d607] — 11 May 2026
+
 ### Módulo "Pruebas" + Validación de Antecedentes en pipeline
 - **`Pipeline.tsx`, `mock.ts`, `mock-comfandi.ts`, `Sidebar.tsx`** — Renombrado el módulo/etapa "Evaluaciones" → "Pruebas" en todos los labels de display (el ID interno `evaluaciones` no cambia)
 - **`ValidacionAntecedentes.tsx`** (nuevo) — Componente con tabla de 10 fuentes de antecedentes (categorías Alto/Medio), score mock calculado automáticamente (–10 pts por Alto, –5 pts por Medio) y banner de riesgo color-coded
