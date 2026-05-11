@@ -26,6 +26,7 @@ import { CandidateStatusProvider } from './context/CandidateStatusContext';
 import { AuthProvider } from './context/AuthContext';
 import { InterviewProvider } from './context/InterviewContext';
 import { PipelineProvider } from './context/PipelineContext';
+import { WaPrescreeningProvider } from './context/WaPrescreeningContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
     <AuthProvider>
       <CandidateStatusProvider>
         <InterviewProvider>
+          <WaPrescreeningProvider>
           <PipelineProvider>
         <BrowserRouter>
           <Routes>
@@ -89,6 +91,7 @@ export default function App() {
           </Routes>
         </BrowserRouter>
           </PipelineProvider>
+          </WaPrescreeningProvider>
         </InterviewProvider>
       </CandidateStatusProvider>
     </AuthProvider>

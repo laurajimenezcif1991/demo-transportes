@@ -112,12 +112,13 @@ interface Props {
   onClose: () => void;
   candidates: Candidate[];
   jobTitle?: string;
+  onConfirmSend?: (candidates: Candidate[]) => void;
 }
 
 type View = 'confirm' | 'chat';
 
 // ─── Main Modal ────────────────────────────────────────────────────────────────
-export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates, jobTitle = 'la vacante' }: Props) {
+export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates, jobTitle = 'la vacante', onConfirmSend }: Props) {
   const [view, setView] = useState<View>('confirm');
   const [activeIdx, setActiveIdx] = useState(0);
   const [visibleMsgs, setVisibleMsgs] = useState<WaMsg[]>([]);
@@ -313,6 +314,7 @@ export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates
                 </div>
 
                 {/* CTA */}
+                {/* Botón 1: ver simulación del chat */}
                 <button
                   onClick={() => setView('chat')}
                   style={{
@@ -323,9 +325,27 @@ export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates
                   }}
                 >
                   <WaIcon size={22} color="white" />
-                  Iniciar simulación de pre-entrevista
+                  Ver simulación de la pre-entrevista
                   <ChevronRight size={18} />
                 </button>
+
+                {/* Botón 2: confirmar y llenar resultados en sección Pre-entrevista IA */}
+                {onConfirmSend && (
+                  <button
+                    onClick={() => { onConfirmSend(candidates); onClose(); }}
+                    style={{
+                      width: '100%', padding: '14px', borderRadius: '12px',
+                      background: '#fff', border: '2px solid #128C7E', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                      fontWeight: 700, fontSize: '15px', color: '#128C7E',
+                      marginTop: '10px',
+                    }}
+                  >
+                    <CheckCircle2 size={20} color="#128C7E" />
+                    Confirmar y enviar pre-entrevista
+                  </button>
+                )}
+
                 <p style={{ textAlign: 'center', fontSize: '12px', color: '#aaa', marginTop: '10px' }}>
                   Simulación demo · No se envían mensajes reales
                 </p>

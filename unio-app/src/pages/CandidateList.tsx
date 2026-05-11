@@ -14,6 +14,7 @@ import { useVacantes } from '../hooks/useVacantes';
 import { mockCandidatesByStage, mockCandidatesById } from '../data/mock';
 import { useMockStageState } from '../hooks/useMockStageState';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
+import { useWaPrescreening } from '../context/WaPrescreeningContext';
 
 type FilterTab = 'todos' | 'high' | 'mid' | 'low';
 
@@ -42,6 +43,7 @@ export default function CandidateList() {
     priorStages(stage).some((s) => getStatus(candidateId, s) === 'descartado');
   const { setJobId, setSelectionProcessId, progressStage, setProgressStage } = usePipeline();
   const { advanceCandidates, getPendingCandidates, getPassedCandidates } = useMockStageState();
+  const { markCompleted: markWaCompleted } = useWaPrescreening();
   const { vacantes } = useVacantes();
   const vacante = vacantes.find((v) => v.id === jobId);
 
@@ -501,6 +503,11 @@ export default function CandidateList() {
         onClose={() => setWaModalOpen(false)}
         candidates={waCandidates}
         jobTitle={vacante?.title ?? 'la vacante'}
+        onConfirmSend={(cands) => {
+          markWaCompleted(cands);
+          setToastMessage(`Pre-entrevista enviada · Resultados disponibles en Pre-screening IA`);
+          setToastVisible(true);
+        }}
       />
 
       <Toast
