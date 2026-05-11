@@ -778,7 +778,7 @@ export default function CandidateOnepage() {
                 boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
               }}
             >
-              <WaIcon size={16} />
+              <WaIcon size={20} color="white" />
               Lanzar pre-entrevista
             </button>
           )}

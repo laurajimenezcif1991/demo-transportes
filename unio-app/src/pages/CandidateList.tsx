@@ -461,7 +461,7 @@ export default function CandidateList() {
                 boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
               }}
             >
-              <WaIcon size={18} />
+              <WaIcon size={22} color="white" />
               Iniciar pre-entrevista IA
             </button>
           )}
