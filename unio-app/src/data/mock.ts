@@ -2053,25 +2053,10 @@ import {
 } from './mock-comfandi';
 
 export const MOCK_VACANTES: Vacante[] = [
-  { id: 'mock-recep',    jobId: 'mock-recep',    status: 'activa',   title: 'Recepcionista',              area: ['Servicios', 'Salud'],           priority: 'media', progressLabel: 'Scoring',          progressPct: 10, total: 15, activos: 15, fecha: '05 Mar 2025' },
-  { id: 'mock-bodega',   jobId: 'mock-bodega',   status: 'activa',   title: 'Auxiliar de Bodega',         area: ['Operaciones', 'Logística'],     priority: 'alta',  progressLabel: 'Pre-screening IA', progressPct: 20, total: 15, activos: 15, fecha: '10 Mar 2025' },
-  { id: 'mock-th',       jobId: 'mock-th',       status: 'activa',   title: 'Analista de Talento Humano', area: ['RRHH', 'Talento'],              priority: 'alta',  progressLabel: 'Entrevistas',      progressPct: 40, total: 10, activos: 10, fecha: '15 Mar 2025' },
-  { id: 'mock-finanzas', jobId: 'mock-finanzas', status: 'activa',   title: 'Jefe de Finanzas',           area: ['Finanzas', 'Administración'],   priority: 'alta',  progressLabel: 'Evaluaciones',     progressPct: 60, total:  6, activos:  6, fecha: '20 Mar 2025' },
-  { id: 'mock-ventas',   jobId: 'mock-ventas',   status: 'cerrada',  title: 'Gerente de Ventas',          area: ['Comercial', 'Ventas'],          priority: 'alta',  progressLabel: 'Finalistas',       progressPct: 80, total:  3, activos:  3, fecha: '25 Mar 2025' },
   ...COMFANDI_VACANTES,
 ];
 
 export const MOCK_DESCRIPTIONS: Record<string, string> = {
-  'mock-recep':
-    'Buscamos una Recepcionista para nuestra clínica de especialidades médicas en Bogotá. Será el primer punto de contacto con pacientes y visitantes, responsable de la gestión de agenda, atención telefónica y coordinación administrativa. Requerimos excelente presentación, comunicación asertiva y manejo de herramientas ofimáticas.',
-  'mock-bodega':
-    'Auxiliar de Bodega para planta de producción masiva de termoformados en Medellín. Apoya la recepción, almacenamiento y despacho de materias primas y producto terminado. Trabaja en coordinación directa con el área de producción y logística para garantizar el flujo eficiente de inventarios y cumplir los indicadores de la operación.',
-  'mock-th':
-    'Analista de Talento Humano para apoyar los procesos de selección, contratación y seguimiento de personal en nuestra planta industrial. Gestiona el ciclo completo de reclutamiento, coordina entrevistas, aplica pruebas y da soporte operativo al área de RRHH. Requiere manejo de ATS, comunicación fluida y orientación al detalle.',
-  'mock-finanzas':
-    'Jefe de Finanzas para liderar el control financiero, presupuestal y de costos de la compañía. Reporta directamente a Gerencia General y coordina con las áreas de producción y operación para garantizar la salud financiera del negocio. Se requiere experiencia en manufactura, dominio de herramientas de análisis y capacidad de liderazgo.',
-  'mock-ventas':
-    'Gerente de Ventas para dirigir el equipo comercial B2B y garantizar el cumplimiento de metas en canales de distribución industrial. Responsable de la estrategia de crecimiento, seguimiento de KPIs, negociación con clientes clave y desarrollo del equipo. Se busca un perfil con liderazgo probado, orientación a resultados y visión estratégica.',
   ...COMFANDI_DESCRIPTIONS,
 };
 
