@@ -193,8 +193,8 @@ export const getPipelineStages = (jobId: string): PipelineStage[] => [
   },
   {
     id: 'evaluaciones',
-    label: 'Evaluaciones',
-    stageBadge: 'Evaluaciones',
+    label: 'Pruebas',
+    stageBadge: 'Pruebas',
     status: 'in_progress',
     candidateCount: 8,
     isAI: false,

@@ -7,7 +7,10 @@
 
 ## [Sin commitear]
 
-_Sin cambios pendientes._
+### Módulo "Pruebas" + Validación de Antecedentes en pipeline
+- **`Pipeline.tsx`, `mock.ts`, `mock-comfandi.ts`, `Sidebar.tsx`** — Renombrado el módulo/etapa "Evaluaciones" → "Pruebas" en todos los labels de display (el ID interno `evaluaciones` no cambia)
+- **`ValidacionAntecedentes.tsx`** (nuevo) — Componente con tabla de 10 fuentes de antecedentes (categorías Alto/Medio), score mock calculado automáticamente (–10 pts por Alto, –5 pts por Medio) y banner de riesgo color-coded
+- **`CandidateOnepage.tsx`** — Nueva sección 6 "Validación de Antecedentes" dentro del módulo Pruebas; se activa cuando el candidato está en etapa evaluaciones/pruebas; muestra tabla completa y score 10/100 "Riesgo Muy Alto"
 
 ---
 

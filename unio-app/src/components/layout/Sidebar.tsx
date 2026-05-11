@@ -104,7 +104,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     },
     {
       id: 'evaluaciones',
-      label: 'Evaluaciones',
+      label: 'Pruebas',
       Icon: CheckSquare,
       path: `${stageBase}/evaluaciones`,
       locked: progressIdx < 3,            // requiere haber llegado a evaluaciones

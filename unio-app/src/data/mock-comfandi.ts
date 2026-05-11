@@ -556,7 +556,7 @@ export const COMFANDI_VACANTES: import('./mock').Vacante[] = [
     id: 'mock-comf-cb', jobId: 'mock-comf-cb', status: 'activa',
     title: 'Científico(a) Comportamental',
     area: ['Investigación', 'Comportamiento'], priority: 'alta',
-    progressLabel: 'Evaluaciones', progressPct: 60,
+    progressLabel: 'Pruebas', progressPct: 60,
     total: 30, activos: 3, fecha: '25 Ene 2025',
   },
 ];
@@ -580,7 +580,7 @@ export function getComfandiPipelineStages(jobId: string): import('./mock').Pipel
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
         s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    5, true),
         s('entrevistas',  'Entrevistas',         'Entrevistas',   'in_progress',  3, false),
-        s('evaluaciones', 'Evaluaciones',        'Evaluaciones',  'not_started',  0, false),
+        s('evaluaciones', 'Pruebas',             'Pruebas',       'not_started',  0, false),
         s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
       ];
     case 'mock-comf-gcv':
@@ -588,7 +588,7 @@ export function getComfandiPipelineStages(jobId: string): import('./mock').Pipel
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
         s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'in_progress',  5, true),
         s('entrevistas',  'Entrevistas',         'Entrevistas',   'not_started',  0, false),
-        s('evaluaciones', 'Evaluaciones',        'Evaluaciones',  'not_started',  0, false),
+        s('evaluaciones', 'Pruebas',             'Pruebas',       'not_started',  0, false),
         s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
       ];
     case 'mock-comf-cb':
@@ -596,7 +596,7 @@ export function getComfandiPipelineStages(jobId: string): import('./mock').Pipel
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
         s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    5, true),
         s('entrevistas',  'Entrevistas',         'Entrevistas',   'completed',    5, false),
-        s('evaluaciones', 'Evaluaciones',        'Evaluaciones',  'in_progress',  3, false),
+        s('evaluaciones', 'Pruebas',             'Pruebas',       'in_progress',  3, false),
         s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
       ];
     default:

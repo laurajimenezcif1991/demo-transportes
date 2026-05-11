@@ -39,6 +39,7 @@ import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
 import PruebaTecnicaContent from '../components/ui/PruebaTecnicaContent';
+import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import {
   interviewData,
   type InterviewFeedback,
@@ -220,6 +221,7 @@ export default function CandidateOnepage() {
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
   const [pruebaTecnicaOpen, setPruebaTecnicaOpen] = useState(false);
+  const [antecedentesOpen, setAntecedentesOpen] = useState(false);
 
   const scoringSectionRef = useRef<HTMLDivElement>(null);
   const prescreeningSectionRef = useRef<HTMLDivElement>(null);
@@ -707,6 +709,34 @@ export default function CandidateOnepage() {
                     onScoreChange={setTechTestScore}
                     onRecomendacionChange={setTechTestRecomendacion}
                   />
+                )}
+              </AccordionSection>
+            </div>
+
+            {/* 6. Validación de Antecedentes */}
+            <div style={{ marginTop: 12 }}>
+              <AccordionSection
+                number={6}
+                title="Validación de Antecedentes"
+                score={(hasEntrevistas || isPendingEvaluaciones) ? 10 : undefined}
+                statusText={
+                  (!hasEntrevistas && !isPendingEvaluaciones) ? 'Por iniciar' :
+                  isPendingEvaluaciones ? 'En proceso' :
+                  'Riesgo Muy Alto'
+                }
+                statusOk={false}
+                isOpen={antecedentesOpen}
+                onToggle={() => (hasEntrevistas || isPendingEvaluaciones) && setAntecedentesOpen(!antecedentesOpen)}
+                isLocked={!hasEntrevistas && !isPendingEvaluaciones}
+              >
+                {(hasEntrevistas || isPendingEvaluaciones) && (
+                  isPendingEvaluaciones ? (
+                    <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                      Pendiente: la validación de antecedentes aún no ha sido completada.
+                    </div>
+                  ) : (
+                    <ValidacionAntecedentes />
+                  )
                 )}
               </AccordionSection>
             </div>
