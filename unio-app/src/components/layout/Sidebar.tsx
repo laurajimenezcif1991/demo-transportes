@@ -7,6 +7,7 @@ import {
   MessageSquare,
   CheckSquare,
   CheckCheck,
+  RotateCcw,
 } from 'lucide-react';
 import { usePipeline } from '../../context/PipelineContext';
 import { useMockStageState } from '../../hooks/useMockStageState';
@@ -188,10 +189,56 @@ export default function Sidebar({ activeItem }: SidebarProps) {
       {/* Footer */}
       <div
         style={{
-          padding: '16px 20px',
+          padding: '12px 20px 16px',
           borderTop: '1px solid var(--color-border-default)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
         }}
       >
+        {/* Reset demo button */}
+        <button
+          title="Reiniciar demo (limpia el progreso guardado)"
+          onClick={() => {
+            const toRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('unio') || k.startsWith('hm_eval_') || k.startsWith('prueba_'))) {
+                toRemove.push(k);
+              }
+            }
+            toRemove.forEach((k) => localStorage.removeItem(k));
+            window.location.href = '/';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            width: '100%',
+            padding: '6px 8px',
+            background: 'transparent',
+            border: '1px solid var(--color-border-default)',
+            borderRadius: 'var(--radius-sm)',
+            cursor: 'pointer',
+            fontSize: '11px',
+            color: 'var(--color-text-muted)',
+            fontFamily: 'var(--font-display)',
+            fontWeight: 500,
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-surface-subtle)';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-default)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-muted)';
+          }}
+        >
+          <RotateCcw size={12} />
+          <span>Reiniciar demo</span>
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
           <span>Powered by</span>
           <img src="/logo-unio.png" alt="Unio" style={{ height: '16px', width: 'auto' }} />
