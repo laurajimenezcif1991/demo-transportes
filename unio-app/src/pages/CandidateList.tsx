@@ -42,7 +42,7 @@ export default function CandidateList() {
   const isEliminatedBefore = (candidateId: string, stage: string) =>
     priorStages(stage).some((s) => getStatus(candidateId, s) === 'descartado');
   const { setJobId, setSelectionProcessId, progressStage, setProgressStage } = usePipeline();
-  const { advanceCandidates, getPendingCandidates, getPassedCandidates } = useMockStageState();
+  const { advanceCandidates, getPendingCandidates, getPassedCandidates, getMockProgressStage } = useMockStageState();
   const { markCompleted: markWaCompleted } = useWaPrescreening();
   const { vacantes } = useVacantes();
   const vacante = vacantes.find((v) => v.id === jobId);
@@ -64,15 +64,24 @@ export default function CandidateList() {
     if (processId) setSelectionProcessId(processId);
   }, [processId, setSelectionProcessId]);
 
-  // Advance progressStage when navigating to a later stage — never go backwards
+  // Advance progressStage when navigating to a later stage — never go backwards.
+  // Also seed from DEFAULT_MOCK_PROGRESS on first load so pre-seeded demo vacancies
+  // unlock the correct sidebar stages without requiring any navigation.
   useEffect(() => {
     const order = ['scoring', 'prescreening', 'entrevistas', 'evaluaciones'] as const;
-    const curIdx  = order.indexOf(currentStage as typeof order[number]);
     const progIdx = order.indexOf(progressStage as typeof order[number]);
-    if (curIdx > progIdx) {
-      setProgressStage(currentStage as 'scoring' | 'prescreening' | 'entrevistas' | 'evaluaciones');
+
+    // Seed from persisted mock progress (handles DEFAULT_MOCK_PROGRESS + localStorage state)
+    const mockProgress = isMock ? getMockProgressStage(jobId) : null;
+    const mockIdx = mockProgress ? order.indexOf(mockProgress as typeof order[number]) : -1;
+
+    const curIdx  = order.indexOf(currentStage as typeof order[number]);
+    const maxIdx  = Math.max(curIdx, mockIdx);
+
+    if (maxIdx > progIdx) {
+      setProgressStage(order[maxIdx] as 'scoring' | 'prescreening' | 'entrevistas' | 'evaluaciones');
     }
-  }, [currentStage, progressStage, setProgressStage]);
+  }, [currentStage, progressStage, setProgressStage, jobId, isMock, getMockProgressStage]);
 
   // Fetch candidates from API when processId exists and stage is scoring/prescreening
   const apiStage = (currentStage === 'scoring' || currentStage === 'prescreening') ? currentStage : 'scoring';

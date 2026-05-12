@@ -23,6 +23,10 @@ export const DEFAULT_MOCK_PROGRESS: Record<string, MockStageKey> = {
   'mock-th':       'entrevistas',
   'mock-finanzas': 'evaluaciones',
   'mock-ventas':   'evaluaciones',
+  // Comfandi vacancies — default unlocked stage
+  'mock-comf-gca': 'prescreening',
+  'mock-comf-gcv': 'scoring',
+  'mock-comf-cb':  'entrevistas',
 };
 
 interface MockStageData {
@@ -77,6 +81,11 @@ export function useMockStageState() {
         const existingPassed = cur.passedCandidates?.[fromStage] ?? [];
         const mergedPassed = [...new Set([...existingPassed, ...candidateIds])];
 
+        // If these candidates were previously passed OUT of toStage (from a prior session),
+        // remove them from that list so they become visible again in the destination stage
+        const prevPassedOutOfDest = cur.passedCandidates?.[toStage] ?? [];
+        const newPassedOutOfDest = prevPassedOutOfDest.filter((id) => !candidateIds.includes(id));
+
         const toIdx = STAGE_ORDER.indexOf(toStage);
         const currProgressIdx = STAGE_ORDER.indexOf(cur.progressStage);
         const newProgress: MockStageKey = toIdx > currProgressIdx ? toStage : cur.progressStage;
@@ -86,7 +95,7 @@ export function useMockStageState() {
           [jobId]: {
             progressStage: newProgress,
             pendingCandidates: { ...cur.pendingCandidates, [toStage]: mergedPending },
-            passedCandidates: { ...(cur.passedCandidates ?? {}), [fromStage]: mergedPassed },
+            passedCandidates: { ...(cur.passedCandidates ?? {}), [fromStage]: mergedPassed, [toStage]: newPassedOutOfDest },
           },
         };
         saveToStorage(next);
