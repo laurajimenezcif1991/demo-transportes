@@ -268,7 +268,10 @@ export default function Shortlist() {
                         }
                         // Pre-defined mock finalists: map card id to real mock candidate id
                         const mockIdMaps: Record<string, Record<string, string>> = {
-                          'mock-ventas': { f1: 'mv-1', f2: 'mv-2', f3: 'mv-3' },
+                          'mock-ventas':    { f1: 'mv-1', f2: 'mv-2', f3: 'mv-3' },
+                          'mock-comf-gca':  { 'gca-f1': 'gca-1', 'gca-f2': 'gca-2' },
+                          'mock-comf-gcv':  { 'gcv-f1': 'gcv-1', 'gcv-f2': 'gcv-2' },
+                          'mock-comf-cb':   { 'cb-f1': 'cb-1', 'cb-f2': 'cb-2' },
                         };
                         const mockIdMap = mockIdMaps[jobId] ?? {};
                         const mockCandidateId = mockIdMap[candidate.id] ?? candidate.id;
@@ -315,25 +318,34 @@ export default function Shortlist() {
                 {/* No negociables */}
                 <SectionHeader icon={<AlertTriangle size={13} />} label="No negociables" />
                 <div style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                    <Check size={12} color="var(--color-positive-500)" />
-                    Ubicación: {candidate.location}
-                  </div>
-                  {/* FinalistCard has modalidad; Candidate does not */}
-                  {(candidate as typeof candidate & { modalidad?: string }).modalidad && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                      <Check size={12} color="var(--color-positive-500)" />
-                      {(candidate as typeof candidate & { modalidad?: string }).modalidad}
-                    </div>
-                  )}
-                  {/* For Candidate objects: show noNegociables from scoringAI */}
-                  {!(candidate as typeof candidate & { modalidad?: string }).modalidad &&
-                    (candidate as typeof candidate & { scoringAI?: { noNegociables?: { label: string }[] } }).scoringAI?.noNegociables?.slice(0, 3).map((nn, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                        <Check size={12} color="var(--color-positive-500)" />
-                        {nn.label}
-                      </div>
-                    ))
+                  {/* FinalistCard with explicit noNeg list (Comfandi vacancies) */}
+                  {(candidate as typeof candidate & { noNeg?: string[] }).noNeg
+                    ? (candidate as typeof candidate & { noNeg: string[] }).noNeg.map((req, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                          <Check size={12} color="var(--color-positive-500)" style={{ flexShrink: 0, marginTop: 1 }} />
+                          <span>{req}</span>
+                        </div>
+                      ))
+                    : <>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                          <Check size={12} color="var(--color-positive-500)" />
+                          Ubicación: {candidate.location}
+                        </div>
+                        {(candidate as typeof candidate & { modalidad?: string }).modalidad && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                            <Check size={12} color="var(--color-positive-500)" />
+                            {(candidate as typeof candidate & { modalidad?: string }).modalidad}
+                          </div>
+                        )}
+                        {!(candidate as typeof candidate & { modalidad?: string }).modalidad &&
+                          (candidate as typeof candidate & { scoringAI?: { noNegociables?: { label: string }[] } }).scoringAI?.noNegociables?.slice(0, 3).map((nn, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                              <Check size={12} color="var(--color-positive-500)" />
+                              {nn.label}
+                            </div>
+                          ))
+                        }
+                      </>
                   }
                 </div>
 
