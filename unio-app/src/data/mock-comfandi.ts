@@ -217,43 +217,44 @@ const cfgGCA: VConfig = {
 };
 
 // GCA — 3 candidatos en Entrevistas
+// GCA — 3 candidatos en Evaluaciones (con psychTest)
+const gcaEval: Candidate[] = [
+  _gen(cfgGCA, 'gca-1', 'María Camila Londoño',    89, _p(1,'women'),  'ML', _c(0), 'Medellín', '5 Años',  "$5'800.000", 'en_rango',       'evaluaciones'),
+  _gen(cfgGCA, 'gca-2', 'Jorge Andrés Palacio',     85, _p(1,'men'),    'JP', _c(1), 'Medellín', '4 Años',  "$6'000.000", 'en_rango',       'evaluaciones'),
+  _gen(cfgGCA, 'gca-3', 'Sandra Milena Echeverri',  81, _p(2,'women'),  'SE', _c(2), 'Medellín', '3 Años',  "$5'500.000", 'en_rango',       'evaluaciones'),
+];
+// GCA — 5 candidatos en Entrevistas
 const gcaEnt: Candidate[] = [
-  _gen(cfgGCA, 'gca-1', 'María Camila Londoño',    85, _p(1,'women'),  'ML', _c(0), 'Medellín', '5 Años',  "$5'800.000", 'en_rango',       'entrevistas'),
-  _gen(cfgGCA, 'gca-2', 'Jorge Andrés Palacio',     82, _p(1,'men'),    'JP', _c(1), 'Medellín', '4 Años',  "$6'000.000", 'en_rango',       'entrevistas'),
-  _gen(cfgGCA, 'gca-3', 'Sandra Milena Echeverri',  78, _p(2,'women'),  'SE', _c(2), 'Medellín', '3 Años',  "$5'500.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCA, 'gca-4', 'Felipe Montoya Arango',    74, _p(2,'men'),    'FM', _c(3), 'Medellín', '4 Años',  "$5'800.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCA, 'gca-5', 'Claudia Patricia Gómez',   70, _p(3,'women'),  'CG', _c(4), 'Medellín', '3 Años',  "$7'500.000", 'fuera_de_rango', 'entrevistas'),
+  _gen(cfgGCA, 'gca-6', 'Andrés Felipe Restrepo',   67, _p(4,'men'),    'AR', _c(0), 'Medellín', '3 Años',  "$5'500.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCA, 'gca-7', 'Marcela Tobón Giraldo',    64, _p(4,'women'),  'MT', _c(1), 'Medellín', '2 Años',  "$5'000.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCA, 'gca-8', 'Ricardo Arango Zuluaga',   61, _p(5,'men'),    'RA', _c(2), 'Medellín', '2 Años',  "$5'800.000", 'en_rango',       'entrevistas'),
 ];
-// GCA — 2 candidatos en Pre-screening
-const gcaPre: Candidate[] = [
-  _gen(cfgGCA, 'gca-4', 'Felipe Montoya Arango',    74, _p(2,'men'),    'FM', _c(3), 'Medellín', '4 Años',  "$5'800.000", 'en_rango',       'prescreening'),
-  _gen(cfgGCA, 'gca-5', 'Claudia Patricia Gómez',   70, _p(3,'women'),  'CG', _c(4), 'Medellín', '3 Años',  "$7'500.000", 'fuera_de_rango', 'prescreening'),
-];
-// GCA — 25 shells en Scoring
+// GCA — 22 shells en Scoring
 const gcaScore: Candidate[] = [
-  _gen(cfgGCA, 'gca-6',  'Liliana Posada',          57, _p(10,'women'), 'LP', _c(0), 'Medellín',   '2 Años',          "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-7',  'Mauricio Ríos',            55, _p(10,'men'),   'MR', _c(1), 'Medellín',   '2 Años',          "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-8',  'Natalia Rueda',            53, _p(11,'women'), 'NR', _c(2), 'Bogotá',     '2 Años',          "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-9',  'Óscar Giraldo',            51, _p(11,'men'),   'OG', _c(3), 'Medellín',   '1 Año',           "$6'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-10', 'Patricia Villegas',        50, _p(12,'women'), 'PV', _c(4), 'Manizales',  '3 Años',          "$7'000.000", 'fuera_de_rango'),
-  _gen(cfgGCA, 'gca-11', 'Quintín López',            48, _p(12,'men'),   'QL', _c(0), 'Medellín',   '1 Año',           "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-12', 'Rosa Agudelo',             47, _p(13,'women'), 'RA', _c(1), 'Medellín',   '2 Años',          "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-13', 'Samuel Betancur',          46, _p(13,'men'),   'SB', _c(2), 'Pereira',    '1 Año',           "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-14', 'Teresa Cano',              44, _p(14,'women'), 'TC', _c(3), 'Medellín',   '1 Año',           "$5'800.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-15', 'Ubaldo Molina',            43, _p(14,'men'),   'UM', _c(4), 'Medellín',   '2 Años',          "$6'500.000", 'fuera_de_rango'),
-  _gen(cfgGCA, 'gca-16', 'Vanessa Soto',             41, _p(15,'women'), 'VS', _c(0), 'Bogotá',     '1 Año',           "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-17', 'William Gaviria',          40, _p(15,'men'),   'WG', _c(1), 'Medellín',   '1 Año',           "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-18', 'Ximena Alzate',            39, _p(16,'women'), 'XA', _c(2), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-19', 'Yesenia Córdoba',          38, _p(17,'women'), 'YC', _c(3), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-20', 'Zulma Torres',             37, _p(18,'women'), 'ZT', _c(4), 'Pereira',    'Sin experiencia', "$4'800.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-21', 'Andrés Naranjo',           36, _p(16,'men'),   'AN', _c(0), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-22', 'Beatriz Gutiérrez',        35, _p(19,'women'), 'BG', _c(1), 'Bogotá',     'Sin experiencia', "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-23', 'César Henao',              33, _p(17,'men'),   'CH', _c(2), 'Medellín',   'Sin experiencia', "$7'500.000", 'fuera_de_rango'),
-  _gen(cfgGCA, 'gca-24', 'Doris Marín',              32, _p(20,'women'), 'DM', _c(3), 'Manizales',  'Sin experiencia', "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-25', 'Enrique Castaño',          31, _p(18,'men'),   'EC', _c(4), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-26', 'Fabiola Restrepo',         30, _p(21,'women'), 'FR', _c(0), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-27', 'Germán Upegui',            28, _p(19,'men'),   'GU', _c(1), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-28', 'Haydee Jiménez',           27, _p(22,'women'), 'HJ', _c(2), 'Pereira',    'Sin experiencia', "$4'500.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-29', 'Ignacio Villa',            26, _p(20,'men'),   'IV', _c(3), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
-  _gen(cfgGCA, 'gca-30', 'Jackeline Osorio',         25, _p(23,'women'), 'JO', _c(4), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-9',  'Liliana Posada',          57, _p(10,'women'), 'LP', _c(0), 'Medellín',   '2 Años',          "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-10', 'Mauricio Ríos',            55, _p(10,'men'),   'MR', _c(1), 'Medellín',   '2 Años',          "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-11', 'Natalia Rueda',            53, _p(11,'women'), 'NR', _c(2), 'Bogotá',     '2 Años',          "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-12', 'Óscar Giraldo',            51, _p(11,'men'),   'OG', _c(3), 'Medellín',   '1 Año',           "$6'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-13', 'Patricia Villegas',        50, _p(12,'women'), 'PV', _c(4), 'Manizales',  '3 Años',          "$7'000.000", 'fuera_de_rango'),
+  _gen(cfgGCA, 'gca-14', 'Quintín López',            48, _p(12,'men'),   'QL', _c(0), 'Medellín',   '1 Año',           "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-15', 'Rosa Agudelo',             47, _p(13,'women'), 'RA', _c(1), 'Medellín',   '2 Años',          "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-16', 'Samuel Betancur',          46, _p(13,'men'),   'SB', _c(2), 'Pereira',    '1 Año',           "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-17', 'Teresa Cano',              44, _p(14,'women'), 'TC', _c(3), 'Medellín',   '1 Año',           "$5'800.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-18', 'Ubaldo Molina',            43, _p(14,'men'),   'UM', _c(4), 'Medellín',   '2 Años',          "$6'500.000", 'fuera_de_rango'),
+  _gen(cfgGCA, 'gca-19', 'Vanessa Soto',             41, _p(15,'women'), 'VS', _c(0), 'Bogotá',     '1 Año',           "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-20', 'William Gaviria',          40, _p(15,'men'),   'WG', _c(1), 'Medellín',   '1 Año',           "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-21', 'Ximena Alzate',            39, _p(16,'women'), 'XA', _c(2), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-22', 'Yesenia Córdoba',          38, _p(17,'women'), 'YC', _c(3), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-23', 'Zulma Torres',             37, _p(18,'women'), 'ZT', _c(4), 'Pereira',    'Sin experiencia', "$4'800.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-24', 'Andrés Naranjo',           36, _p(16,'men'),   'AN', _c(0), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-25', 'Beatriz Gutiérrez',        35, _p(19,'women'), 'BG', _c(1), 'Bogotá',     'Sin experiencia', "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-26', 'César Henao',              33, _p(17,'men'),   'CH', _c(2), 'Medellín',   'Sin experiencia', "$7'500.000", 'fuera_de_rango'),
+  _gen(cfgGCA, 'gca-27', 'Doris Marín',              32, _p(20,'women'), 'DM', _c(3), 'Manizales',  'Sin experiencia', "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-28', 'Enrique Castaño',          31, _p(18,'men'),   'EC', _c(4), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-29', 'Fabiola Restrepo',         30, _p(21,'women'), 'FR', _c(0), 'Medellín',   'Sin experiencia', "$5'000.000", 'en_rango'),
+  _gen(cfgGCA, 'gca-30', 'Germán Upegui',            28, _p(19,'men'),   'GU', _c(1), 'Medellín',   'Sin experiencia', "$5'500.000", 'en_rango'),
 ];
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -356,19 +357,22 @@ const cfgGCV: VConfig = {
   ],
 };
 
-// GCV — 5 candidatos en Pre-screening
-const gcvPre: Candidate[] = [
-  _gen(cfgGCV, 'gcv-1', 'Valentina Ospina Caicedo', 79, _p(4,'women'),  'VO', _c(0), 'Cali', '2 Años',  "$3'800.000", 'en_rango',       'prescreening'),
-  _gen(cfgGCV, 'gcv-2', 'Diego Alejandro Caicedo',  76, _p(3,'men'),    'DC', _c(1), 'Cali', '2 Años',  "$4'000.000", 'en_rango',       'prescreening'),
-  _gen(cfgGCV, 'gcv-3', 'Andrea Carolina Mosquera', 73, _p(5,'women'),  'AM', _c(2), 'Cali', '1 Año',   "$3'500.000", 'en_rango',       'prescreening'),
-  _gen(cfgGCV, 'gcv-4', 'Carlos Alberto Palacios',  70, _p(4,'men'),    'CP', _c(3), 'Cali', '2 Años',  "$4'500.000", 'fuera_de_rango', 'prescreening'),
-  _gen(cfgGCV, 'gcv-5', 'Laura Daniela Henao',      67, _p(6,'women'),  'LH', _c(4), 'Cali', '1 Año',   "$3'800.000", 'en_rango',       'prescreening'),
+// GCV — 3 candidatos en Evaluaciones (con psychTest)
+const gcvEval: Candidate[] = [
+  _gen(cfgGCV, 'gcv-1', 'Valentina Ospina Caicedo', 82, _p(4,'women'),  'VO', _c(0), 'Cali', '2 Años',  "$3'800.000", 'en_rango',       'evaluaciones'),
+  _gen(cfgGCV, 'gcv-2', 'Diego Alejandro Caicedo',  78, _p(3,'men'),    'DC', _c(1), 'Cali', '2 Años',  "$4'000.000", 'en_rango',       'evaluaciones'),
+  _gen(cfgGCV, 'gcv-3', 'Andrea Carolina Mosquera', 75, _p(5,'women'),  'AM', _c(2), 'Cali', '1 Año',   "$3'500.000", 'en_rango',       'evaluaciones'),
 ];
-// GCV — 25 shells en Scoring
+// GCV — 5 candidatos en Entrevistas
+const gcvEnt: Candidate[] = [
+  _gen(cfgGCV, 'gcv-4', 'Carlos Alberto Palacios',  71, _p(4,'men'),    'CP', _c(3), 'Cali', '2 Años',  "$4'500.000", 'fuera_de_rango', 'entrevistas'),
+  _gen(cfgGCV, 'gcv-5', 'Laura Daniela Henao',      68, _p(6,'women'),  'LH', _c(4), 'Cali', '1 Año',   "$3'800.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCV, 'gcv-6', 'Lina Riascos',             65, _p(24,'women'), 'LR', _c(0), 'Cali', '1 Año',   "$3'500.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCV, 'gcv-7', 'Manuel Ortega',            63, _p(21,'men'),   'MO', _c(1), 'Cali', '1 Año',   "$4'000.000", 'en_rango',       'entrevistas'),
+  _gen(cfgGCV, 'gcv-8', 'Nathalie Angulo',          60, _p(25,'women'), 'NA', _c(2), 'Cali', '1 Año',   "$3'800.000", 'en_rango',       'entrevistas'),
+];
+// GCV — 22 shells en Scoring
 const gcvScore: Candidate[] = [
-  _gen(cfgGCV, 'gcv-6',  'Lina Riascos',             57, _p(24,'women'), 'LR', _c(0), 'Cali',         '1 Año',           "$3'500.000", 'en_rango'),
-  _gen(cfgGCV, 'gcv-7',  'Manuel Ortega',             55, _p(21,'men'),   'MO', _c(1), 'Cali',         '1 Año',           "$4'000.000", 'en_rango'),
-  _gen(cfgGCV, 'gcv-8',  'Nathalie Angulo',           53, _p(25,'women'), 'NA', _c(2), 'Bogotá',       '1 Año',           "$4'200.000", 'fuera_de_rango'),
   _gen(cfgGCV, 'gcv-9',  'Omar Mina',                 51, _p(22,'men'),   'OM', _c(3), 'Cali',         '1 Año',           "$3'500.000", 'en_rango'),
   _gen(cfgGCV, 'gcv-10', 'Paula Sánchez',             50, _p(26,'women'), 'PS', _c(4), 'Palmira',      '1 Año',           "$3'800.000", 'en_rango'),
   _gen(cfgGCV, 'gcv-11', 'Rebeca Daza',               48, _p(27,'women'), 'RD', _c(0), 'Cali',         'Sin experiencia', "$3'000.000", 'en_rango'),
@@ -499,16 +503,16 @@ const cbEval: Candidate[] = [
   _gen(cfgCB, 'cb-2', 'Paola Andrea Jiménez',       87, _p(7,'women'),  'PJ', _c(1), 'Bogotá', '5 Años', "$6'000.000", 'en_rango',       'evaluaciones'),
   _gen(cfgCB, 'cb-3', 'Sebastián Mora García',      84, _p(6,'men'),    'SM', _c(2), 'Bogotá', '4 Años', "$5'500.000", 'en_rango',       'evaluaciones'),
 ];
-// CB — 2 candidatos en Entrevistas (con prescreeningAI, sin psychTest)
+// CB — 5 candidatos en Entrevistas (con prescreeningAI, sin psychTest)
 const cbEnt: Candidate[] = [
   _gen(cfgCB, 'cb-4', 'Camila Torres Díaz',         79, _p(8,'women'),  'CT', _c(3), 'Bogotá', '4 Años', "$5'500.000", 'en_rango',       'entrevistas'),
   _gen(cfgCB, 'cb-5', 'Juan Pablo Martínez Rojas',  76, _p(7,'men'),    'JM', _c(4), 'Bogotá', '3 Años', "$7'500.000", 'fuera_de_rango', 'entrevistas'),
+  _gen(cfgCB, 'cb-6', 'Laura Forero Vargas',         73, _p(38,'women'), 'LF', _c(0), 'Bogotá', '3 Años', "$5'000.000", 'en_rango',       'entrevistas'),
+  _gen(cfgCB, 'cb-7', 'Miguel Vargas Peña',          70, _p(32,'men'),   'MV', _c(1), 'Bogotá', '2 Años', "$5'500.000", 'en_rango',       'entrevistas'),
+  _gen(cfgCB, 'cb-8', 'Natalia Espinosa Ruiz',       67, _p(39,'women'), 'NE', _c(2), 'Bogotá', '2 Años', "$5'000.000", 'en_rango',       'entrevistas'),
 ];
-// CB — 25 shells en Scoring
+// CB — 22 shells en Scoring
 const cbScore: Candidate[] = [
-  _gen(cfgCB, 'cb-6',  'Laura Forero',              57, _p(38,'women'), 'LF', _c(0), 'Bogotá',      '2 Años',          "$5'000.000", 'en_rango'),
-  _gen(cfgCB, 'cb-7',  'Miguel Vargas',              55, _p(32,'men'),   'MV', _c(1), 'Bogotá',      '2 Años',          "$5'500.000", 'en_rango'),
-  _gen(cfgCB, 'cb-8',  'Natalia Espinosa',           54, _p(39,'women'), 'NE', _c(2), 'Medellín',    '3 Años',          "$6'000.000", 'en_rango'),
   _gen(cfgCB, 'cb-9',  'Oskar Heredia',              52, _p(33,'men'),   'OH', _c(3), 'Bogotá',      '2 Años',          "$5'500.000", 'en_rango'),
   _gen(cfgCB, 'cb-10', 'Paola Sáenz',                50, _p(40,'women'), 'PS', _c(4), 'Bogotá',      '1 Año',           "$7'500.000", 'fuera_de_rango'),
   _gen(cfgCB, 'cb-11', 'Rebeca Morales',             49, _p(41,'women'), 'RM', _c(0), 'Cali',        '2 Años',          "$5'000.000", 'en_rango'),
@@ -542,15 +546,15 @@ export const COMFANDI_VACANTES: import('./mock').Vacante[] = [
     id: 'mock-comf-gca', jobId: 'mock-comf-gca', status: 'activa',
     title: 'Gestor(a) Comercial Convenios y Alianzas Crédito',
     area: ['Crédito', 'Comercial'], priority: 'alta',
-    progressLabel: 'Entrevistas', progressPct: 40,
+    progressLabel: 'Pruebas', progressPct: 60,
     total: 30, activos: 3, fecha: '15 Ene 2025',
   },
   {
     id: 'mock-comf-gcv', jobId: 'mock-comf-gcv', status: 'activa',
     title: 'Gestor(a) Calidad de Vida Crédito',
     area: ['Crédito', 'Servicios Financieros'], priority: 'alta',
-    progressLabel: 'Pre-screening IA', progressPct: 20,
-    total: 30, activos: 5, fecha: '20 Ene 2025',
+    progressLabel: 'Pruebas', progressPct: 60,
+    total: 30, activos: 3, fecha: '20 Ene 2025',
   },
   {
     id: 'mock-comf-cb', jobId: 'mock-comf-cb', status: 'activa',
@@ -578,26 +582,26 @@ export function getComfandiPipelineStages(jobId: string): import('./mock').Pipel
     case 'mock-comf-gca':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
-        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    5, true),
-        s('entrevistas',  'Entrevistas',         'Entrevistas',   'in_progress',  3, false),
-        s('evaluaciones', 'Pruebas',             'Pruebas',       'not_started',  0, false),
-        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
+        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    8, true),
+        s('entrevistas',  'Entrevistas',         'Entrevistas',   'completed',    5, false),
+        s('evaluaciones', 'Pruebas',             'Pruebas',       'in_progress',  3, false),
+        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  2, false),
       ];
     case 'mock-comf-gcv':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
-        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'in_progress',  5, true),
-        s('entrevistas',  'Entrevistas',         'Entrevistas',   'not_started',  0, false),
-        s('evaluaciones', 'Pruebas',             'Pruebas',       'not_started',  0, false),
-        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
+        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    8, true),
+        s('entrevistas',  'Entrevistas',         'Entrevistas',   'completed',    5, false),
+        s('evaluaciones', 'Pruebas',             'Pruebas',       'in_progress',  3, false),
+        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  2, false),
       ];
     case 'mock-comf-cb':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'completed',   30, true),
-        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    5, true),
+        s('prescreening', 'Pre-entrevista IA',  'Pre screening', 'completed',    8, true),
         s('entrevistas',  'Entrevistas',         'Entrevistas',   'completed',    5, false),
         s('evaluaciones', 'Pruebas',             'Pruebas',       'in_progress',  3, false),
-        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  0, false),
+        s('finalistas',   'Finalistas',          'Finalistas',    'not_started',  2, false),
       ];
     default:
       return null;
@@ -606,24 +610,29 @@ export function getComfandiPipelineStages(jobId: string): import('./mock').Pipel
 
 export const COMFANDI_CANDIDATES_BY_STAGE: Record<string, Partial<Record<string, Candidate[]>>> = {
   'mock-comf-gca': {
-    scoring:      [...gcaEnt, ...gcaPre, ...gcaScore],
-    prescreening: [...gcaEnt, ...gcaPre],
+    scoring:      [...gcaEval, ...gcaEnt, ...gcaScore],
+    prescreening: [...gcaEval, ...gcaEnt],
     entrevistas:  gcaEnt,
+    evaluaciones: gcaEval,
   },
   'mock-comf-gcv': {
-    scoring:      [...gcvPre, ...gcvScore],
-    prescreening: gcvPre,
+    scoring:      [...gcvEval, ...gcvEnt, ...gcvScore],
+    prescreening: [...gcvEval, ...gcvEnt],
+    entrevistas:  gcvEnt,
+    evaluaciones: gcvEval,
   },
   'mock-comf-cb': {
     scoring:      [...cbEval, ...cbEnt, ...cbScore],
     prescreening: [...cbEval, ...cbEnt],
-    entrevistas:  [...cbEval, ...cbEnt],
+    entrevistas:  cbEnt,
     evaluaciones: cbEval,
   },
 };
 
+export { gcaEval, gcvEval, cbEval };
+
 export const COMFANDI_ALL_CANDIDATES: Candidate[] = [
-  ...gcaEnt, ...gcaPre, ...gcaScore,
-  ...gcvPre, ...gcvScore,
+  ...gcaEval, ...gcaEnt, ...gcaScore,
+  ...gcvEval, ...gcvEnt, ...gcvScore,
   ...cbEval, ...cbEnt, ...cbScore,
 ];

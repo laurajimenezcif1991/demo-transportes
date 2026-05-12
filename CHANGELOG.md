@@ -7,7 +7,11 @@
 
 ## [Sin commitear]
 
-_Sin cambios pendientes._
+- Reestructurar candidatos Comfandi: 3 en Pruebas + 5 en Entrevistas + 22 shells por vacante (30 total c/u)
+- Agregar datos de entrevistas (HR + HM feedback) para los 24 candidatos activos de las 3 vacantes
+- Agregar prueba técnica pre-diligenciada para los 9 candidatos en etapa Pruebas
+- Agregar 2 finalistas por vacante en mockFinalistCards (6 tarjetas nuevas)
+- Actualizar DEFAULT_MOCK_PROGRESS a 'evaluaciones' para las 3 vacantes Comfandi (todos los stages desbloqueados)
 
 ---
 
