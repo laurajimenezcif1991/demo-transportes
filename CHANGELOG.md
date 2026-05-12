@@ -7,6 +7,12 @@
 
 ## [Sin commitear]
 
+_Sin cambios pendientes._
+
+---
+
+## [62a7820] — 12 May 2026
+
 - Mapear no negociables del RCP en tarjetas de Finalistas: cada vacante Comfandi muestra los 4 requisitos reales del cargo
 - Corregir navegación "Ver perfil" en Finalistas para vacantes Comfandi (gca-f1→gca-1, gcv-f1→gcv-1, etc.)
 
