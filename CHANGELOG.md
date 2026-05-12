@@ -7,6 +7,12 @@
 
 ## [Sin commitear]
 
+_Sin cambios pendientes._
+
+---
+
+## [a1ae79e] — 12 May 2026
+
 - Reestructurar candidatos Comfandi: 3 en Pruebas + 5 en Entrevistas + 22 shells por vacante (30 total c/u)
 - Agregar datos de entrevistas (HR + HM feedback) para los 24 candidatos activos de las 3 vacantes
 - Agregar prueba técnica pre-diligenciada para los 9 candidatos en etapa Pruebas
