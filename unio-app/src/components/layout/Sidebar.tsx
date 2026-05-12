@@ -12,6 +12,7 @@ import {
 import { usePipeline } from '../../context/PipelineContext';
 import { useMockStageState } from '../../hooks/useMockStageState';
 import { mockFinalistCards } from '../../data/mock';
+import { assetUrl } from '../../utils/assets';
 
 /** Finalistas está habilitado — la ruta /pipeline/:jobId/finalistas apunta a Shortlist. */
 
@@ -140,7 +141,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px' }}>
         <img
-          src={companyLogoUrl || '/logo-comfandi.webp'}
+          src={companyLogoUrl || assetUrl('/logo-comfandi.webp')}
           alt={companyName || 'Comfandi'}
           style={{ maxHeight: '56px', maxWidth: '168px', width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }}
         />
@@ -241,7 +242,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
           <span>Powered by</span>
-          <img src="/logo-unio.png" alt="Unio" style={{ height: '16px', width: 'auto' }} />
+          <img src={assetUrl('/logo-unio.png')} alt="Unio" style={{ height: '16px', width: 'auto' }} />
         </div>
       </div>
     </aside>

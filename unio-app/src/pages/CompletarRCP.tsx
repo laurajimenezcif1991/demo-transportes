@@ -1,3 +1,4 @@
+import { assetUrl } from '../utils/assets';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, ChevronLeft, ArrowRight, HelpCircle } from 'lucide-react';
@@ -170,12 +171,12 @@ export default function CompletarRCP() {
         justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img src="/logo-comfandi.webp" alt="Comfandi"
+          <img src={assetUrl('/logo-comfandi.webp')} alt="Comfandi"
             style={{ maxHeight: '52px', maxWidth: '200px', width: 'auto', height: 'auto', objectFit: 'contain' }} />
           <div style={{ width: '1px', height: '32px', background: 'var(--color-border-default)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
             <span>Powered by</span>
-            <img src="/logo-unio.png" alt="Unio" style={{ height: '14px', width: 'auto' }} />
+            <img src={assetUrl('/logo-unio.png')} alt="Unio" style={{ height: '14px', width: 'auto' }} />
           </div>
         </div>
         <Button variant="ghost" size="sm" onClick={() => navigate('/')}>Cancelar</Button>

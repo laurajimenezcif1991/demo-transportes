@@ -1,3 +1,4 @@
+import { assetUrl } from '../../utils/assets';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { PipelineStageKey } from '../../data/mock';
@@ -73,7 +74,7 @@ function IAChip() {
         lineHeight: 1,
       }}
     >
-      <img src="/icons/sparkles.svg" alt="" width={10} height={10} style={{ filter: 'invert(1)' }} />
+      <img src={assetUrl('/icons/sparkles.svg')} alt="" width={10} height={10} style={{ filter: 'invert(1)' }} />
       IA
     </span>
   );

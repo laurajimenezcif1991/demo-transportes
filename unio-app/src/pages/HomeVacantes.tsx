@@ -1,3 +1,4 @@
+import { assetUrl } from '../utils/assets';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -165,7 +166,7 @@ export default function HomeVacantes() {
           <div style={{ width: '1px', height: '32px', background: 'var(--color-border-default)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
             <span>Powered by</span>
-            <img src="/logo-unio.png" alt="Unio" style={{ height: '14px', width: 'auto' }} />
+            <img src={assetUrl('/logo-unio.png')} alt="Unio" style={{ height: '14px', width: 'auto' }} />
           </div>
         </div>
 

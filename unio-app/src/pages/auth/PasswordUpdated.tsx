@@ -1,3 +1,4 @@
+import { assetUrl } from '../../utils/assets';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 import { PrimaryButton } from './AuthPage';
@@ -31,7 +32,7 @@ export default function PasswordUpdated() {
       >
         {/* Success image */}
         <img
-          src="/success.png"
+          src={assetUrl('/success.png')}
           alt="Contraseña actualizada"
           className="success-image"
           style={{ width: '120px', height: 'auto', display: 'block' }}

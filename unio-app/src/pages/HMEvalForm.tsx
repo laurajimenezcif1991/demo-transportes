@@ -1,3 +1,4 @@
+import { assetUrl } from '../utils/assets';
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import StarRating from '../components/ui/StarRating';
@@ -82,7 +83,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
             <img src={COMPANY_LOGO} alt="Logo empresa" style={{ height: '84px', width: 'auto', objectFit: 'contain' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '14px', color: '#151515', lineHeight: '19px' }}>Powered by</span>
-              <img src="/logo-unio.png" alt="Unio" style={{ height: '23px', width: 'auto' }} />
+              <img src={assetUrl('/logo-unio.png')} alt="Unio" style={{ height: '23px', width: 'auto' }} />
             </div>
           </div>
 
@@ -121,7 +122,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '14px', color: '#151515' }}>Powered by</span>
-              <img src="/logo-unio.png" alt="Unio" style={{ height: '23px', width: 'auto' }} />
+              <img src={assetUrl('/logo-unio.png')} alt="Unio" style={{ height: '23px', width: 'auto' }} />
             </div>
             <a href="https://www.linkedin.com/company/unio-latam" target="_blank" rel="noopener noreferrer"
               style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: '1px solid #27214d', borderRadius: '12px', textDecoration: 'none', color: '#27214d', fontSize: '14px', fontWeight: 700 }}>
