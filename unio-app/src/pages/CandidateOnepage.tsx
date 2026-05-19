@@ -42,6 +42,7 @@ import PruebaTecnicaContent from '../components/ui/PruebaTecnicaContent';
 import ValidacionAntecedentes, { getAntecedentesScore } from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
+import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntrevistaModal';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
 import {
   interviewData,
@@ -227,6 +228,7 @@ export default function CandidateOnepage() {
   const [pruebaTecnicaOpen, setPruebaTecnicaOpen] = useState(false);
   const [antecedentesOpen, setAntecedentesOpen] = useState(false);
   const [waModalOpen, setWaModalOpen] = useState(false);
+  const [waAgendarOpen, setWaAgendarOpen] = useState(false);
 
   const scoringSectionRef = useRef<HTMLDivElement>(null);
   const prescreeningSectionRef = useRef<HTMLDivElement>(null);
@@ -795,7 +797,22 @@ export default function CandidateOnepage() {
               Lanzar pre-entrevista
             </button>
           )}
-          {stage !== 'scoring' && (
+          {stage === 'prescreening' && (
+            <button
+              onClick={() => setWaAgendarOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '9px 16px', borderRadius: '10px',
+                background: '#25D366', border: 'none', cursor: 'pointer',
+                fontWeight: 700, fontSize: '13px', color: '#fff',
+                boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
+              }}
+            >
+              <WaIcon size={20} color="white" />
+              Agendar entrevista
+            </button>
+          )}
+          {stage !== 'scoring' && stage !== 'prescreening' && (
             <Button
                 variant="primary"
                 size="md"
@@ -810,8 +827,7 @@ export default function CandidateOnepage() {
                 }}
               >
                 <CheckCircle2 size={16} />
-                {stage === 'prescreening' ? 'Pasar a Entrevistas'
-                  : stage === 'entrevistas' ? 'Pasar a Pruebas'
+                {stage === 'entrevistas' ? 'Pasar a Pruebas'
                   : stage === 'evaluaciones' ? 'Pasar a Finalistas'
                   : 'Pasar etapa'}
               </Button>
@@ -845,6 +861,23 @@ export default function CandidateOnepage() {
         onConfirmSend={(cands) => {
           markWaCompleted(cands);
           showToast('Pre-entrevista enviada · Resultados disponibles en Pre-screening IA');
+        }}
+      />
+
+      {/* WhatsApp agendar entrevista modal */}
+      <WhatsAppAgendarEntrevistaModal
+        isOpen={waAgendarOpen}
+        onClose={() => setWaAgendarOpen(false)}
+        candidates={candidate ? [candidate] : []}
+        jobTitle={candidate?.role}
+        onConfirmSend={() => {
+          setStatus(candidateId, stage, 'continua');
+          const idx = ONEPAGE_PIPELINE_STAGES.indexOf(stage);
+          if (idx >= 0 && idx < ONEPAGE_PIPELINE_STAGES.length - 1) {
+            const next = ONEPAGE_PIPELINE_STAGES[idx + 1];
+            navigate(`/pipeline/${jobId}/candidate/${candidateId}?stage=${next}`, { replace: true });
+          }
+          showToast('Entrevista agendada · Candidato pasado a Entrevistas');
         }}
       />
 

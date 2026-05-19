@@ -14,6 +14,7 @@ import { useVacantes } from '../hooks/useVacantes';
 import { mockCandidatesByStage, mockCandidatesById } from '../data/mock';
 import { useMockStageState } from '../hooks/useMockStageState';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
+import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntrevistaModal';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
 
 type FilterTab = 'todos' | 'high' | 'mid' | 'low';
@@ -129,6 +130,10 @@ export default function CandidateList() {
   // WhatsApp pre-entrevista modal
   const [waModalOpen, setWaModalOpen] = useState(false);
   const [waCandidates, setWaCandidates] = useState<typeof candidates>([]);
+
+  // WhatsApp agendar entrevista modal
+  const [waAgendarOpen, setWaAgendarOpen] = useState(false);
+  const [waAgendarCandidates, setWaAgendarCandidates] = useState<typeof candidates>([]);
 
   const statusPriority = (id: string) => {
     const s = getStatus(id, currentStage);
@@ -485,15 +490,33 @@ export default function CandidateList() {
               Iniciar pre-entrevista IA
             </button>
           )}
-          {currentStage !== 'scoring' && (
+          {currentStage === 'prescreening' && (
+            <button
+              onClick={() => {
+                const sel = filteredCandidates.filter(c => selected.has(c.id));
+                setWaAgendarCandidates(sel);
+                setWaAgendarOpen(true);
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 18px', borderRadius: '10px',
+                background: '#25D366', border: 'none', cursor: 'pointer',
+                fontWeight: 700, fontSize: '14px', color: '#fff',
+                boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
+              }}
+            >
+              <WaIcon size={22} color="white" />
+              Agendar entrevista
+            </button>
+          )}
+          {currentStage !== 'scoring' && currentStage !== 'prescreening' && (
             <Button
               variant="primary"
               size="lg"
               onClick={() => handleBulkAction('pasar')}
             >
               <CheckCircle2 size={18} />
-              {currentStage === 'prescreening' ? 'Pasar a Entrevistas'
-                : currentStage === 'entrevistas' ? 'Pasar a Pruebas'
+              {currentStage === 'entrevistas' ? 'Pasar a Pruebas'
                 : currentStage === 'evaluaciones' ? 'Pasar a Finalistas'
                 : 'Pasar etapa'}
             </Button>
@@ -518,6 +541,22 @@ export default function CandidateList() {
         onConfirmSend={(cands) => {
           markWaCompleted(cands);
           setToastMessage(`Pre-entrevista enviada · Resultados disponibles en Pre-screening IA`);
+          setToastVisible(true);
+        }}
+      />
+
+      {/* WhatsApp agendar entrevista modal */}
+      <WhatsAppAgendarEntrevistaModal
+        isOpen={waAgendarOpen}
+        onClose={() => setWaAgendarOpen(false)}
+        candidates={waAgendarCandidates}
+        jobTitle={vacante?.title ?? 'la vacante'}
+        onConfirmSend={(cands) => {
+          const ids = cands.map(c => c.id);
+          const nextStage = advanceCandidates(jobId, 'prescreening', ids);
+          if (nextStage) setProgressStage(nextStage as Parameters<typeof setProgressStage>[0]);
+          setSelected(new Set());
+          setToastMessage(`${ids.length} candidato${ids.length !== 1 ? 's' : ''} pasado${ids.length !== 1 ? 's' : ''} a Entrevistas`);
           setToastVisible(true);
         }}
       />

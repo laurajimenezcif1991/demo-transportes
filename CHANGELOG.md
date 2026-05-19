@@ -7,7 +7,10 @@
 
 ## [Sin commitear]
 
-_Sin cambios pendientes._
+- Crear `WhatsAppAgendarEntrevistaModal`: simulación interactiva de agendamiento por WhatsApp con selección AM/PM y franjas horarias
+- Reemplazar botón "Pasar a Entrevistas" en CandidateList y CandidateOnepage por "Agendar entrevista" con icono y UI de WhatsApp
+- Flujo de agendamiento: Alex IA envía felicitaciones, invita a elegir franja AM/PM y luego un horario específico
+- Confirmación avanza candidatos a la etapa Entrevistas en el pipeline
 
 ---
 
