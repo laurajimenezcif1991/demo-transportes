@@ -7,44 +7,36 @@ import DateRangePicker, { type DateRange } from '../components/ui/DateRangePicke
 
 const VACANCY_STATS = [
   {
-    key: 'abiertas',
-    label: 'ABIERTAS',
+    key: 'Abierta',
+    label: 'Abiertas',
     value: 8,
     sub: 'En proceso actualmente',
-    accent: 'var(--color-brand-primary)',
-    bg: '#18142E',
-    fg: '#ffffff',
-    dark: true,
+    accentColor: 'var(--color-brand-primary)',
+    selectedBg: 'var(--color-secondary-50)',
   },
   {
-    key: 'completadas',
-    label: 'COMPLETADAS',
+    key: 'Completada',
+    label: 'Completadas',
     value: 24,
     sub: 'Cerradas con contratado',
-    accent: 'var(--color-positive-500)',
-    bg: '#ffffff',
-    fg: 'var(--color-text-primary)',
-    dark: false,
+    accentColor: 'var(--color-positive-500)',
+    selectedBg: '#edfaf3',
   },
   {
-    key: 'pausadas',
-    label: 'PAUSADAS',
+    key: 'Pausada',
+    label: 'Pausadas',
     value: 3,
     sub: 'En espera de decisión',
-    accent: 'var(--color-warning-500)',
-    bg: '#ffffff',
-    fg: 'var(--color-text-primary)',
-    dark: false,
+    accentColor: 'var(--color-warning-500)',
+    selectedBg: '#fffbeb',
   },
   {
-    key: 'desiertas',
-    label: 'DESIERTAS',
+    key: 'Desierta',
+    label: 'Desiertas',
     value: 2,
     sub: 'Sin candidato contratado',
-    accent: 'var(--color-neutral-400)',
-    bg: '#ffffff',
-    fg: 'var(--color-text-primary)',
-    dark: false,
+    accentColor: 'var(--color-neutral-400)',
+    selectedBg: 'var(--color-surface-subtle)',
   },
 ];
 
@@ -194,6 +186,8 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 export default function AnalyticsPage() {
   const [activeChannel, setActiveChannel] = useState('general');
   const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null });
+  const [estadoFilter, setEstadoFilter] = useState<string>('Todas');
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const sectionGap: React.CSSProperties = { marginBottom: '24px' };
 
@@ -265,11 +259,10 @@ export default function AnalyticsPage() {
                 <DateRangePicker value={dateRange} onChange={setDateRange} />
               </div>
 
-              {/* Área, Tipo de Vacante, Estado Vacante */}
+              {/* Área, Tipo de Vacante */}
               {[
                 { label: 'ÁREA', options: ['Todas las áreas', 'Operaciones', 'Finanzas', 'Ventas', 'Logística', 'Compras'] },
                 { label: 'TIPO DE VACANTE', options: ['Todos los tipos', 'Operativa', 'Administrativa', 'Estratégica'] },
-                { label: 'ESTADO VACANTE', options: ['Todas', 'Abierta', 'Completada', 'Pausada', 'Desierta'] },
               ].map(({ label, options }) => (
                 <div key={label}>
                   <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>
@@ -297,34 +290,110 @@ export default function AnalyticsPage() {
                   </select>
                 </div>
               ))}
+
+              {/* Estado Vacante — controlled, synced with cards below */}
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>
+                  ESTADO VACANTE
+                </div>
+                <select
+                  value={estadoFilter}
+                  onChange={(e) => setEstadoFilter(e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '38px',
+                    padding: '0 32px 0 10px',
+                    border: estadoFilter !== 'Todas'
+                      ? '1px solid var(--color-brand-accent)'
+                      : '1px solid var(--color-border-default)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: estadoFilter !== 'Todas' ? 'var(--color-secondary-50)' : '#ffffff',
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '13px',
+                    color: estadoFilter !== 'Todas'
+                      ? 'var(--color-brand-accent)'
+                      : 'var(--color-text-primary)',
+                    cursor: 'pointer',
+                    appearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2368686a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 10px center',
+                  }}
+                >
+                  {['Todas', 'Abierta', 'Completada', 'Pausada', 'Desierta'].map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </Card>
 
           {/* ── ESTADO DE VACANTES ── */}
           <Card style={sectionGap}>
             <SectionTitle>Estado de Vacantes</SectionTitle>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-              {VACANCY_STATS.map((s) => (
-                <div
-                  key={s.key}
-                  style={{
-                    background: s.dark ? s.bg : '#ffffff',
-                    border: `1px solid ${s.dark ? s.bg : 'var(--color-border-default)'}`,
-                    borderRadius: 'var(--radius-sm)',
-                    padding: '16px',
-                  }}
-                >
-                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1px', color: s.dark ? 'rgba(255,255,255,0.6)' : 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
-                    {s.label}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+              {VACANCY_STATS.map((s) => {
+                const isSelected = estadoFilter === s.key;
+                const isHovered = hoveredCard === s.key;
+                return (
+                  <div
+                    key={s.key}
+                    onClick={() => setEstadoFilter(isSelected ? 'Todas' : s.key)}
+                    onMouseEnter={() => setHoveredCard(s.key)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    style={{
+                      background: isSelected
+                        ? s.selectedBg
+                        : isHovered
+                        ? 'var(--color-surface-subtle)'
+                        : '#ffffff',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '16px 18px',
+                      borderTop: isSelected
+                        ? `1.5px solid ${s.accentColor}`
+                        : '1px solid var(--color-border-default)',
+                      borderRight: isSelected
+                        ? `1.5px solid ${s.accentColor}`
+                        : '1px solid var(--color-border-default)',
+                      borderBottom: isSelected
+                        ? `1.5px solid ${s.accentColor}`
+                        : '1px solid var(--color-border-default)',
+                      borderLeft: `4px solid ${s.accentColor}`,
+                      cursor: 'pointer',
+                      transition: 'background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
+                      userSelect: 'none',
+                      boxShadow: isSelected ? `0 0 0 3px ${s.accentColor}22` : 'none',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: 800,
+                        fontSize: '28px',
+                        color: isSelected ? s.accentColor : 'var(--color-brand-primary)',
+                        lineHeight: 1,
+                        marginBottom: '5px',
+                        transition: 'color 0.15s ease',
+                      }}
+                    >
+                      {s.value}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: isSelected ? s.accentColor : 'var(--color-text-muted)',
+                        transition: 'color 0.15s ease',
+                      }}
+                    >
+                      {s.label}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text-placeholder)', marginTop: '2px' }}>
+                      {s.sub}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '36px', fontWeight: 800, color: s.dark ? '#ffffff' : s.accent, lineHeight: 1, marginBottom: '4px' }}>
-                    {s.value}
-                  </div>
-                  <div style={{ fontSize: '12px', color: s.dark ? 'rgba(255,255,255,0.55)' : 'var(--color-text-muted)' }}>
-                    {s.sub}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
 
