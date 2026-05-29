@@ -429,8 +429,17 @@ export default function AnalyticsPage() {
               Haz click en un canal para filtrar el funnel
             </div>
 
-            {/* Channel tabs */}
-            <div style={{ display: 'flex', gap: '0', marginBottom: '20px', borderBottom: '1px solid var(--color-border-default)' }}>
+            {/* Channel tabs — pill navigation */}
+            <div
+              style={{
+                display: 'inline-flex',
+                background: 'var(--color-surface-subtle)',
+                borderRadius: '9999px',
+                padding: '4px',
+                gap: '2px',
+                marginBottom: '24px',
+              }}
+            >
               {CHANNEL_TABS.map(({ id, label }) => {
                 const isActive = activeChannel === id;
                 return (
@@ -438,18 +447,22 @@ export default function AnalyticsPage() {
                     key={id}
                     onClick={() => setActiveChannel(id)}
                     style={{
-                      padding: '8px 16px',
-                      background: isActive ? 'var(--color-brand-primary)' : 'transparent',
+                      padding: '7px 18px',
+                      background: isActive ? '#ffffff' : 'transparent',
                       border: 'none',
-                      borderRight: '1px solid var(--color-border-default)',
+                      borderRadius: '9999px',
                       cursor: 'pointer',
-                      fontSize: '11px',
+                      fontSize: '13px',
                       fontFamily: 'var(--font-display)',
-                      fontWeight: 700,
-                      letterSpacing: '0.5px',
-                      color: isActive ? '#ffffff' : 'var(--color-text-muted)',
-                      textTransform: 'uppercase',
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive
+                        ? 'var(--color-text-primary)'
+                        : 'var(--color-text-muted)',
+                      boxShadow: isActive
+                        ? '0 1px 4px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.06)'
+                        : 'none',
                       transition: 'all 0.15s ease',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {label}
@@ -459,44 +472,51 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Funnel bars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {FUNNEL_STAGES.map((stage, i) => {
-                const isFirst = i === 0;
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {FUNNEL_STAGES.map((stage) => {
                 const barWidth = `${Math.max(stage.pct, 0.5)}%`;
                 return (
-                  <div key={stage.label} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {/* Bar label */}
+                  <div key={stage.label} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+
+                    {/* Stage label — plain text, no background */}
                     <div
                       style={{
                         width: '130px',
                         flexShrink: 0,
-                        background: isFirst || i === FUNNEL_STAGES.length - 1 ? 'var(--color-brand-primary)' : 'var(--color-brand-primary)',
-                        padding: '10px 14px',
-                        fontSize: '11px',
+                        fontSize: '12px',
                         fontWeight: 700,
                         letterSpacing: '0.5px',
-                        color: '#ffffff',
+                        color: 'var(--color-text-primary)',
                         textTransform: 'uppercase',
                       }}
                     >
                       {stage.label}
                     </div>
 
-                    {/* Bar track */}
-                    <div style={{ flex: 1, position: 'relative', height: '36px', background: '#f0f0f0' }}>
+                    {/* Bar track — pill shaped */}
+                    <div
+                      style={{
+                        flex: 1,
+                        height: '28px',
+                        background: 'var(--color-neutral-100)',
+                        borderRadius: '9999px',
+                        overflow: 'hidden',
+                      }}
+                    >
                       <div
                         style={{
                           height: '100%',
                           width: barWidth,
-                          background: 'var(--color-brand-primary)',
+                          background: 'var(--color-brand-accent)',
+                          borderRadius: '9999px',
                           transition: 'width 0.4s ease',
                         }}
                       />
                     </div>
 
-                    {/* Value + dropoff */}
+                    {/* Value + dropoff — no background on labels */}
                     <div style={{ flexShrink: 0, textAlign: 'right', minWidth: '200px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
                         <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                           {stage.value.toLocaleString('es-CO')}
                         </span>
@@ -506,10 +526,6 @@ export default function AnalyticsPage() {
                               fontSize: '11px',
                               fontWeight: 600,
                               color: 'var(--color-negative-600)',
-                              background: 'var(--color-danger-bg)',
-                              border: '1px solid var(--color-negative-300)',
-                              borderRadius: '4px',
-                              padding: '2px 7px',
                             }}
                           >
                             {stage.dropoff}
@@ -520,6 +536,7 @@ export default function AnalyticsPage() {
                         {stage.convLabel}
                       </div>
                     </div>
+
                   </div>
                 );
               })}
