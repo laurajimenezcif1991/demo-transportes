@@ -11,7 +11,7 @@ const VACANCY_STATS = [
     label: 'Abiertas',
     value: 8,
     sub: 'En proceso actualmente',
-    accentColor: 'var(--color-brand-primary)',
+    accentColor: 'var(--color-brand-accent)',
     selectedBg: 'var(--color-secondary-50)',
   },
   {
