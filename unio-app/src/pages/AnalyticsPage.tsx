@@ -1,139 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Download, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import MainSidebar from '../components/layout/MainSidebar';
 import DateRangePicker, { type DateRange } from '../components/ui/DateRangePicker';
+import { generateAnalyticsData } from '../data/analytics-mock-generator';
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const VACANCY_STATS = [
-  {
-    key: 'Abierta',
-    label: 'Abiertas',
-    value: 8,
-    sub: 'En proceso actualmente',
-    accentColor: 'var(--color-brand-accent)',
-    selectedBg: 'var(--color-secondary-50)',
-  },
-  {
-    key: 'Completada',
-    label: 'Completadas',
-    value: 24,
-    sub: 'Cerradas con contratado',
-    accentColor: 'var(--color-positive-500)',
-    selectedBg: '#edfaf3',
-  },
-  {
-    key: 'Pausada',
-    label: 'Pausadas',
-    value: 3,
-    sub: 'En espera de decisión',
-    accentColor: 'var(--color-warning-500)',
-    selectedBg: '#fffbeb',
-  },
-  {
-    key: 'Desierta',
-    label: 'Desiertas',
-    value: 2,
-    sub: 'Sin candidato contratado',
-    accentColor: 'var(--color-neutral-400)',
-    selectedBg: 'var(--color-surface-subtle)',
-  },
-];
-
-const KPI_CARDS = [
-  {
-    key: 'ahorro_h',
-    label: 'AHORRO DE HORAS',
-    value: '480h',
-    sub: 'promedio por vacante',
-    detail: '↑ +15% vs mes anterior',
-    detailColor: 'var(--color-positive-600)',
-  },
-  {
-    key: 'ahorro_v',
-    label: 'VALOR DEL AHORRO',
-    value: '$24M',
-    sub: 'COP por vacante',
-    detail: 'Costo hora: $50,000',
-    detailColor: 'var(--color-text-muted)',
-  },
-  {
-    key: 'ttf',
-    label: 'TIME-TO-FILL',
-    value: '28 días',
-    sub: 'promedio',
-    detail: 'vs 45 días manual (-38%)',
-    detailColor: 'var(--color-positive-600)',
-  },
-  {
-    key: 'ratio',
-    label: 'RATIO DE CONVERSIÓN',
-    value: '350:1',
-    sub: 'CVs por contratado',
-    detail: 'Tasa: 0.29%',
-    detailColor: 'var(--color-text-muted)',
-  },
-];
-
-const FUNNEL_STAGES = [
-  { label: 'APLICADOS', value: 2450, pct: 100, convLabel: '100% · inicio del funnel', dropoff: null },
-  { label: 'SCORING', value: 2083, pct: 85, convLabel: '85% conversión', dropoff: '367 por no negociables' },
-  { label: 'PRE-SCREENING', value: 1176, pct: 56, convLabel: '48% conversión', dropoff: null },
-  { label: 'ENTREVISTAS', value: 490, pct: 20, convLabel: '20% conversión', dropoff: null },
-  { label: 'EVALUACIÓN', value: 196, pct: 8, convLabel: '8% conversión', dropoff: null },
-  { label: 'FINALISTAS', value: 59, pct: 2.4, convLabel: '2.4% conversión', dropoff: null },
-  { label: 'CONTRATADOS', value: 7, pct: 0.29, convLabel: '0.29% · ratio 350:1', dropoff: null },
-];
-
-const DROPOFF_TABLE = [
-  { reason: 'Años mínimos de experiencia', count: 180, pct: '49%' },
-  { reason: 'Dominio de herramientas (SAP, Excel)', count: 120, pct: '33%' },
-  { reason: 'Ubicación geográfica', count: 67, pct: '18%' },
-];
+// ─── Static config (non-data) ─────────────────────────────────────────────────
 
 const CHANNEL_TABS = [
-  { id: 'general', label: 'GENERAL' },
-  { id: 'redes', label: 'REDES SOCIALES' },
+  { id: 'general',  label: 'GENERAL' },
+  { id: 'redes',    label: 'REDES SOCIALES' },
   { id: 'portales', label: 'PORTALES' },
-  { id: 'web', label: 'PÁGINA WEB' },
-  { id: 'fisico', label: 'FÍSICO (QR)' },
-];
-
-const TIME_PHASES = [
-  { label: 'Scoring', days: 2, bottleneck: false },
-  { label: 'Pre-screening', days: 5, bottleneck: true },
-  { label: 'Entrevistas', days: 8, bottleneck: false },
-  { label: 'Evaluaciones', days: 7, bottleneck: false },
-  { label: 'Finalistas', days: 6, bottleneck: false },
-];
-
-const HR_RESPONSE = [
-  { from: 'Scoring → Pre-screening', days: 1.2, warning: false },
-  { from: 'Pre-screening → Entrevistas', days: 3.8, warning: true },
-  { from: 'Entrevistas → Evaluaciones', days: 2.1, warning: false },
-  { from: 'Evaluaciones → Finalistas', days: 1.5, warning: false },
-];
-
-const AGING_CRITICO = [
-  { vacante: 'Analista Financiero Sr.', area: 'Finanzas', days: 42 },
-  { vacante: 'Coord. de Compras', area: 'Compras', days: 35 },
-  { vacante: 'Supervisor Almacén', area: 'Logística', days: 28 },
-];
-
-const HM_TABLE = [
-  { name: 'María García', area: 'Operaciones', vacantes: 4, entrevistas: 28, contratados: 4, ratio: '7:1', ratioOk: true, ttf: '26 días' },
-  { name: 'Carlos Ruiz', area: 'Ventas', vacantes: 3, entrevistas: 45, contratados: 3, ratio: '15:1', ratioOk: false, ttf: '38 días' },
-  { name: 'Andrea López', area: 'Finanzas', vacantes: 2, entrevistas: 18, contratados: 1, ratio: '18:1', ratioOk: false, ttf: '44 días' },
-  { name: 'Juan Morales', area: 'Logística', vacantes: 3, entrevistas: 24, contratados: 3, ratio: '8:1', ratioOk: true, ttf: '24 días' },
-];
-
-const DETAIL_TABLE = [
-  { vacante: 'Coordinador de Logística', area: 'Operaciones', tipo: 'Operativa', estado: 'COMPLETADA', aplicados: 520, contratados: 1, ratio: '520:1', ttf: '32 días', aging: false, ahorro: '450h' },
-  { vacante: 'Analista Financiero Sr.', area: 'Finanzas', tipo: 'Administrativa', estado: 'ABIERTA', aplicados: 380, contratados: 0, ratio: '—', ttf: '42 días', aging: true, ahorro: '—' },
-  { vacante: 'Ejecutivo de Ventas', area: 'Ventas', tipo: 'Operativa', estado: 'COMPLETADA', aplicados: 650, contratados: 2, ratio: '325:1', ttf: '28 días', aging: false, ahorro: '480h' },
-  { vacante: 'Supervisor de Almacén', area: 'Logística', tipo: 'Operativa', estado: 'ABIERTA', aplicados: 420, contratados: 0, ratio: '—', ttf: '35 días', aging: true, ahorro: '—' },
-  { vacante: 'Gerente Comercial', area: 'Ventas', tipo: 'Estratégica', estado: 'DESIERTA', aplicados: 180, contratados: 0, ratio: '—', ttf: '60 días', aging: false, ahorro: '—' },
-  { vacante: 'Coord. de Compras', area: 'Compras', tipo: 'Administrativa', estado: 'PAUSADA', aplicados: 280, contratados: 0, ratio: '—', ttf: '35 días', aging: false, ahorro: '—' },
+  { id: 'web',      label: 'PÁGINA WEB' },
+  { id: 'fisico',   label: 'FÍSICO (QR)' },
 ];
 
 // ─── Status badge config ──────────────────────────────────────────────────────
@@ -245,6 +123,22 @@ export default function AnalyticsPage() {
   const [estadoFilter, setEstadoFilter] = useState<string>('Todas');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [tipoFilter, setTipoFilter] = useState<string>('todos');
+
+  // Derive a stable period string from dateRange
+  const periodoKey = dateRange.start && dateRange.end
+    ? `${dateRange.start.toISOString().slice(0, 10)}_${dateRange.end.toISOString().slice(0, 10)}`
+    : 'default';
+
+  // Regenerate all data whenever any filter changes
+  const data = useMemo(
+    () => generateAnalyticsData(periodoKey, tipoFilter, estadoFilter, activeChannel),
+    [periodoKey, tipoFilter, estadoFilter, activeChannel]
+  );
+
+  const {
+    vacancyStats, kpiCards, funnelStages, dropoffTable,
+    timePhases, hrResponse, agingCritico, hmTable, detailTable,
+  } = data;
 
   const sectionGap: React.CSSProperties = { marginBottom: '24px' };
 
@@ -395,7 +289,7 @@ export default function AnalyticsPage() {
           <Card id="seccion-estado" style={sectionGap}>
             <SectionTitle>Estado de Vacantes</SectionTitle>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              {VACANCY_STATS.map((s) => {
+              {vacancyStats.map((s) => {
                 const isSelected = estadoFilter === s.key;
                 const isHovered = hoveredCard === s.key;
                 return (
@@ -464,7 +358,7 @@ export default function AnalyticsPage() {
           <Card style={sectionGap}>
             <SectionTitle>Métricas Clave</SectionTitle>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-              {KPI_CARDS.map((k) => (
+              {kpiCards.map((k) => (
                 <div
                   key={k.key}
                   style={{
@@ -536,7 +430,7 @@ export default function AnalyticsPage() {
 
             {/* Funnel bars */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {FUNNEL_STAGES.map((stage) => {
+              {funnelStages.map((stage) => {
                 const barWidth = `${Math.max(stage.pct, 0.5)}%`;
                 return (
                   <div key={stage.label} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -650,7 +544,7 @@ export default function AnalyticsPage() {
                   <span>Descartados</span>
                   <span>% del Total</span>
                 </div>
-                {DROPOFF_TABLE.map((row) => (
+                {dropoffTable.map((row) => (
                   <div
                     key={row.reason}
                     style={{
@@ -677,7 +571,7 @@ export default function AnalyticsPage() {
 
             {/* Phase cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '20px' }}>
-              {TIME_PHASES.map((p) => (
+              {timePhases.map((p) => (
                 <div
                   key={p.label}
                   style={{
@@ -732,7 +626,7 @@ export default function AnalyticsPage() {
                   <Clock size={13} />
                   Tiempo de respuesta HR (promedio por fase)
                 </div>
-                {HR_RESPONSE.map((row) => (
+                {hrResponse.map((row) => (
                   <div
                     key={row.from}
                     style={{
@@ -779,7 +673,7 @@ export default function AnalyticsPage() {
                   <AlertTriangle size={13} />
                   Vacantes con aging crítico (+30 días sin avanzar)
                 </div>
-                {AGING_CRITICO.map((row) => (
+                {agingCritico.map((row) => (
                   <div
                     key={row.vacante}
                     style={{
@@ -834,7 +728,7 @@ export default function AnalyticsPage() {
                 <span>Entrevistas/contratado</span>
                 <span>Time-to-fill prom.</span>
               </div>
-              {HM_TABLE.map((row) => (
+              {hmTable.map((row) => (
                 <div
                   key={row.name}
                   style={{
@@ -926,7 +820,7 @@ export default function AnalyticsPage() {
                 <span>Time-to-Fill</span>
                 <span>Ahorro (h)</span>
               </div>
-              {DETAIL_TABLE.map((row) => {
+              {detailTable.map((row) => {
                 const s = STATUS_STYLE[row.estado] ?? { bg: '#f7f7f8', color: '#68686a', border: '#c0c0c1' };
                 return (
                   <div
