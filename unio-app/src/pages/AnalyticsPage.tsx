@@ -193,9 +193,10 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function Card({ children, style, id }: { children: React.ReactNode; style?: React.CSSProperties; id?: string }) {
   return (
     <div
+      id={id}
       style={{
         background: '#ffffff',
         border: '1px solid var(--color-border-default)',
@@ -391,7 +392,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* ── ESTADO DE VACANTES ── */}
-          <Card style={sectionGap}>
+          <Card id="seccion-estado" style={sectionGap}>
             <SectionTitle>Estado de Vacantes</SectionTitle>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
               {VACANCY_STATS.map((s) => {
@@ -485,7 +486,7 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* ── FUNNEL DE CANDIDATOS ── */}
-          <Card style={sectionGap}>
+          <Card id="seccion-funnel" style={sectionGap}>
             <SectionTitle>Funnel de Candidatos</SectionTitle>
             <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '16px', marginTop: '-10px' }}>
               Haz click en un canal para filtrar el funnel
@@ -671,7 +672,7 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* ── EFICIENCIA DE TIEMPO ── */}
-          <Card style={sectionGap}>
+          <Card id="seccion-eficiencia" style={sectionGap}>
             <SectionTitle>Eficiencia de Tiempo</SectionTitle>
 
             {/* Phase cards */}
@@ -802,7 +803,7 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* ── KPI HIRING MANAGER ── */}
-          <Card style={sectionGap}>
+          <Card id="seccion-kpi" style={sectionGap}>
             <SectionTitle>KPI Hiring Manager</SectionTitle>
             <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '16px', marginTop: '-10px' }}>
               Entrevistas realizadas por contratado — eficiencia del proceso de entrevistas
@@ -873,7 +874,7 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* ── DETALLE POR VACANTE ── */}
-          <Card style={{ marginBottom: '40px' }}>
+          <Card id="seccion-detalle" style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <SectionTitle>Detalle por Vacante</SectionTitle>
               <button
