@@ -215,20 +215,6 @@ export default function MainSidebar() {
                             }}
                           />
                         )}
-                        {/* Step number */}
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            color: isSectionActive
-                              ? 'var(--color-secondary-600)'
-                              : 'var(--color-neutral-300)',
-                            minWidth: '14px',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {idx === 0 ? '·' : idx}
-                        </span>
                         <span style={{ lineHeight: '1.3' }}>{sLabel}</span>
                       </button>
                     );
