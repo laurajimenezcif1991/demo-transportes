@@ -3,6 +3,7 @@ import { Download, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import MainSidebar from '../components/layout/MainSidebar';
 import DateRangePicker, { type DateRange } from '../components/ui/DateRangePicker';
 import { generateAnalyticsData } from '../data/analytics-mock-generator';
+import { useCountUp } from '../hooks/useCountUp';
 
 // ─── Static config (non-data) ─────────────────────────────────────────────────
 
@@ -114,6 +115,33 @@ const selectStyle: React.CSSProperties = {
   backgroundPosition: 'right 10px center',
   minWidth: '160px',
 };
+
+// ─── Animated sub-components ─────────────────────────────────────────────────
+
+/** Count-up number for vacancy stat cards */
+function AnimatedCount({ value, color }: { value: number; color: string }) {
+  const display = useCountUp(value, 650);
+  return (
+    <span style={{ color, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px', lineHeight: 1 }}>
+      {display}
+    </span>
+  );
+}
+
+/** Flip animation on a day number when it changes */
+function FlipNumber({ value }: { value: number }) {
+  return (
+    <span
+      key={value}
+      style={{
+        display: 'inline-block',
+        animation: 'flipIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both',
+      }}
+    >
+      {value}
+    </span>
+  );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -289,7 +317,7 @@ export default function AnalyticsPage() {
           <Card id="seccion-estado" style={sectionGap}>
             <SectionTitle>Estado de Vacantes</SectionTitle>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              {vacancyStats.map((s) => {
+              {vacancyStats.map((s, idx) => {
                 const isSelected = estadoFilter === s.key;
                 const isHovered = hoveredCard === s.key;
                 return (
@@ -299,6 +327,7 @@ export default function AnalyticsPage() {
                     onMouseEnter={() => setHoveredCard(s.key)}
                     onMouseLeave={() => setHoveredCard(null)}
                     style={{
+                      animation: `scaleIn 0.3s cubic-bezier(0.34,1.4,0.64,1) ${idx * 60}ms both`,
                       background: isSelected
                         ? s.selectedBg
                         : isHovered
@@ -322,18 +351,11 @@ export default function AnalyticsPage() {
                       boxShadow: isSelected ? `0 0 0 3px ${s.accentColor}22` : 'none',
                     }}
                   >
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontWeight: 800,
-                        fontSize: '28px',
-                        color: isSelected ? s.accentColor : 'var(--color-brand-primary)',
-                        lineHeight: 1,
-                        marginBottom: '5px',
-                        transition: 'color 0.15s ease',
-                      }}
-                    >
-                      {s.value}
+                    <div style={{ marginBottom: '5px', transition: 'color 0.15s ease' }}>
+                      <AnimatedCount
+                        value={s.value}
+                        color={isSelected ? s.accentColor : 'var(--color-brand-primary)'}
+                      />
                     </div>
                     <div
                       style={{
@@ -429,11 +451,19 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Funnel bars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {funnelStages.map((stage) => {
+            <div key={periodoKey + tipoFilter + activeChannel} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {funnelStages.map((stage, idx) => {
                 const barWidth = `${Math.max(stage.pct, 0.5)}%`;
                 return (
-                  <div key={stage.label} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    key={stage.label}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+                      animation: `fadeSlideRight 0.35s ease ${idx * 55}ms both`,
+                    }}
+                  >
 
                     {/* Stage label — plain text, no background */}
                     <div
@@ -585,7 +615,7 @@ export default function AnalyticsPage() {
                     {p.label}
                   </div>
                   <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-text-primary)', lineHeight: 1 }}>
-                    {p.days}
+                    <FlipNumber value={p.days} />
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                     {p.bottleneck ? (
