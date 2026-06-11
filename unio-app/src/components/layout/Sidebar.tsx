@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { usePipeline } from '../../context/PipelineContext';
 import { useMockStageState } from '../../hooks/useMockStageState';
-import { mockFinalistCards } from '../../data/mock';
+import { mockFinalistCards, getMockPipelineStages } from '../../data/mock';
 import { assetUrl } from '../../utils/assets';
 
 /** Finalistas está habilitado — la ruta /pipeline/:jobId/finalistas apunta a Shortlist. */
@@ -82,42 +82,47 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     },
   ];
 
+  // Use dynamic labels from getMockPipelineStages when inside a mock job
+  const pipelineStages = isMockJob ? getMockPipelineStages(jobId) : null;
+  const stageLabel = (stageId: string, fallback: string) =>
+    pipelineStages?.find(s => s.id === stageId)?.label ?? fallback;
+
   const stageItems = [
     {
       id: 'scoring',
-      label: 'Scoring IA',
+      label: stageLabel('scoring', 'Scoring IA'),
       Icon: Search,
       path: `${stageBase}/scoring`,
-      locked: false,                      // siempre activo: es la primera fase
+      locked: false,
     },
     {
       id: 'prescreening',
-      label: 'Pre screening IA',
+      label: stageLabel('prescreening', 'Pre screening IA'),
       Icon: AlignLeft,
       path: `${stageBase}/prescreening`,
-      locked: progressIdx < 1,            // requiere haber llegado a prescreening
+      locked: progressIdx < 1,
     },
     {
       id: 'entrevistas',
-      label: 'Entrevistas',
+      label: stageLabel('entrevistas', 'Entrevistas'),
       Icon: MessageSquare,
       path: `${stageBase}/entrevistas`,
-      locked: progressIdx < 2,            // requiere haber llegado a entrevistas
+      locked: progressIdx < 2,
     },
     {
       id: 'evaluaciones',
-      label: 'Pruebas',
+      label: stageLabel('evaluaciones', 'Pruebas'),
       Icon: CheckSquare,
       path: `${stageBase}/evaluaciones`,
-      locked: progressIdx < 3,            // requiere haber llegado a evaluaciones
+      locked: progressIdx < 3,
     },
-    ...[{
-        id: 'finalistas',
-        label: 'Finalistas',
-        Icon: CheckCheck,
-        path: `${stageBase}/finalistas`,
-        locked: finalistasLocked,          // desbloquea en entrevistas Y cuando hay finalistas
-      }],
+    {
+      id: 'finalistas',
+      label: stageLabel('finalistas', 'Finalistas'),
+      Icon: CheckCheck,
+      path: `${stageBase}/finalistas`,
+      locked: finalistasLocked,
+    },
   ];
 
   const allItems = [...topItems, ...stageItems];
