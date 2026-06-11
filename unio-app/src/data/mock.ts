@@ -69,8 +69,16 @@ export interface Candidate {
     noNegociables: EvalRow[];
     plusDetectados: string[];
     senales: string[];
+    entornoPersonal?: { label: string; value: string; status: 'ok' | 'warning' | 'neutral' }[];
+    experienciaLaboral?: { empresa: string; rol: string; periodo: string; descripcion: string }[];
   };
   psychTest?: PsychTestResult;
+  runtVerification?: {
+    cc: string;
+    totalManifiestos: number;
+    licenseCategories: { categoria: string; fechaExpedicion: string; fechaVencimiento: string }[];
+  };
+  pruebaManejo?: { status: 'agendada'; fecha: string; hora: string; lugar: string } | { status: 'pendiente' };
 }
 
 export interface NoNegociable {
@@ -2080,18 +2088,600 @@ import {
   gcaEval, gcvEval, cbEval,
 } from './mock-comfandi';
 
+// ══════════════════════════════════════════════════════════════════════════════
+// VACANTE DEMO TRANSPORTES — CONDUCTOR C2 CARGA REFRIGERADA
+// ══════════════════════════════════════════════════════════════════════════════
+
+const _vigiaRunt: { cc: string; cats: { c: string; e: string; v: string }[] }[] = [
+  { cc: '79582341',   cats: [{ c:'C2', e:'10/08/2022', v:'10/08/2025' }, { c:'A2', e:'14/02/2010', v:'14/02/2028' }, { c:'B2', e:'10/08/2022', v:'10/08/2032' }] },
+  { cc: '19478256',   cats: [{ c:'C2', e:'05/11/2023', v:'05/11/2026' }, { c:'A2', e:'18/06/2011', v:'18/06/2025' }, { c:'B2', e:'05/11/2023', v:'05/11/2033' }] },
+  { cc: '80341972',   cats: [{ c:'C2', e:'22/04/2023', v:'22/04/2026' }, { c:'B2', e:'22/04/2023', v:'22/04/2033' }] },
+  { cc: '1020774521', cats: [{ c:'C2', e:'17/01/2024', v:'17/01/2027' }, { c:'A2', e:'09/09/2014', v:'09/09/2028' }, { c:'B2', e:'17/01/2024', v:'17/01/2034' }] },
+  { cc: '79918834',   cats: [{ c:'C2', e:'03/07/2023', v:'03/07/2026' }, { c:'B1', e:'03/07/2023', v:'03/07/2033' }] },
+  { cc: '80275634',   cats: [{ c:'C2', e:'28/09/2023', v:'28/09/2026' }, { c:'B2', e:'28/09/2023', v:'28/09/2033' }] },
+  { cc: '1072671845', cats: [{ c:'C2', e:'14/05/2024', v:'14/05/2027' }, { c:'A2', e:'20/03/2018', v:'20/03/2026' }] },
+  { cc: '1015421837', cats: [{ c:'C2', e:'06/02/2024', v:'06/02/2027' }] },
+  { cc: '52847293',   cats: [{ c:'C2', e:'11/10/2023', v:'11/10/2026' }, { c:'B1', e:'11/10/2023', v:'11/10/2033' }] },
+  { cc: '79648392',   cats: [{ c:'C2', e:'25/03/2024', v:'25/03/2027' }] },
+  { cc: '1014238945', cats: [{ c:'C2', e:'08/08/2024', v:'08/08/2027' }] },
+  { cc: '1014876523', cats: [{ c:'C2', e:'01/02/2024', v:'01/02/2027' }] },
+  { cc: '63423876',   cats: [{ c:'C2', e:'17/06/2023', v:'17/06/2026' }] },
+  { cc: '80193847',   cats: [{ c:'C2', e:'30/11/2023', v:'30/11/2026' }] },
+  { cc: '72485938',   cats: [{ c:'C2', e:'15/04/2025', v:'15/04/2028' }] },
+];
+
+const _vigiaJobs = [
+  { c: 'Saferbo S.A.',                r: 'Conductor C2',                d: '01/2025' },
+  { c: 'TCC S.A.S.',                  r: 'Conductor Carga Refrigerada',  d: '11/2024' },
+  { c: 'Servientrega S.A.',           r: 'Conductor C2',                d: '03/2025' },
+  { c: 'Coordinadora Mercantil',      r: 'Conductor C2',                d: '12/2024' },
+  { c: 'Almacenes Éxito',             r: 'Conductor Refrigerado',       d: '02/2025' },
+  { c: 'Frío Andino S.A.S.',          r: 'Conductor Carga Refrigerada', d: '01/2025' },
+  { c: 'Logística TransCor S.A.S.',   r: 'Conductor C2',                d: '04/2024' },
+  { c: 'Transportes El Cóndor',       r: 'Conductor C2',                d: '10/2024' },
+  { c: 'Almacenes La 14 S.A.',        r: 'Conductor Refrigerado',       d: '06/2024' },
+  { c: 'Rapi Carga S.A.',             r: 'Conductor C2',                d: '09/2024' },
+  { c: 'TransAldi S.A.S.',            r: 'Conductor',                   d: '03/2024' },
+  { c: 'Carga Global S.A.S.',         r: 'Conductor C2',                d: '07/2024' },
+  { c: 'Transportes Rápidos Ltda.',   r: 'Conductor',                   d: '05/2024' },
+  { c: 'Distribuidora Andina',        r: 'Conductor C2',                d: '02/2024' },
+  { c: 'Trans Express Col',           r: 'Conductor',                   d: '08/2024' },
+];
+
+const _vigiaExpPrev: { c: string; r: string; periodo: string; desc: string }[] = [
+  { c: 'Frigorífico Nacional S.A.',    r: 'Conductor C2 Refrigerado',   periodo: '2020 – 2022', desc: 'Transporte de carne y lácteos a cadenas de supermercados en ruta Bogotá–Medellín. Manejo de furgón refrigerado Kenworth T300 con control de temperatura -18 °C.' },
+  { c: 'Rapi Carga S.A.',              r: 'Conductor C2',               periodo: '2019 – 2021', desc: 'Distribución de carga general y refrigerada a nivel local y regional. Gestión de manifiestos de carga y protocolo de entrega a cliente final.' },
+  { c: 'Logística El Cóndor',          r: 'Conductor C2',               periodo: '2018 – 2020', desc: 'Transporte de mercancía en ruta Bogotá–Cali–Medellín. Responsable de precarga, seguridad de carga y entrega conforme a BL.' },
+  { c: 'Transportes La Espiga Ltda.',  r: 'Conductor Auxiliar',         periodo: '2021 – 2023', desc: 'Apoyo en rutas nacionales de distribución de alimentos perecederos. Manejo de temperatura, bitácora de ruta y protocolo BASC.' },
+  { c: 'Distribuidora Andina S.A.S.',  r: 'Conductor C2 Refrigerado',   periodo: '2020 – 2022', desc: 'Rutas de entrega de productos lácteos y embutidos a clientes institucionales. Manejo de camión NQR con cava y control de temperatura.' },
+  { c: 'Frigoríficos Colanta',         r: 'Conductor Refrigerado',      periodo: '2022 – 2024', desc: 'Transporte de lácteos en ruta regional Cundinamarca–Boyacá. Cumplimiento estricto de cadena de frío y registros INVIMA.' },
+  { c: 'Trans Bogotá Express S.A.S.',  r: 'Conductor C2',               periodo: '2019 – 2021', desc: 'Distribución urbana y periurbana de carga paletizada. Manejo de Isuzu NPR y documentación de despacho.' },
+  { c: 'Almacenes Olímpica',           r: 'Conductor Refrigerado',      periodo: '2021 – 2023', desc: 'Reposición de neveras y distribución de congelados en puntos de venta de cadena. Ruta diaria Bogotá–Soacha–Girardot.' },
+  { c: 'Logística TCC',                r: 'Conductor C2',               periodo: '2018 – 2020', desc: 'Carga express y mensajería pesada a nivel nacional. Reporte de novedades en plataforma interna y uso de GPS.' },
+  { c: 'Saferbo S.A.',                 r: 'Conductor C2',               periodo: '2020 – 2022', desc: 'Transporte de carga general y encomiendas en rutas Bogotá–Manizales–Pereira.' },
+  { c: 'TCC S.A.S.',                   r: 'Conductor',                  periodo: '2019 – 2021', desc: 'Despacho y recepción de carga en bodegas regionales. Apoyo en cargue y descargue de mercancía.' },
+  { c: 'Servientrega S.A.',            r: 'Conductor C2',               periodo: '2018 – 2020', desc: 'Distribución de paquetería y carga mediana en ruta Bogotá–Villavicencio.' },
+  { c: 'Coltrans S.A.S.',              r: 'Conductor',                  periodo: '2017 – 2019', desc: 'Transporte de insumos agrícolas y distribución en zona rural de Cundinamarca.' },
+  { c: 'Ganadería El Porvenir',        r: 'Conductor Auxiliar',         periodo: '2017 – 2018', desc: 'Transporte de ganado y productos cárnicos en ruta regional. Primer empleo formal en el sector.' },
+  { c: 'Trans Express Col',            r: 'Conductor',                  periodo: '2016 – 2018', desc: 'Distribución local de mensajería y carga liviana. Manejo de camión NHR en zona norte de Bogotá.' },
+];
+
+const _vigiaPersonal: { label: string; value: string; status: 'ok' | 'warning' | 'neutral' }[][] = [
+  [{ label: 'Municipio', value: 'Bogotá (Suba)', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Disponible — salió por fin de contrato', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'Moto propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Casado, 2 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Cota (cerca planta)', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Trabaja — dispuesto a cambiar', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Disponibilidad total', status: 'ok' }, { label: 'Transporte', value: 'Vehículo propio', status: 'ok' }, { label: 'Grupo familiar', value: 'Casado, 3 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Mosquera', status: 'ok' }, { label: 'Disponibilidad de inicio', value: '8 días de preaviso', status: 'ok' }, { label: 'Situación laboral', value: 'Empleado activo', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'Moto propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Soltero, sin hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Bogotá (Kennedy)', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Disponible — empresa cerró operaciones', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Disponibilidad total', status: 'ok' }, { label: 'Transporte', value: 'SITP + caminata', status: 'neutral' }, { label: 'Grupo familiar', value: 'Casado, 1 hijo', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Funza', status: 'ok' }, { label: 'Disponibilidad de inicio', value: '15 días de preaviso', status: 'ok' }, { label: 'Situación laboral', value: 'Empleado activo', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'Bicicleta propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Unión libre, 2 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Cota', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Disponible — contrato temporal vencido', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Disponibilidad total', status: 'ok' }, { label: 'Transporte', value: 'Moto propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Casado, 2 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Madrid, Cundinamarca', status: 'ok' }, { label: 'Disponibilidad de inicio', value: '8 días de preaviso', status: 'ok' }, { label: 'Situación laboral', value: 'Empleado activo', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'Moto propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Soltero', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Bogotá (Bosa)', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Disponible', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'SITP', status: 'neutral' }, { label: 'Grupo familiar', value: 'Casado, 2 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Mosquera', status: 'ok' }, { label: 'Disponibilidad de inicio', value: '15 días de preaviso', status: 'warning' }, { label: 'Situación laboral', value: 'Empleado activo', status: 'neutral' }, { label: 'Disponibilidad horaria', value: 'Dom–dom, necesita compensatorio claro', status: 'warning' }, { label: 'Transporte', value: 'Moto propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Casado, 3 hijos', status: 'neutral' }],
+  [{ label: 'Municipio', value: 'Bogotá (Engativá)', status: 'ok' }, { label: 'Disponibilidad de inicio', value: 'Inmediata', status: 'ok' }, { label: 'Situación laboral', value: 'Disponible', status: 'ok' }, { label: 'Disponibilidad horaria', value: 'Dom–dom con compensatorio', status: 'ok' }, { label: 'Transporte', value: 'Bicicleta propia', status: 'ok' }, { label: 'Grupo familiar', value: 'Soltero, sin hijos', status: 'neutral' }],
+];
+
+const _vigiaTestSlots = [
+  { fecha: 'Sáb 21 Jun 2026', hora: '08:00 AM', lugar: 'Patio de maniobras Demo Transportes — Cota' },
+  { fecha: 'Sáb 21 Jun 2026', hora: '09:30 AM', lugar: 'Patio de maniobras Demo Transportes — Cota' },
+  { fecha: 'Dom 22 Jun 2026', hora: '08:00 AM', lugar: 'Patio de maniobras Demo Transportes — Cota' },
+];
+
+function _mkVigia(id: string, name: string, score: number, photo: string, initials: string, color: string, city: string, years: string, aspiration: string, salaryRange: SalaryRange, stage: 'scoring' | 'prescreening' | 'entrevistas' = 'scoring'): Candidate {
+  const hi = score >= 75; const md = score >= 58;
+  const idx = parseInt(id.split('-')[1]) - 1;
+  const job = _vigiaJobs[idx] ?? _vigiaJobs[0];
+  const prevJob = _vigiaExpPrev[idx] ?? _vigiaExpPrev[0];
+  const trips = hi ? Math.round(150 + (score - 75) * 8) : md ? Math.round(70 + (score - 58) * 3) : Math.round(20 + score * 0.5);
+  const licYears = hi ? Math.max(4, Math.round((score - 75) / 4) + 4) : md ? 2 : 1;
+  const wrongCity = city === 'Bucaramanga' || city === 'Barranquilla';
+  const personal = idx < _vigiaPersonal.length ? _vigiaPersonal[idx] : _vigiaPersonal[0];
+  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+    score: Math.round(score * 0.97),
+    status: hi ? 'continua' : md ? 'continua' : 'pendiente',
+    resumen: hi
+      ? `${name} confirmó disponibilidad inmediata y motivación genuina por el cargo. Durante la conversación demostró conocimiento práctico de rutas nacionales y manejo de carga refrigerada. Corroboró experiencia documentada en su hoja de vida y no presentó inconsistencias.`
+      : md
+      ? `${name} confirmó interés en la posición y disponibilidad de inicio en el corto plazo. Su historial de experiencia es consistente, aunque con menor profundidad en manejo específico de cadena de frío. Requiere validación de algunos detalles en entrevista.`
+      : `${name} mostró interés básico pero presentó inconsistencias en las fechas de experiencia declaradas. La disponibilidad horaria para esquema domingo a domingo no fue confirmada de forma clara.`,
+    noNegociables: [
+      { label: 'Experiencia conduciendo vehículos C2 con carga refrigerada', score: hi ? score - 2 : md ? score - 8 : score - 18, evidencia: hi ? `Confirmó manejo de camión refrigerado en ${job.c}. Describió con precisión el protocolo de control de temperatura y registro de novedades.` : md ? `Menciona experiencia en carga refrigerada pero sin detalle del tipo de unidad de frío.` : `No acreditó experiencia específica en refrigerados durante la conversación.` } as EvalRow,
+      { label: 'Disponibilidad horaria domingo a domingo con compensatorio', score: hi ? score - 1 : md ? score - 5 : score - 20, evidencia: hi ? `Confirma disponibilidad total para esquema DOM–DOM. Ha trabajado bajo este esquema en al menos dos empresas anteriores.` : md ? `Acepta el esquema DOM–DOM con la condición de que el compensatorio sea pactado desde el contrato.` : `Manifestó dudas sobre la disponibilidad dominical. Requiere validar.` } as EvalRow,
+      { label: 'Conocimiento de protocolos HSEQ y BASC en carga nacional', score: hi ? score - 3 : md ? score - 9 : score - 15, evidencia: hi ? `Describió el proceso de revisión preoperacional, llenado de bitácora BASC y reporte de novedades de seguridad.` : md ? `Conoce los conceptos básicos pero sin certificación o capacitación formal reciente.` : `No demostró familiaridad con protocolos BASC ni bitácora de ruta.` } as EvalRow,
+      { label: 'Sin antecedentes disciplinarios ni comparendos graves vigentes', score: hi ? score : md ? score - 4 : score - 12, evidencia: hi ? `Declara record limpio en RUNT. Consistente con verificación ya realizada en la etapa anterior.` : md ? `No reporta comparendos vigentes. Pendiente cruce final con RUNT.` : `Declara tener un comparendo pendiente de pago. Requiere verificación.` } as EvalRow,
+    ],
+    plusDetectados: hi
+      ? [`Conocimiento de rutas nacionales: Bogotá–Medellín, Bogotá–Cali y Bogotá–Barranquilla`, `Manejo documentado de camión con unidad de frío marca Carrier o Thermoking`, `Actitud proactiva — propuso preguntas sobre el plan de carrera y beneficios`]
+      : md
+      ? [`Disposición para recibir capacitación en cadena de frío`, `Puntualidad evidenciada — llegó antes del tiempo acordado a la entrevista de verificación`]
+      : [`Disposición para empezar en el corto plazo si se resuelven las dudas sobre el esquema`],
+    senales: hi
+      ? [`Confirmar si tiene experiencia con caja Fuller o caja automática — para asignación de vehículo`]
+      : md
+      ? [`Validar fechas de experiencia con empleadores — hay un período de 4 meses sin actividad reportada`, `Reconfirmar disponibilidad DOM–DOM en la entrevista presencial`]
+      : [`Inconsistencia de fechas entre lo declarado en la llamada y la hoja de vida`, `Confirmar situación del comparendo pendiente antes de avanzar`],
+    entornoPersonal: personal,
+    experienciaLaboral: [
+      { empresa: job.c, rol: job.r, periodo: hi ? `2022 – Presente` : md ? `2023 – ${job.d.replace('/','/20').slice(0, 7)}` : `2022 – ${job.d}`, descripcion: hi ? `Transporte de carga refrigerada a nivel nacional. Manejo de camión con unidad de frío, control de temperatura y entrega conforme a BL. Sin incidentes en ${Math.round(trips * 0.6)} rutas completadas.` : md ? `Conducción de carga general y refrigerada en rutas nacionales. Cumplimiento de entregas y manejo básico de documentación de ruta.` : `Conducción en rutas cortas con carga general. Experiencia básica sin especialización en refrigerados.` },
+      { empresa: prevJob.c, rol: prevJob.r, periodo: prevJob.periodo, descripcion: prevJob.desc },
+    ],
+  } : undefined;
+  return {
+    id, name, role: 'Conductor C2 Carga Refrigerada', sector: 'Transporte de Carga / Logística',
+    years, location: `${city}, Colombia`,
+    bio: 'Conductor de carga con licencia C2 y experiencia en transporte terrestre de mercancía refrigerada y congelada a nivel nacional. Manejo de vehículos con unidad de frío y cumplimiento de protocolos HSEQ y BASC.',
+    score, photo, avatarInitials: initials, avatarColor: color,
+    hasCurrentJob: score >= 68,
+    ...(score >= 68
+      ? { currentCompany: job.c, currentRole: job.r }
+      : { lastCompany: job.c, lastRole: job.r, lastDate: job.d }),
+    superpoder: hi
+      ? '"Conducción segura con cero incidentes y manejo preciso de cadena de frío"'
+      : md
+      ? '"Conocimiento de rutas nacionales y cumplimiento de tiempos de entrega"'
+      : '"Disponibilidad y disposición para aprender el cargo"',
+    aspiration, budget: "$3'500.000", salaryRange, currentStage: stage,
+    runtVerification: {
+      cc: _vigiaRunt[idx]?.cc ?? '00000000',
+      totalManifiestos: trips,
+      licenseCategories: (_vigiaRunt[idx]?.cats ?? []).map(r => ({ categoria: r.c, fechaExpedicion: r.e, fechaVencimiento: r.v })),
+    },
+    ...(stage === 'entrevistas'
+      ? { pruebaManejo: idx < _vigiaTestSlots.length ? { status: 'agendada' as const, ..._vigiaTestSlots[idx] } : { status: 'pendiente' as const } }
+      : {}),
+    ...(pre ? { prescreeningAI: pre } : {}),
+    scoringAI: {
+      score: Math.round(score * 0.95),
+      status: score >= 58 ? 'continua' : 'pendiente',
+      resumen: hi
+        ? `${name} cumple todos los criterios verificados en RUNT y RNDC. Licencia C2 con ${licYears}+ años de expedición, ${trips} manifiestos de ruta verificados en los últimos 5 años y sin infracciones graves registradas.`
+        : md
+        ? `${name} cumple parcialmente los criterios de verificación RUNT/RNDC. Algunos criterios presentan observaciones que requieren validación adicional en el proceso.`
+        : `${name} no cumple los requisitos mínimos verificados en RUNT/RNDC. Se identificaron brechas en licencia vigente, historial de viajes o criterios de ubicación.`,
+      noNegociables: [
+        { label: 'Licencia C2 vigente con mínimo 2 años desde expedición', cumple: hi || (md && score >= 65) },
+        { label: 'Mínimo 100 manifiestos de ruta verificados (RUNT/RNDC, últimos 5 años)', cumple: hi || (md && score >= 63) },
+        { label: 'Residencia en Cota, municipios aledaños o Bogotá', cumple: !wrongCity },
+        { label: 'Expectativa salarial ≤ $3.500.000', cumple: salaryRange === 'en_rango' },
+      ],
+      logros: hi
+        ? [
+            `${trips} manifiestos de ruta verificados en RNDC — supera el umbral mínimo requerido de 100 viajes`,
+            `Licencia C2 con ${licYears} años de expedición vigente y sin suspensiones registradas en RUNT`,
+            'Cero infracciones graves ni comparendos vigentes registrados en el sistema RUNT',
+          ]
+        : md
+        ? [
+            `${trips} viajes verificados en RNDC — requiere complementar manifiestos para alcanzar el umbral mínimo`,
+            'Licencia C2 vigente con período de expedición cercano al límite mínimo requerido',
+          ]
+        : [
+            'Historial de viajes en RNDC por debajo del umbral mínimo requerido de 100 manifiestos',
+          ],
+      senales: hi
+        ? ['Confirmar disponibilidad para turnos domingo a domingo con compensatorio previamente acordado']
+        : md
+        ? [
+            'Validar manifiestos de ruta faltantes directamente con empleadores anteriores',
+            score < 68 ? 'Confirmar manejo de caja Fuller con prueba técnica presencial' : 'Verificar experiencia documentada en control de unidades de refrigeración',
+          ]
+        : [
+            wrongCity
+              ? `Candidato residente en ${city} — fuera de la cobertura geográfica requerida (Cota / municipios aledaños / Bogotá)`
+              : 'Historial de viajes insuficiente — no supera el mínimo de 100 manifiestos verificables en RNDC',
+            salaryRange === 'fuera_de_rango'
+              ? 'Expectativa salarial por encima del presupuesto del cargo ($3.500.000)'
+              : 'Período de expedición de licencia inferior al mínimo requerido de 2 años',
+          ],
+    },
+  };
+}
+
+const vigiaCandidates: Candidate[] = [
+  _mkVigia('mvc-1',  'Carlos Jiménez',         91, _p(1,  'men'), 'CJ', '#8750F6', 'Bogotá',       '12 Años', "$3'200.000", 'en_rango',       'entrevistas'),
+  _mkVigia('mvc-2',  'Hernando Vargas',         88, _p(2,  'men'), 'HV', '#27BE69', 'Cota',         '10 Años', "$3'000.000", 'en_rango',       'entrevistas'),
+  _mkVigia('mvc-3',  'Luis Fernando Moreno',    85, _p(3,  'men'), 'LM', '#295BFF', 'Mosquera',     '8 Años',  "$3'400.000", 'en_rango',       'entrevistas'),
+  _mkVigia('mvc-4',  'Jhon Édison Pérez',       82, _p(4,  'men'), 'JP', '#F6A350', 'Bogotá',       '9 Años',  "$3'000.000", 'en_rango',       'entrevistas'),
+  _mkVigia('mvc-5',  'Gustavo Rodríguez',       79, _p(5,  'men'), 'GR', '#8750F6', 'Funza',        '7 Años',  "$3'200.000", 'en_rango',       'entrevistas'),
+  _mkVigia('mvc-6',  'Édgar Ríos',              76, _p(6,  'men'), 'ER', '#27BE69', 'Cota',         '6 Años',  "$3'500.000", 'en_rango',       'prescreening'),
+  _mkVigia('mvc-7',  'Alexánder Suárez',        72, _p(7,  'men'), 'AS', '#295BFF', 'Madrid',       '5 Años',  "$3'100.000", 'en_rango',       'prescreening'),
+  _mkVigia('mvc-8',  'William Castaño',         66, _p(8,  'men'), 'WC', '#F6A350', 'Bogotá',       '6 Años',  "$2'900.000", 'en_rango',       'prescreening'),
+  _mkVigia('mvc-9',  'Orlando Medina',          54, _p(9,  'men'), 'OM', '#8750F6', 'Mosquera',     '5 Años',  "$3'300.000", 'en_rango',       'prescreening'),
+  _mkVigia('mvc-10', 'Pablo Acosta',            49, _p(10, 'men'), 'PA', '#27BE69', 'Bogotá',       '5 Años',  "$3'000.000", 'en_rango',       'prescreening'),
+  _mkVigia('mvc-11', 'Nelson Cruz',             81, _p(11, 'men'), 'NC', '#295BFF', 'Bogotá',       '6 Años',  "$3'200.000", 'en_rango'),
+  _mkVigia('mvc-12', 'William Huertas',         78, _p(12, 'men'), 'WH', '#F6A350', 'Bogotá',       '5 Años',  "$3'000.000", 'en_rango'),
+  _mkVigia('mvc-13', 'Fredy Gutiérrez',         74, _p(13, 'men'), 'FG', '#8750F6', 'Funza',        '5 Años',  "$3'400.000", 'en_rango'),
+  _mkVigia('mvc-14', 'Germán Parra',            70, _p(14, 'men'), 'GP', '#27BE69', 'Bogotá',       '4 Años',  "$3'100.000", 'en_rango'),
+  _mkVigia('mvc-15', 'Álvaro Ramos',            63, _p(15, 'men'), 'AR', '#295BFF', 'Cota',         '4 Años',  "$3'200.000", 'en_rango'),
+  _mkVigia('mvc-16', 'Ricardo Bermúdez',        55, _p(1,  'men'), 'RB', '#F65078', 'Bogotá',       '3 Años',  "$3'100.000", 'en_rango'),
+  _mkVigia('mvc-17', 'Javier Morales',          50, _p(2,  'men'), 'JM', '#27BE69', 'Barranquilla', '2 Años',  "$3'000.000", 'en_rango'),
+  _mkVigia('mvc-18', 'Edwin Salcedo',           45, _p(3,  'men'), 'ES', '#F6A350', 'Bogotá',       '2 Años',  "$4'800.000", 'fuera_de_rango'),
+  _mkVigia('mvc-19', 'Raúl Quintero',           40, _p(4,  'men'), 'RQ', '#295BFF', 'Cali',         '1 Año',   "$5'000.000", 'fuera_de_rango'),
+  _mkVigia('mvc-20', 'Andrés Castellanos',      34, _p(5,  'men'), 'AC', '#8750F6', 'Bogotá',       '1 Año',   "$2'800.000", 'en_rango'),
+];
+
+const vigiaScoring       = vigiaCandidates.filter(c => c.currentStage === 'scoring');
+const vigiaPrescreening  = vigiaCandidates.filter(c => c.currentStage === 'prescreening');
+const vigiaEntrevistas   = vigiaCandidates.filter(c => c.currentStage === 'entrevistas');
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VACANTE 2 — CONDUCTOR C2 TRANSPORTE PÚBLICO (SITP/TM)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const _transpPubRunt: { cc: string; cats: { c: string; e: string; v: string }[] }[] = [
+  { cc: '80124567', cats: [{ c:'C2', e:'15/03/2022', v:'15/03/2025' }, { c:'B2', e:'15/03/2022', v:'15/03/2032' }] },
+  { cc: '1019234567', cats: [{ c:'C2', e:'20/07/2023', v:'20/07/2026' }, { c:'A2', e:'05/01/2012', v:'05/01/2029' }] },
+  { cc: '79345678', cats: [{ c:'C2', e:'10/11/2023', v:'10/11/2026' }, { c:'B1', e:'10/11/2023', v:'10/11/2033' }] },
+  { cc: '1023456789', cats: [{ c:'C2', e:'08/02/2024', v:'08/02/2027' }, { c:'B2', e:'08/02/2024', v:'08/02/2034' }] },
+  { cc: '80567890', cats: [{ c:'C2', e:'25/05/2023', v:'25/05/2026' }] },
+  { cc: '1045678901', cats: [{ c:'C2', e:'12/09/2024', v:'12/09/2027' }] },
+  { cc: '79678901', cats: [{ c:'C2', e:'03/04/2023', v:'03/04/2026' }, { c:'A2', e:'18/08/2015', v:'18/08/2028' }] },
+  { cc: '1056789012', cats: [{ c:'C2', e:'28/01/2024', v:'28/01/2027' }] },
+  { cc: '80789012', cats: [{ c:'C2', e:'16/06/2023', v:'16/06/2026' }] },
+  { cc: '1067890123', cats: [{ c:'C2', e:'05/10/2024', v:'05/10/2027' }] },
+  { cc: '79890123', cats: [{ c:'C2', e:'22/12/2023', v:'22/12/2026' }] },
+  { cc: '1078901234', cats: [{ c:'C2', e:'14/03/2024', v:'14/03/2027' }] },
+  { cc: '80901234', cats: [{ c:'C2', e:'07/08/2023', v:'07/08/2026' }] },
+  { cc: '1089012345', cats: [{ c:'C2', e:'30/05/2025', v:'30/05/2028' }] },
+  { cc: '79012345', cats: [{ c:'C2', e:'19/01/2024', v:'19/01/2027' }] },
+];
+
+const _transpPubJobs = [
+  { c: 'Consorcio Express S.A.S.',  r: 'Conductor SITP',          d: '01/2025' },
+  { c: 'MiBus S.A.S.',              r: 'Conductor TransMilenio',   d: '03/2025' },
+  { c: 'GMOVIL S.A.S.',             r: 'Conductor SITP',          d: '11/2024' },
+  { c: 'SOI S.A.S.',                r: 'Conductor Articulado',    d: '12/2024' },
+  { c: 'Transdev Colombia S.A.S.',  r: 'Conductor Bus Urbano',    d: '02/2025' },
+  { c: 'Masivo Bogotá S.A.',        r: 'Conductor SITP Troncal',  d: '01/2025' },
+  { c: 'Conexión Móvil S.A.S.',     r: 'Conductor Bus Urbano',    d: '04/2024' },
+  { c: 'Transmilenio Alianza',      r: 'Conductor Articulado',    d: '10/2024' },
+  { c: 'Empresa Metro Bus S.A.S.',  r: 'Conductor SITP',          d: '06/2024' },
+  { c: 'Ruta & Futuro S.A.S.',      r: 'Conductor Bus Urbano',    d: '09/2024' },
+];
+
+const _transpPubExpPrev = [
+  { c: 'Consorcio Express S.A.S.',  r: 'Conductor SITP',         periodo: '2020–2022', desc: 'Operación de ruta SITP en zona norte de Bogotá. Gestión de pasajeros, cumplimiento de itinerarios y reporte de novedades en plataforma SISCOVID.' },
+  { c: 'MiBus S.A.S.',              r: 'Conductor Articulado',   periodo: '2019–2021', desc: 'Conducción de bus articulado TransMilenio en troncal Caracas. Cumplimiento de frecuencias, manejo de pasajeros en hora pico y registro de incidentes.' },
+  { c: 'GMOVIL S.A.S.',             r: 'Conductor SITP',         periodo: '2018–2020', desc: 'Operación de rutas periféricas SITP en Bosa y Kennedy. Manejo de recaudo electrónico y atención al usuario.' },
+  { c: 'Transdev Colombia',         r: 'Conductor Bus Urbano',   periodo: '2021–2023', desc: 'Conducción urbana en rutas complementarias. Manejo de pasajeros con movilidad reducida y cumplimiento de estándares de servicio.' },
+  { c: 'SOI S.A.S.',                r: 'Conductor Articulado',   periodo: '2020–2022', desc: 'Operación articulado en corredor NQS. Turno nocturno, gestión de incidentes en vía y mantenimiento básico preventivo.' },
+];
+
+function _mkTranspPub(id: string, name: string, score: number, photo: string, initials: string, color: string, city: string, years: string, aspiration: string, salaryRange: SalaryRange, stage: 'scoring' | 'prescreening' | 'entrevistas' = 'scoring'): Candidate {
+  const hi = score >= 75; const md = score >= 58;
+  const idx = Math.max(0, parseInt(id.split('-')[1]) - 1) || 0;
+  const job = _transpPubJobs[idx % _transpPubJobs.length] ?? _transpPubJobs[0];
+  const prevJob = _transpPubExpPrev[idx % _transpPubExpPrev.length] ?? _transpPubExpPrev[0];
+  const trips = hi ? Math.round(180 + (score - 75) * 10) : md ? Math.round(80 + (score - 58) * 4) : Math.round(25 + score * 0.4);
+  const licYears = hi ? Math.max(3, Math.round((score - 75) / 5) + 3) : md ? 2 : 1;
+  const wrongCity = city === 'Medellín' || city === 'Cali';
+  const runt = _transpPubRunt[idx % _transpPubRunt.length];
+  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+    score: Math.round(score * 0.96),
+    status: hi ? 'continua' : md ? 'continua' : 'pendiente',
+    resumen: hi
+      ? `${name} confirmó licencia C2 vigente y record vial limpio. Con ${years} de experiencia en transporte público, demostró conocimiento del protocolo de servicio al usuario y disponibilidad total para turnos rotativos.`
+      : md
+      ? `${name} tiene licencia C2 vigente y experiencia básica en transporte urbano. La disponibilidad para turnos nocturnos y festivos requiere confirmación adicional.`
+      : `${name} manifestó incertidumbre sobre la disponibilidad para turnos rotativos. Su historial de experiencia en transporte público no fue confirmado con detalle.`,
+    noNegociables: [
+      { label: 'Licencia C2 vigente con mínimo 2 años desde expedición', score: hi ? score - 1 : md ? score - 7 : score - 18, evidencia: hi ? `Confirmó licencia C2 vigente y relató proceso de renovación reciente. Sin suspensiones.` : md ? `Licencia C2 vigente pero con antigüedad cercana al mínimo.` : `No pudo confirmar estado exacto de vigencia de licencia.` } as EvalRow,
+      { label: 'Sin comparendos activos ni suspensiones en RUNT', score: hi ? score : md ? score - 5 : score - 20, evidencia: hi ? `Declara record limpio verificado en RUNT. Consistente con etapa anterior.` : md ? `No reporta comparendos activos, pero hay período sin información.` : `Mencionó una multa pendiente de pago.` } as EvalRow,
+      { label: 'Disponibilidad para turnos rotativos (incluye fines de semana y festivos)', score: hi ? score - 2 : md ? score - 6 : score - 15, evidencia: hi ? `Confirma disponibilidad total, ha operado en turnos nocturnos y dominicales previamente.` : md ? `Acepta turnos rotativos con condiciones; prefiere no trabajar domingo.` : `Expresó limitaciones para trabajar en festivos.` } as EvalRow,
+      { label: 'Experiencia mínima 2 años en transporte público o carga', score: hi ? score - 1 : md ? score - 8 : score - 12, evidencia: hi ? `${years} de experiencia en transporte público urbano con múltiples operadores SITP.` : md ? `Experiencia confirmada pero con interrupciones en el historial.` : `Experiencia inferior a 2 años en transporte público formal.` } as EvalRow,
+    ],
+    plusDetectados: hi
+      ? [`Conocimiento de rutas SITP en corredores norte y occidental de Bogotá`, `Manejo de articulados TransMilenio con certificación vigente`, `Actitud de servicio al usuario evidenciada durante la entrevista`]
+      : md
+      ? [`Disposición para capacitación en manejo de articulados`, `Puntualidad y compromiso con los horarios declarado consistentemente`]
+      : [`Disposición general para aprender la operación si se clarifica esquema de turnos`],
+    senales: hi
+      ? [`Confirmar si tiene experiencia específica en articulados o solo buses padrones`]
+      : md
+      ? [`Validar disponibilidad festivos en contrato`, `Confirmar historial en RUNT antes de avanzar`]
+      : [`Aclarar situación del comparendo pendiente`, `Confirmar disponibilidad real para turnos rotativos`],
+    entornoPersonal: [
+      { label: 'Municipio', value: city, status: wrongCity ? 'warning' : 'ok' },
+      { label: 'Disponibilidad', value: hi ? 'Inmediata' : '15 días de preaviso', status: hi ? 'ok' : 'neutral' },
+      { label: 'Turnos rotativos', value: hi ? 'Disponibilidad total' : 'Disponibilidad parcial', status: hi ? 'ok' : 'warning' },
+    ],
+    experienciaLaboral: [
+      { empresa: job.c, rol: job.r, periodo: hi ? '2023 – Presente' : `2022 – ${job.d}`, descripcion: hi ? `Operación de ruta ${job.r} con cumplimiento de frecuencias y atención al usuario. ${trips} servicios completados sin incidentes mayores.` : `Conducción en ruta urbana. Experiencia en manejo de pasajeros y recaudo electrónico.` },
+      { empresa: prevJob.c, rol: prevJob.r, periodo: prevJob.periodo, descripcion: prevJob.desc },
+    ],
+  } : undefined;
+  return {
+    id, name, role: 'Conductor C2 Transporte Público', sector: 'Transporte Público / SITP',
+    years, location: `${city}, Colombia`,
+    bio: 'Conductor de transporte público urbano con licencia C2 y experiencia en operación de rutas SITP y TransMilenio. Orientado al servicio al usuario, cumplimiento de frecuencias y protocolos de seguridad vial.',
+    score, photo, avatarInitials: initials, avatarColor: color,
+    hasCurrentJob: score >= 68,
+    ...(score >= 68 ? { currentCompany: job.c, currentRole: job.r } : { lastCompany: job.c, lastRole: job.r, lastDate: job.d }),
+    superpoder: hi ? '"Servicio al usuario impecable y cero incidentes en operación urbana"' : md ? '"Conocimiento de rutas y cumplimiento de frecuencias SITP"' : '"Disposición y ganas de crecer en el sector transporte"',
+    aspiration, budget: "$2'800.000", salaryRange, currentStage: stage,
+    runtVerification: {
+      cc: runt?.cc ?? '00000000',
+      totalManifiestos: trips,
+      licenseCategories: (runt?.cats ?? []).map(r => ({ categoria: r.c, fechaExpedicion: r.e, fechaVencimiento: r.v })),
+    },
+    ...(pre ? { prescreeningAI: pre } : {}),
+    scoringAI: {
+      score: Math.round(score * 0.95),
+      status: score >= 58 ? 'continua' : 'pendiente',
+      resumen: hi
+        ? `${name} cumple todos los criterios de verificación. Licencia C2 con ${licYears}+ años, ${trips} servicios SITP registrados y sin comparendos activos en RUNT.`
+        : md
+        ? `${name} cumple parcialmente. Algunos criterios presentan observaciones que requieren validación adicional.`
+        : `${name} no cumple los requisitos mínimos. Se identificaron brechas en licencia, historial de servicios o disponibilidad.`,
+      noNegociables: [
+        { label: 'Licencia C2 vigente con mínimo 2 años desde expedición', cumple: hi || (md && score >= 65) },
+        { label: 'Sin comparendos activos ni suspensiones (RUNT)', cumple: hi || (md && score >= 62) },
+        { label: 'Disponibilidad para turnos rotativos (incluye festivos)', cumple: !wrongCity && (hi || (md && score >= 60)) },
+        { label: 'Residencia en Bogotá o municipios del área metropolitana', cumple: !wrongCity },
+      ],
+      logros: hi
+        ? [`${trips} servicios urbanos registrados en SITP — supera umbral mínimo de 100 servicios`, `Licencia C2 con ${licYears} años de expedición, sin suspensiones en RUNT`, 'Cero comparendos activos ni multas pendientes']
+        : md
+        ? [`${trips} servicios registrados — cerca del umbral mínimo requerido`, 'Licencia C2 vigente, período de expedición en límite mínimo']
+        : ['Historial de servicios insuficiente en sistema SITP'],
+      senales: hi
+        ? ['Confirmar disponibilidad para turno nocturno si la ruta lo requiere']
+        : md
+        ? ['Validar historial completo de servicios en plataforma SITP', 'Confirmar disponibilidad en festivos directamente en entrevista']
+        : [wrongCity ? `Candidato residente en ${city} — fuera del área metropolitana de Bogotá` : 'Historial de servicios insuficiente o comparendos sin regularizar'],
+    },
+  };
+}
+
+const transpPubCandidates: Candidate[] = [
+  _mkTranspPub('tp-1',  'Rodrigo Castellanos',    93, _p(16, 'men'), 'RC', '#8750F6', 'Bogotá',      '14 Años', "$2'800.000", 'en_rango',       'entrevistas'),
+  _mkTranspPub('tp-2',  'Camilo Reyes',            89, _p(17, 'men'), 'CR', '#27BE69', 'Soacha',      '11 Años', "$2'700.000", 'en_rango',       'entrevistas'),
+  _mkTranspPub('tp-3',  'Humberto Ávila',          86, _p(18, 'men'), 'HA', '#295BFF', 'Bogotá',      '9 Años',  "$2'900.000", 'en_rango',       'entrevistas'),
+  _mkTranspPub('tp-4',  'Mauricio Soto',           83, _p(19, 'men'), 'MS', '#F6A350', 'Bogotá',      '8 Años',  "$2'800.000", 'en_rango',       'entrevistas'),
+  _mkTranspPub('tp-5',  'Libardo Pinzón',          80, _p(20, 'men'), 'LP', '#8750F6', 'Chía',        '7 Años',  "$2'700.000", 'en_rango',       'entrevistas'),
+  _mkTranspPub('tp-6',  'Julián Méndez',           77, _p(21, 'men'), 'JM', '#27BE69', 'Bogotá',      '6 Años',  "$2'800.000", 'en_rango',       'prescreening'),
+  _mkTranspPub('tp-7',  'Ernesto Vásquez',         73, _p(22, 'men'), 'EV', '#295BFF', 'Bogotá',      '5 Años',  "$2'600.000", 'en_rango',       'prescreening'),
+  _mkTranspPub('tp-8',  'Samuel Giraldo',          68, _p(23, 'men'), 'SG', '#F6A350', 'Soacha',      '5 Años',  "$2'700.000", 'en_rango',       'prescreening'),
+  _mkTranspPub('tp-9',  'Alberto Pedraza',         55, _p(24, 'men'), 'AP', '#8750F6', 'Bogotá',      '4 Años',  "$2'500.000", 'en_rango',       'prescreening'),
+  _mkTranspPub('tp-10', 'Ignacio Forero',          48, _p(25, 'men'), 'IF', '#27BE69', 'Bogotá',      '3 Años',  "$2'600.000", 'en_rango',       'prescreening'),
+  _mkTranspPub('tp-11', 'Diego Cárdenas',          84, _p(26, 'men'), 'DC', '#295BFF', 'Bogotá',      '7 Años',  "$2'800.000", 'en_rango'),
+  _mkTranspPub('tp-12', 'Francisco Patiño',        80, _p(27, 'men'), 'FP', '#F6A350', 'Bogotá',      '6 Años',  "$2'700.000", 'en_rango'),
+  _mkTranspPub('tp-13', 'Jesús Rojas',             76, _p(28, 'men'), 'JR', '#8750F6', 'Madrid',      '5 Años',  "$2'800.000", 'en_rango'),
+  _mkTranspPub('tp-14', 'Manuel Espitia',          72, _p(29, 'men'), 'ME', '#27BE69', 'Bogotá',      '4 Años',  "$2'700.000", 'en_rango'),
+  _mkTranspPub('tp-15', 'Óscar Clavijo',           65, _p(30, 'men'), 'OC', '#295BFF', 'Bogotá',      '4 Años',  "$2'600.000", 'en_rango'),
+  _mkTranspPub('tp-16', 'Roberto Fonseca',         57, _p(31, 'men'), 'RF', '#F65078', 'Bogotá',      '3 Años',  "$2'500.000", 'en_rango'),
+  _mkTranspPub('tp-17', 'Jairo Montaño',           51, _p(32, 'men'), 'JM', '#27BE69', 'Cali',        '2 Años',  "$2'600.000", 'en_rango'),
+  _mkTranspPub('tp-18', 'Luis Angarita',           46, _p(33, 'men'), 'LA', '#F6A350', 'Bogotá',      '2 Años',  "$3'500.000", 'fuera_de_rango'),
+  _mkTranspPub('tp-19', 'Pedro Salamanca',         41, _p(34, 'men'), 'PS', '#295BFF', 'Medellín',    '1 Año',   "$3'800.000", 'fuera_de_rango'),
+  _mkTranspPub('tp-20', 'Sergio Amaya',            36, _p(35, 'men'), 'SA', '#8750F6', 'Bogotá',      '1 Año',   "$2'400.000", 'en_rango'),
+];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VACANTE 3 — CONDUCTOR C2 DISTRIBUCIÓN URBANA (ÚLTIMA MILLA)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const _distribRunt: { cc: string; cats: { c: string; e: string; v: string }[] }[] = [
+  { cc: '80234567', cats: [{ c:'C2', e:'05/02/2022', v:'05/02/2025' }, { c:'B2', e:'05/02/2022', v:'05/02/2032' }] },
+  { cc: '1029345678', cats: [{ c:'C2', e:'18/06/2023', v:'18/06/2026' }] },
+  { cc: '79456789', cats: [{ c:'C2', e:'30/10/2023', v:'30/10/2026' }, { c:'B1', e:'30/10/2023', v:'30/10/2033' }] },
+  { cc: '1034567890', cats: [{ c:'C2', e:'14/01/2024', v:'14/01/2027' }] },
+  { cc: '80678901', cats: [{ c:'C2', e:'22/04/2023', v:'22/04/2026' }] },
+  { cc: '1050789012', cats: [{ c:'C2', e:'07/08/2024', v:'07/08/2027' }] },
+  { cc: '79789012', cats: [{ c:'C2', e:'25/03/2023', v:'25/03/2026' }] },
+  { cc: '1061890123', cats: [{ c:'C2', e:'12/12/2023', v:'12/12/2026' }] },
+  { cc: '80890123', cats: [{ c:'C2', e:'03/07/2023', v:'03/07/2026' }] },
+  { cc: '1072901234', cats: [{ c:'C2', e:'28/09/2024', v:'28/09/2027' }] },
+  { cc: '79901234', cats: [{ c:'C2', e:'15/02/2024', v:'15/02/2027' }] },
+  { cc: '1083012345', cats: [{ c:'C2', e:'01/06/2024', v:'01/06/2027' }] },
+  { cc: '80012345', cats: [{ c:'C2', e:'20/11/2023', v:'20/11/2026' }] },
+  { cc: '1094123456', cats: [{ c:'C2', e:'08/04/2025', v:'08/04/2028' }] },
+  { cc: '79123456', cats: [{ c:'C2', e:'27/08/2023', v:'27/08/2026' }] },
+];
+
+const _distribJobs = [
+  { c: 'Última Milla Express S.A.S.', r: 'Conductor Distribución Urbana', d: '01/2025' },
+  { c: 'Red Logística S.A.S.',         r: 'Conductor Reparto Urbano',      d: '03/2025' },
+  { c: 'TuEnvío Colombia S.A.S.',      r: 'Conductor Mensajería',          d: '11/2024' },
+  { c: 'Lógika Freight S.A.S.',        r: 'Conductor C2 Urbano',           d: '12/2024' },
+  { c: 'Entrega Ya S.A.S.',            r: 'Conductor Última Milla',        d: '02/2025' },
+  { c: 'Rappi Logística S.A.S.',       r: 'Conductor de Flota',            d: '01/2025' },
+  { c: 'DHL Supply Chain',             r: 'Conductor Distribución',        d: '04/2024' },
+  { c: 'Coordinadora Mercantil',       r: 'Conductor C2',                  d: '10/2024' },
+  { c: 'Envia CCC S.A.',               r: 'Conductor Carga Ligera',        d: '06/2024' },
+  { c: 'Speed Cargo S.A.S.',           r: 'Conductor Reparto',             d: '09/2024' },
+];
+
+const _distribExpPrev = [
+  { c: 'Última Milla Express',    r: 'Conductor C2',            periodo: '2021–2023', desc: 'Distribución de mercancía paletizada en zona norte de Bogotá. Rutas diarias con 15-20 entregas a clientes comerciales. Responsable de cargue, descargue y firma de guías.' },
+  { c: 'Red Logística S.A.S.',    r: 'Conductor Reparto',       periodo: '2020–2022', desc: 'Reparto urbano de electrodomésticos y mercancía a granel. Manejo de camión NQR. Control de inventario en vehículo y uso de sistema de guías digital.' },
+  { c: 'DHL Supply Chain',        r: 'Conductor Distribución',  periodo: '2019–2021', desc: 'Distribución de paquetería y carga mediana en zona centro de Bogotá. Manejo de rutas de alto tráfico y cumplimiento de ventanas de entrega.' },
+  { c: 'Coordinadora Mercantil',  r: 'Conductor C2',            periodo: '2021–2023', desc: 'Transporte de encomiendas y carga general en ruta Bogotá–Villavicencio. Gestión de manifiestos de ruta y firma de recibidos.' },
+  { c: 'TuEnvío Colombia',        r: 'Conductor Mensajería',    periodo: '2020–2022', desc: 'Entrega de paquetes e-commerce en Bogotá. Uso de app de seguimiento de entregas, gestión de cliente y recolección de devoluciones.' },
+];
+
+function _mkDistrib(id: string, name: string, score: number, photo: string, initials: string, color: string, city: string, years: string, aspiration: string, salaryRange: SalaryRange, stage: 'scoring' | 'prescreening' | 'entrevistas' = 'scoring'): Candidate {
+  const hi = score >= 75; const md = score >= 58;
+  const idx = Math.max(0, parseInt(id.split('-')[1]) - 1) || 0;
+  const job = _distribJobs[idx % _distribJobs.length] ?? _distribJobs[0];
+  const prevJob = _distribExpPrev[idx % _distribExpPrev.length] ?? _distribExpPrev[0];
+  const trips = hi ? Math.round(200 + (score - 75) * 12) : md ? Math.round(90 + (score - 58) * 5) : Math.round(30 + score * 0.5);
+  const licYears = hi ? Math.max(3, Math.round((score - 75) / 5) + 3) : md ? 2 : 1;
+  const wrongCity = city === 'Barranquilla' || city === 'Cali' || city === 'Medellín';
+  const runt = _distribRunt[idx % _distribRunt.length];
+  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+    score: Math.round(score * 0.97),
+    status: hi ? 'continua' : md ? 'continua' : 'pendiente',
+    resumen: hi
+      ? `${name} confirmó licencia C2 vigente y amplia experiencia en rutas de distribución urbana. Demuestra conocimiento detallado de procesos de cargue/descargue y manejo de guías digitales.`
+      : md
+      ? `${name} tiene experiencia básica en distribución. Confirmó disponibilidad y licencia vigente, pero con menor detalle en manejo de sistemas de guías y rutas de alto volumen.`
+      : `${name} presentó experiencia limitada en distribución formal. La disponibilidad para cargue y descargue no fue confirmada con claridad.`,
+    noNegociables: [
+      { label: 'Licencia C2 vigente con mínimo 2 años desde expedición', score: hi ? score - 1 : md ? score - 6 : score - 15, evidencia: hi ? `Confirmó licencia C2 vigente. Relató proceso de renovación y categorías adicionales.` : md ? `Licencia C2 vigente en límite mínimo.` : `No confirmó vigencia exacta de la licencia.` } as EvalRow,
+      { label: 'Sin comparendos activos ni infracciones graves', score: hi ? score : md ? score - 4 : score - 18, evidencia: hi ? `Record limpio confirmado. Sin multas pendientes en RUNT.` : md ? `Sin comparendos activos declarados.` : `Mencionó infracción pendiente de regularización.` } as EvalRow,
+      { label: 'Disponibilidad para cargue y descargue de mercancía', score: hi ? score - 2 : md ? score - 5 : score - 12, evidencia: hi ? `Confirma disponibilidad total y ha realizado cargue/descargue en ${prevJob.c}.` : md ? `Acepta cargue y descargue con acuerdo previo.` : `Expresó dudas sobre actividades de cargue físico.` } as EvalRow,
+      { label: 'Conocimiento de rutas urbanas en Bogotá y alrededores', score: hi ? score - 1 : md ? score - 7 : score - 14, evidencia: hi ? `Conoce todas las zonas de Bogotá. Describe rutas específicas con naturalidad.` : md ? `Conoce zona norte y centro; menos familiaridad con sur.` : `Conocimiento parcial de rutas.` } as EvalRow,
+    ],
+    plusDetectados: hi
+      ? [`Manejo de app de seguimiento de entregas y sistema de guías digital`, `Experiencia en distribución e-commerce — perfil alineado con tendencia del sector`, `Actitud de servicio al cliente final evidenciada en entrevista`]
+      : md
+      ? [`Disposición para aprender plataformas de seguimiento de entregas`, `Conocimiento básico de nomenclatura urbana`]
+      : [`Disposición para trabajar en distribución si se aclaran las condiciones`],
+    senales: hi
+      ? [`Confirmar si tiene experiencia con vehículo NKR o NPR específicamente`]
+      : md
+      ? [`Validar conocimiento de rutas en zona sur de Bogotá`, `Confirmar disponibilidad para turnos de madrugada si aplica`]
+      : [`Aclarar situación de licencia y comparendos antes de avanzar`],
+    entornoPersonal: [
+      { label: 'Municipio', value: city, status: wrongCity ? 'warning' : 'ok' },
+      { label: 'Disponibilidad inicio', value: hi ? 'Inmediata' : '8 días preaviso', status: hi ? 'ok' : 'neutral' },
+      { label: 'Cargue y descargue', value: hi ? 'Sin restricciones' : 'Con condiciones', status: hi ? 'ok' : 'warning' },
+    ],
+    experienciaLaboral: [
+      { empresa: job.c, rol: job.r, periodo: hi ? '2023 – Presente' : `2022 – ${job.d}`, descripcion: hi ? `Distribución urbana con ${trips} entregas documentadas. Manejo de sistema de guías y relación directa con clientes comerciales.` : `Reparto urbano y gestión de entregas. Experiencia en cargue y descargue de mercancía.` },
+      { empresa: prevJob.c, rol: prevJob.r, periodo: prevJob.periodo, descripcion: prevJob.desc },
+    ],
+  } : undefined;
+  return {
+    id, name, role: 'Conductor C2 Distribución Urbana', sector: 'Logística / Última Milla',
+    years, location: `${city}, Colombia`,
+    bio: 'Conductor con licencia C2 y experiencia en distribución urbana y reparto de mercancía. Manejo de rutas de última milla, sistemas de guías y atención al cliente final.',
+    score, photo, avatarInitials: initials, avatarColor: color,
+    hasCurrentJob: score >= 68,
+    ...(score >= 68 ? { currentCompany: job.c, currentRole: job.r } : { lastCompany: job.c, lastRole: job.r, lastDate: job.d }),
+    superpoder: hi ? '"Eficiencia en rutas urbanas con cero pérdidas de mercancía"' : md ? '"Conocimiento de Bogotá y cumplimiento en entregas"' : '"Disposición para trabajar en distribución"',
+    aspiration, budget: "$2'600.000", salaryRange, currentStage: stage,
+    runtVerification: {
+      cc: runt?.cc ?? '00000000',
+      totalManifiestos: trips,
+      licenseCategories: (runt?.cats ?? []).map(r => ({ categoria: r.c, fechaExpedicion: r.e, fechaVencimiento: r.v })),
+    },
+    ...(pre ? { prescreeningAI: pre } : {}),
+    scoringAI: {
+      score: Math.round(score * 0.95),
+      status: score >= 58 ? 'continua' : 'pendiente',
+      resumen: hi
+        ? `${name} cumple todos los criterios. Licencia C2 con ${licYears}+ años, ${trips} manifiestos registrados y sin comparendos activos.`
+        : md
+        ? `${name} cumple parcialmente. Requiere validación adicional de historial y disponibilidad.`
+        : `${name} no cumple los requisitos mínimos. Brechas en licencia, historial o disponibilidad.`,
+      noNegociables: [
+        { label: 'Licencia C2 vigente con mínimo 2 años desde expedición', cumple: hi || (md && score >= 65) },
+        { label: 'Sin comparendos activos (RUNT)', cumple: hi || (md && score >= 62) },
+        { label: 'Residencia en Bogotá o área metropolitana', cumple: !wrongCity },
+        { label: 'Expectativa salarial ≤ $2.800.000', cumple: salaryRange === 'en_rango' },
+      ],
+      logros: hi
+        ? [`${trips} manifiestos de distribución verificados — supera umbral requerido`, `Licencia C2 con ${licYears} años de expedición vigente`, 'Sin comparendos activos en RUNT']
+        : md
+        ? [`${trips} manifiestos — en límite del umbral mínimo`, 'Licencia vigente con expedición reciente']
+        : ['Historial de entregas insuficiente para el umbral mínimo'],
+      senales: hi
+        ? ['Confirmar tipo de vehículo (NPR/NKR/NQR) para asignación de flota']
+        : md
+        ? ['Validar manifiestos faltantes', 'Confirmar disponibilidad para cargue físico']
+        : [wrongCity ? `Candidato en ${city} — fuera del área de operación de Bogotá` : 'Historial insuficiente o aspiración salarial fuera de rango'],
+    },
+  };
+}
+
+const distribCandidates: Candidate[] = [
+  _mkDistrib('d-1',  'Andrés Morales',        92, _p(36, 'men'), 'AM', '#8750F6', 'Bogotá',       '13 Años', "$2'600.000", 'en_rango',       'entrevistas'),
+  _mkDistrib('d-2',  'Iván Herrera',           88, _p(37, 'men'), 'IH', '#27BE69', 'Bogotá',       '10 Años', "$2'500.000", 'en_rango',       'entrevistas'),
+  _mkDistrib('d-3',  'Jhon Mejía',             85, _p(38, 'men'), 'JM', '#295BFF', 'Soacha',       '8 Años',  "$2'700.000", 'en_rango',       'entrevistas'),
+  _mkDistrib('d-4',  'Carlos Zambrano',        82, _p(39, 'men'), 'CZ', '#F6A350', 'Bogotá',       '7 Años',  "$2'600.000", 'en_rango',       'entrevistas'),
+  _mkDistrib('d-5',  'Mauricio Ospina',        79, _p(40, 'men'), 'MO', '#8750F6', 'Bogotá',       '6 Años',  "$2'500.000", 'en_rango',       'entrevistas'),
+  _mkDistrib('d-6',  'Javier Lozano',          76, _p(41, 'men'), 'JL', '#27BE69', 'Bogotá',       '6 Años',  "$2'600.000", 'en_rango',       'prescreening'),
+  _mkDistrib('d-7',  'Luis Molina',            71, _p(42, 'men'), 'LM', '#295BFF', 'Bogotá',       '5 Años',  "$2'400.000", 'en_rango',       'prescreening'),
+  _mkDistrib('d-8',  'Henry Vargas',           66, _p(43, 'men'), 'HV', '#F6A350', 'Bogotá',       '4 Años',  "$2'500.000", 'en_rango',       'prescreening'),
+  _mkDistrib('d-9',  'Sergio Nieto',           55, _p(44, 'men'), 'SN', '#8750F6', 'Bogotá',       '3 Años',  "$2'600.000", 'en_rango',       'prescreening'),
+  _mkDistrib('d-10', 'Freddy Peña',            48, _p(45, 'men'), 'FP', '#27BE69', 'Bogotá',       '3 Años',  "$2'400.000", 'en_rango',       'prescreening'),
+  _mkDistrib('d-11', 'Gabriel Torres',         83, _p(46, 'men'), 'GT', '#295BFF', 'Bogotá',       '7 Años',  "$2'600.000", 'en_rango'),
+  _mkDistrib('d-12', 'Nicolás Parra',          79, _p(47, 'men'), 'NP', '#F6A350', 'Bogotá',       '6 Años',  "$2'500.000", 'en_rango'),
+  _mkDistrib('d-13', 'Fabio Guerrero',         75, _p(48, 'men'), 'FG', '#8750F6', 'Bosa',         '5 Años',  "$2'600.000", 'en_rango'),
+  _mkDistrib('d-14', 'Álvaro Pineda',          70, _p(49, 'men'), 'AP', '#27BE69', 'Bogotá',       '4 Años',  "$2'500.000", 'en_rango'),
+  _mkDistrib('d-15', 'Gonzalo Rincón',         64, _p(50, 'men'), 'GR', '#295BFF', 'Bogotá',       '4 Años',  "$2'400.000", 'en_rango'),
+  _mkDistrib('d-16', 'Omar Bermúdez',          57, _p(51, 'men'), 'OB', '#F65078', 'Bogotá',       '3 Años',  "$2'500.000", 'en_rango'),
+  _mkDistrib('d-17', 'Hernán Lagos',           51, _p(52, 'men'), 'HL', '#27BE69', 'Cali',         '2 Años',  "$2'400.000", 'en_rango'),
+  _mkDistrib('d-18', 'Mario Cárdenas',         45, _p(53, 'men'), 'MC', '#F6A350', 'Bogotá',       '2 Años',  "$3'500.000", 'fuera_de_rango'),
+  _mkDistrib('d-19', 'Felipe Serna',           40, _p(54, 'men'), 'FS', '#295BFF', 'Medellín',     '1 Año',   "$3'800.000", 'fuera_de_rango'),
+  _mkDistrib('d-20', 'Ricardo Álvarez',        35, _p(55, 'men'), 'RA', '#8750F6', 'Bogotá',       '1 Año',   "$2'300.000", 'en_rango'),
+];
+
+const transpPubScoring      = transpPubCandidates.filter(c => c.currentStage === 'scoring');
+const transpPubPrescreening = transpPubCandidates.filter(c => c.currentStage === 'prescreening');
+const transpPubEntrevistas  = transpPubCandidates.filter(c => c.currentStage === 'entrevistas');
+
+const distribScoring      = distribCandidates.filter(c => c.currentStage === 'scoring');
+const distribPrescreening = distribCandidates.filter(c => c.currentStage === 'prescreening');
+const distribEntrevistas  = distribCandidates.filter(c => c.currentStage === 'entrevistas');
+
+export const MOCK_INITIAL_STATUSES: Record<string, Partial<Record<string, Record<string, string>>>> = {
+  'mock-vigia': {
+    scoring: {
+      'mvc-11': 'continua', 'mvc-12': 'continua', 'mvc-13': 'continua',
+      'mvc-14': 'por_validar', 'mvc-15': 'por_validar', 'mvc-16': 'por_validar',
+      'mvc-17': 'descartado', 'mvc-18': 'descartado', 'mvc-19': 'descartado', 'mvc-20': 'descartado',
+    },
+    prescreening: {
+      'mvc-6': 'continua', 'mvc-7': 'continua',
+      'mvc-8': 'por_validar', 'mvc-9': 'por_validar', 'mvc-10': 'descartado',
+    },
+  },
+  'mock-transp-pub': {
+    scoring: {
+      'tp-11': 'continua', 'tp-12': 'continua', 'tp-13': 'continua',
+      'tp-14': 'por_validar', 'tp-15': 'por_validar', 'tp-16': 'por_validar',
+      'tp-17': 'descartado', 'tp-18': 'descartado', 'tp-19': 'descartado', 'tp-20': 'descartado',
+    },
+    prescreening: {
+      'tp-6': 'continua', 'tp-7': 'continua',
+      'tp-8': 'por_validar', 'tp-9': 'por_validar', 'tp-10': 'descartado',
+    },
+  },
+  'mock-distrib': {
+    scoring: {
+      'd-11': 'continua', 'd-12': 'continua', 'd-13': 'continua',
+      'd-14': 'por_validar', 'd-15': 'por_validar', 'd-16': 'por_validar',
+      'd-17': 'descartado', 'd-18': 'descartado', 'd-19': 'descartado', 'd-20': 'descartado',
+    },
+    prescreening: {
+      'd-6': 'continua', 'd-7': 'continua',
+      'd-8': 'por_validar', 'd-9': 'por_validar', 'd-10': 'descartado',
+    },
+  },
+};
+
 export const MOCK_VACANTES: Vacante[] = [
-  ...COMFANDI_VACANTES,
+  { id: 'mock-transp-pub', jobId: 'mock-transp-pub', status: 'activa',   title: 'Conductor C2 Transporte Público', area: ['Operaciones', 'Transporte Público'], priority: 'alta',  progressLabel: 'Validación RUNT', progressPct: 25, total: 20, activos: 20, fecha: '28 Abr 2026' },
+  { id: 'mock-vigia',      jobId: 'mock-vigia',      status: 'activa',   title: 'Conductor C2 Carga Refrigerada',  area: ['Operaciones', 'Logística'],           priority: 'alta',  progressLabel: 'Validación RUNT', progressPct: 10, total: 20, activos: 20, fecha: '03 May 2026' },
+  { id: 'mock-distrib',    jobId: 'mock-distrib',    status: 'activa',   title: 'Conductor C2 Distribución Urbana', area: ['Logística', 'Última Milla'],          priority: 'media', progressLabel: 'Pre-entrevista',  progressPct: 5,  total: 20, activos: 20, fecha: '15 May 2026' },
 ];
 
 export const MOCK_DESCRIPTIONS: Record<string, string> = {
-  ...COMFANDI_DESCRIPTIONS,
+  'mock-transp-pub':
+    'Conductor de bus urbano con licencia C2 para operador de transporte público de Bogotá (SITP/TransMilenio). Responsable de la operación segura y puntual de la ruta asignada, atención al usuario, cumplimiento de frecuencias y reporte de novedades en plataforma del concesionario. Turnos rotativos domingo a domingo con compensatorio. Sede: patios de operación en Bogotá.',
+  'mock-vigia':
+    'Conductor de carga seca refrigerada y congelada para Demo Transportes S.A.S. — empresa con 47 años de experiencia en el sector. Responsable del transporte seguro y puntual de mercancía a nivel nacional, conservando la cadena de frío, cumpliendo protocolos HSEQ, BASC y SARLAFT, y gestionando documentación de despacho y cumplidos en cada viaje. Jornada domingo a domingo, turnos de 12 horas. Sede base: vía Cota-Siberia.',
+  'mock-distrib':
+    'Conductor de distribución urbana y última milla con licencia C2 para operador logístico. Responsable de la entrega de mercancía a clientes comerciales en Bogotá y área metropolitana, cargue y descargue de productos, uso de sistema de guías digital y cumplimiento de ventanas de entrega. Ruta diaria fija, horario desde las 6:00 AM.',
 };
 
 export function getMockPipelineStages(jobId: string): PipelineStage[] {
   const s = (id: string, label: string, badge: string, status: StageStatus, count: number, isAI: boolean): PipelineStage =>
     ({ id, label, stageBadge: badge, status, candidateCount: count, isAI, route: `/pipeline/${jobId}/${id}` });
+
+  // ── Pipeline estándar Transporte & Logística ──
+  const transpPipeline = (scoring: number, pre: number, runt: number, doc: number) => [
+    s('scoring',      'Scoring IA',              'Scoring',       scoring > 0  ? (pre > 0 ? 'completed' : 'in_progress') : 'not_started', scoring, true),
+    s('prescreening', 'Pre-entrevista IA',        'Pre-entrevista', pre > 0    ? (runt > 0 ? 'completed' : 'in_progress') : 'not_started', pre,    true),
+    s('entrevistas',  'Validación RUNT',          'RUNT',           runt > 0   ? (doc > 0 ? 'completed' : 'in_progress') : 'not_started',  runt,   true),
+    s('evaluaciones', 'Validación Documental',    'Documental',     doc > 0    ? 'in_progress' : 'not_started',                            doc,    false),
+    s('finalistas',   'Shortlist',                'Shortlist',     'not_started', 0, false),
+  ];
+
   switch (jobId) {
+    case 'mock-transp-pub': return transpPipeline(20, 10, 5, 0);
+    case 'mock-vigia':      return transpPipeline(20, 10, 5, 0);
+    case 'mock-distrib':    return transpPipeline(20, 10, 0, 0);
     case 'mock-recep':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'in_progress', 15, true),
@@ -2146,6 +2736,9 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
 }
 
 export const mockCandidatesByStage: Record<string, Partial<Record<string, Candidate[]>>> = {
+  'mock-transp-pub': { scoring: [...transpPubEntrevistas, ...transpPubPrescreening, ...transpPubScoring], prescreening: [...transpPubEntrevistas, ...transpPubPrescreening], entrevistas: transpPubEntrevistas },
+  'mock-vigia':      { scoring: [...vigiaEntrevistas, ...vigiaPrescreening, ...vigiaScoring], prescreening: [...vigiaEntrevistas, ...vigiaPrescreening], entrevistas: vigiaEntrevistas },
+  'mock-distrib':    { scoring: [...distribEntrevistas, ...distribPrescreening, ...distribScoring], prescreening: [...distribEntrevistas, ...distribPrescreening], entrevistas: distribEntrevistas },
   'mock-recep':    { scoring: recepCandidates },
   'mock-bodega':   { scoring: [...bodegaPreCandidates, ...bodegaScoreOnly], prescreening: bodegaPreCandidates },
   'mock-th':       { scoring: [...thEntrevistasCandidates, ...thPreCandidates, ...thScoreOnly], prescreening: [...thEntrevistasCandidates, ...thPreCandidates], entrevistas: thEntrevistasCandidates },
@@ -2155,6 +2748,9 @@ export const mockCandidatesByStage: Record<string, Partial<Record<string, Candid
 };
 
 export const mockCandidatesById: Record<string, Candidate> = [
+  ...transpPubCandidates,
+  ...vigiaCandidates,
+  ...distribCandidates,
   ...recepCandidates,
   ...bodegaPreCandidates, ...bodegaScoreOnly,
   ...thEntrevistasCandidates, ...thPreCandidates, ...thScoreOnly,

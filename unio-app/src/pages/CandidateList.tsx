@@ -506,7 +506,7 @@ export default function CandidateList() {
               }}
             >
               <WaIcon size={22} color="white" />
-              Agendar entrevista
+              Agendar prueba de manejo
             </button>
           )}
           {currentStage !== 'scoring' && currentStage !== 'prescreening' && (

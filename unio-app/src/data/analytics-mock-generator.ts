@@ -214,13 +214,13 @@ export function generateAnalyticsData(
   const tasaFinal   = ((contratados / aplicados) * 100).toFixed(2);
 
   const funnelStages: FunnelStage[] = [
-    { label: 'APLICADOS',    value: aplicados,   pct: 100,                                              convLabel: '100% · inicio del funnel',          dropoff: null },
-    { label: 'SCORING',      value: scoring,     pct: scoringPct,                                       convLabel: `${scoringPct}% conversión`,          dropoff: `${dropoffN} por no negociables` },
-    { label: 'PRE-SCREENING',value: prescreen,   pct: Math.round(prescreen / aplicados * 100),          convLabel: `${Math.round(prescreen/scoring*100)}% conversión`,    dropoff: null },
-    { label: 'ENTREVISTAS',  value: entrevistas, pct: Math.round(entrevistas / aplicados * 100),        convLabel: `${Math.round(entrevistas/prescreen*100)}% conversión`, dropoff: null },
-    { label: 'EVALUACIÓN',   value: evaluacion,  pct: Math.round(evaluacion / aplicados * 100),         convLabel: `${Math.round(evaluacion/entrevistas*100)}% conversión`,dropoff: null },
-    { label: 'FINALISTAS',   value: finalistas,  pct: parseFloat((finalistas / aplicados * 100).toFixed(1)), convLabel: `${(finalistas/aplicados*100).toFixed(1)}% conversión`, dropoff: null },
-    { label: 'CONTRATADOS',  value: contratados, pct: parseFloat((contratados / aplicados * 100).toFixed(2)), convLabel: `${tasaFinal}% · ratio ${ratioFinal}:1`, dropoff: null },
+    { label: 'APLICADOS',        value: aplicados,   pct: 100,                                                    convLabel: '100% · inicio del funnel',              dropoff: null },
+    { label: 'SCORING',          value: scoring,     pct: scoringPct,                                             convLabel: `${scoringPct}% conversión`,              dropoff: `${dropoffN} por no negociables` },
+    { label: 'PRE-SCREENING',    value: prescreen,   pct: Math.round(prescreen / aplicados * 100),                convLabel: `${Math.round(prescreen/scoring*100)}% conversión`,    dropoff: null },
+    { label: 'VAL. RUNT / RNDC', value: entrevistas, pct: Math.round(entrevistas / aplicados * 100),             convLabel: `${Math.round(entrevistas/prescreen*100)}% conversión`, dropoff: null },
+    { label: 'VAL. DOCUMENTAL',  value: evaluacion,  pct: Math.round(evaluacion / aplicados * 100),              convLabel: `${Math.round(evaluacion/entrevistas*100)}% conversión`, dropoff: null },
+    { label: 'SHORTLIST',        value: finalistas,  pct: parseFloat((finalistas / aplicados * 100).toFixed(1)), convLabel: `${(finalistas/aplicados*100).toFixed(1)}% conversión`, dropoff: null },
+    { label: 'CONTRATADOS',      value: contratados, pct: parseFloat((contratados / aplicados * 100).toFixed(2)), convLabel: `${tasaFinal}% · ratio ${ratioFinal}:1`, dropoff: null },
   ];
 
   // ── Dropoff
@@ -231,9 +231,9 @@ export function generateAnalyticsData(
   const p3 = 100 - p1 - p2;
 
   const dropoffTable: DropoffRow[] = [
-    { reason: 'Años mínimos de experiencia',       count: c1, pct: `${p1}%` },
-    { reason: 'Dominio de herramientas (SAP, Excel)', count: c2, pct: `${p2}%` },
-    { reason: 'Ubicación geográfica',              count: Math.max(c3, 0), pct: `${Math.max(p3, 0)}%` },
+    { reason: 'Licencia C2 vencida o sin categoría requerida', count: c1, pct: `${p1}%` },
+    { reason: 'Comparendos activos o suspensiones RUNT',       count: c2, pct: `${p2}%` },
+    { reason: 'Expectativa salarial fuera de rango',           count: Math.max(c3, 0), pct: `${Math.max(p3, 0)}%` },
   ];
 
   // ── Time phases
@@ -246,31 +246,31 @@ export function generateAnalyticsData(
   ];
   const bottleneckIdx = phaseDays.indexOf(Math.max(...phaseDays));
   const timePhases: TimePhase[] = [
-    { label: 'Scoring',      days: phaseDays[0], bottleneck: bottleneckIdx === 0 },
-    { label: 'Pre-screening',days: phaseDays[1], bottleneck: bottleneckIdx === 1 },
-    { label: 'Entrevistas',  days: phaseDays[2], bottleneck: bottleneckIdx === 2 },
-    { label: 'Evaluaciones', days: phaseDays[3], bottleneck: bottleneckIdx === 3 },
-    { label: 'Finalistas',   days: phaseDays[4], bottleneck: bottleneckIdx === 4 },
+    { label: 'Scoring',           days: phaseDays[0], bottleneck: bottleneckIdx === 0 },
+    { label: 'Pre-screening',     days: phaseDays[1], bottleneck: bottleneckIdx === 1 },
+    { label: 'Val. RUNT / RNDC',  days: phaseDays[2], bottleneck: bottleneckIdx === 2 },
+    { label: 'Val. Documental',   days: phaseDays[3], bottleneck: bottleneckIdx === 3 },
+    { label: 'Shortlist',         days: phaseDays[4], bottleneck: bottleneckIdx === 4 },
   ];
 
   // ── HR Response
   const hrDays = [randF(r, 0.8, 2.2), randF(r, 1.5, 5.0), randF(r, 1.2, 3.5), randF(r, 0.8, 2.5)];
   const hrMax = Math.max(...hrDays);
   const hrResponse: HrResponseRow[] = [
-    { from: 'Scoring → Pre-screening',     days: hrDays[0], warning: hrDays[0] === hrMax },
-    { from: 'Pre-screening → Entrevistas', days: hrDays[1], warning: hrDays[1] === hrMax },
-    { from: 'Entrevistas → Evaluaciones',  days: hrDays[2], warning: hrDays[2] === hrMax },
-    { from: 'Evaluaciones → Finalistas',   days: hrDays[3], warning: hrDays[3] === hrMax },
+    { from: 'Scoring → Pre-screening',       days: hrDays[0], warning: hrDays[0] === hrMax },
+    { from: 'Pre-screening → Val. RUNT',     days: hrDays[1], warning: hrDays[1] === hrMax },
+    { from: 'Val. RUNT → Val. Documental',   days: hrDays[2], warning: hrDays[2] === hrMax },
+    { from: 'Val. Documental → Shortlist',   days: hrDays[3], warning: hrDays[3] === hrMax },
   ];
 
   // ── Aging crítico
   const VACANTES_AGING = [
-    { vacante: 'Analista Financiero Sr.', area: 'Finanzas' },
-    { vacante: 'Coord. de Compras',       area: 'Compras' },
-    { vacante: 'Supervisor Almacén',      area: 'Logística' },
-    { vacante: 'Gerente Comercial',       area: 'Ventas' },
-    { vacante: 'Jefe de Tesorería',       area: 'Finanzas' },
-    { vacante: 'Analista de Datos Sr.',   area: 'Transformación Digital' },
+    { vacante: 'Conductor C2 Transporte Público',  area: 'Operaciones' },
+    { vacante: 'Conductor C2 Carga Refrigerada',   area: 'Logística' },
+    { vacante: 'Conductor C2 Distribución Urbana', area: 'Logística' },
+    { vacante: 'Conductor C2 Líquidos a Granel',   area: 'Operaciones' },
+    { vacante: 'Conductor C2 Carga Seca',          area: 'Logística' },
+    { vacante: 'Conductor C2 Materiales Peligrosos', area: 'Operaciones' },
   ];
   const agingCount = rand(r, 2, 4);
   const shuffled = [...VACANTES_AGING].sort(() => r() - 0.5).slice(0, agingCount);
@@ -281,12 +281,12 @@ export function generateAnalyticsData(
 
   // ── HM Table
   const HM_NAMES = [
-    { name: 'María García',  area: 'Operaciones' },
-    { name: 'Carlos Ruiz',   area: 'Ventas' },
-    { name: 'Andrea López',  area: 'Finanzas' },
-    { name: 'Juan Morales',  area: 'Logística' },
-    { name: 'Sara Medina',   area: 'Compras' },
-    { name: 'Luis Herrera',  area: 'Transformación Digital' },
+    { name: 'Carlos Vargas',    area: 'Operaciones' },
+    { name: 'Paola Moreno',     area: 'Gestión Humana' },
+    { name: 'Andrés Castillo',  area: 'Logística' },
+    { name: 'Diana Rojas',      area: 'Operaciones' },
+    { name: 'Mauricio Peña',    area: 'Transporte Público' },
+    { name: 'Sandra Gómez',     area: 'Distribución' },
   ];
   const hmCount = rand(r, 3, 5);
   const hmTable: HmRow[] = HM_NAMES.slice(0, hmCount).map((hm) => {
@@ -310,16 +310,16 @@ export function generateAnalyticsData(
 
   // ── Detail Table
   const VACANTE_POOL = [
-    { vacante: 'Coordinador de Logística',   area: 'Operaciones', tipo: 'Operativa' },
-    { vacante: 'Analista Financiero Sr.',     area: 'Finanzas',    tipo: 'Administrativa' },
-    { vacante: 'Ejecutivo de Ventas',         area: 'Ventas',      tipo: 'Operativa' },
-    { vacante: 'Supervisor de Almacén',       area: 'Logística',   tipo: 'Operativa' },
-    { vacante: 'Gerente Comercial',           area: 'Ventas',      tipo: 'Estratégica' },
-    { vacante: 'Coord. de Compras',           area: 'Compras',     tipo: 'Administrativa' },
-    { vacante: 'Analista de Datos Sr.',       area: 'Transformación Digital', tipo: 'Estratégica' },
-    { vacante: 'Jefe de Tesorería',           area: 'Finanzas',    tipo: 'Administrativa' },
-    { vacante: 'Director de Expansión',       area: 'Expansión Comercial',    tipo: 'Estratégica' },
-    { vacante: 'Gestor de Talento',           area: 'Liderazgo Organizacional', tipo: 'Estratégica' },
+    { vacante: 'Conductor C2 Transporte Público',    area: 'Operaciones',       tipo: 'Operativa' },
+    { vacante: 'Conductor C2 Carga Refrigerada',     area: 'Logística',         tipo: 'Operativa' },
+    { vacante: 'Conductor C2 Distribución Urbana',   area: 'Logística',         tipo: 'Operativa' },
+    { vacante: 'Conductor C2 Líquidos a Granel',     area: 'Operaciones',       tipo: 'Operativa' },
+    { vacante: 'Conductor C2 Carga Seca',            area: 'Logística',         tipo: 'Operativa' },
+    { vacante: 'Conductor C2 Materiales Peligrosos', area: 'Operaciones',       tipo: 'Operativa' },
+    { vacante: 'Supervisor de Flota',                area: 'Operaciones',       tipo: 'Administrativa' },
+    { vacante: 'Coord. de Seguridad Vial',           area: 'HSEQ',              tipo: 'Administrativa' },
+    { vacante: 'Despachador de Rutas',               area: 'Operaciones',       tipo: 'Operativa' },
+    { vacante: 'Coord. Transporte Masivo',           area: 'Transporte Público', tipo: 'Estratégica' },
   ];
   const ESTADOS = ['COMPLETADA', 'COMPLETADA', 'ABIERTA', 'ABIERTA', 'PAUSADA', 'DESIERTA'];
   const rowCount = rand(r, 5, 8);

@@ -127,7 +127,7 @@ interface Channel {
 const TIPS = [
   { label: 'Grupos o canales', text: 'Grupos de Facebook y canales de WhatsApp activos con comunidades de búsqueda de empleo en Colombia.' },
   { label: 'Sitios de empleo', text: 'Mayor alcance. Ideal para todo tipo de roles y volumen de candidatos.' },
-  { label: 'Página web', text: 'Refuerza el employer branding con candidatos que ya conocen Comfandi.' },
+  { label: 'Página web', text: 'Refuerza el employer branding con candidatos que ya conocen Demo Transportes.' },
   { label: 'Físico (QR)', text: 'Roles operativos, logística, manufactura y puntos de atención presencial.' },
 ];
 
@@ -278,7 +278,7 @@ export default function CanalesPublicacion() {
       id: 'website',
       icon: <Globe size={20} style={{ color: '#10B981' }} />,
       name: 'Página web de la empresa',
-      description: 'Sección "Trabaja con nosotros" en el sitio corporativo comfandi.com.co. Requiere integración previa.',
+      description: 'Sección "Trabaja con nosotros" en el sitio corporativo demotransportes.com.co. Requiere integración previa.',
       checked: false,
     },
     {
@@ -323,8 +323,8 @@ export default function CanalesPublicacion() {
         justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img src={assetUrl('/logo-comfandi.webp')} alt="Comfandi"
-            style={{ maxHeight: '52px', maxWidth: '200px', width: 'auto', height: 'auto', objectFit: 'contain' }} />
+          <img src={assetUrl('/logo-demo-transportes.png')} alt="Demo Transportes"
+            style={{ maxHeight: '100px', maxWidth: '300px', width: 'auto', height: 'auto', objectFit: 'contain' }} />
           <div style={{ width: '1px', height: '32px', background: 'var(--color-border-default)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-text-muted)' }}>
             <span>Powered by</span>

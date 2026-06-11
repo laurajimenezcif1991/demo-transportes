@@ -20,16 +20,16 @@ type ChatPhase =
   | 'done';
 
 const AM_SLOTS = [
-  'Lunes 19 may · 9:00 AM',
-  'Martes 20 may · 10:30 AM',
-  'Miércoles 21 may · 9:30 AM',
-  'Jueves 22 may · 11:00 AM',
+  'Sáb 21 Jun · 8:00 AM — Patio de maniobras Demo Transportes, Cota',
+  'Sáb 21 Jun · 9:30 AM — Patio de maniobras Demo Transportes, Cota',
+  'Dom 22 Jun · 8:00 AM — Patio de maniobras Demo Transportes, Cota',
+  'Sáb 28 Jun · 8:00 AM — Patio de maniobras Demo Transportes, Cota',
 ];
 const PM_SLOTS = [
-  'Lunes 19 may · 2:00 PM',
-  'Martes 20 may · 3:30 PM',
-  'Miércoles 21 may · 4:00 PM',
-  'Jueves 22 may · 2:30 PM',
+  'Sáb 21 Jun · 2:00 PM — Sede Siberia, Bodega 8',
+  'Dom 22 Jun · 2:00 PM — Sede Siberia, Bodega 8',
+  'Sáb 28 Jun · 2:30 PM — Sede Siberia, Bodega 8',
+  'Dom 29 Jun · 2:00 PM — Sede Siberia, Bodega 8',
 ];
 
 const PHASES_PANEL = [
@@ -53,9 +53,9 @@ function buildOpening(firstName: string, jobTitle: string): WaMsg[] {
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
   };
   return [
-    { from: 'alex', time: fmt(0), text: `¡Hola ${firstName}! 👋 Soy *Alex*, asistente de talento de Comfandi.` },
-    { from: 'alex', time: fmt(1), text: `🎉 ¡Felicitaciones! Has avanzado a la etapa de *Entrevistas* para el cargo de *${jobTitle}*. El equipo quedó muy impresionado con tu perfil.` },
-    { from: 'alex', time: fmt(2), text: 'Nos gustaría conocerte mejor en una conversación de 30–40 minutos con nuestro equipo de selección. ¿Tienes disponibilidad para esta semana?' },
+    { from: 'alex', time: fmt(0), text: `¡Hola ${firstName}! 👋 Soy *Alex*, asistente de selección de *Demo Transportes*.` },
+    { from: 'alex', time: fmt(1), text: `🎉 ¡Felicitaciones! Has superado la pre-entrevista para el cargo de *${jobTitle}*. El equipo quedó muy conforme con tu perfil y tus antecedentes verificados en RUNT.` },
+    { from: 'alex', time: fmt(2), text: 'El siguiente paso es tu *Prueba de Manejo presencial* en nuestro patio de maniobras. La prueba tiene una duración de 45 minutos aproximadamente. ¿Tienes disponibilidad para esta semana? 🚛' },
     { from: 'alex', time: fmt(3), text: '¿Prefieres una franja en la *mañana (AM)* o en la *tarde (PM)*? 🗓️' },
   ];
 }
@@ -77,9 +77,9 @@ function buildConfirmation(firstName: string, slot: string): WaMsg[] {
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
   };
   return [
-    { from: 'alex', time: fmt(0), text: `✅ ¡Confirmado! Tu entrevista queda agendada para el *${slot}*.` },
-    { from: 'alex', time: fmt(1), text: 'La entrevista será por videollamada. Te enviaremos el enlace 30 minutos antes por este mismo canal. 📱' },
-    { from: 'alex', time: fmt(2), text: `¡Nos vemos pronto, ${firstName}! 😊 Si necesitas reagendar, escríbenos aquí.` },
+    { from: 'alex', time: fmt(0), text: `✅ ¡Confirmado! Tu prueba de manejo queda agendada para el *${slot}*.` },
+    { from: 'alex', time: fmt(1), text: `📋 Por favor trae tu *cédula de ciudadanía* y tu *licencia de conducción* el día de la prueba. Llega 10 minutos antes del horario acordado.` },
+    { from: 'alex', time: fmt(2), text: `¡Mucho éxito, ${firstName}! 😊 Si necesitas reagendar o tienes alguna duda, escríbenos aquí.` },
   ];
 }
 
@@ -311,10 +311,10 @@ export default function WhatsAppAgendarEntrevistaModal({
                 <WaIcon size={40} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: '17px', color: '#111' }}>
-                    Agendar entrevista por WhatsApp
+                    Agendar prueba de manejo por WhatsApp
                   </div>
                   <div style={{ fontSize: '13px', color: '#666', marginTop: '1px' }}>
-                    Alex IA · Comfandi Talent
+                    Alex IA · Demo Transportes
                   </div>
                 </div>
                 <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: '4px' }}>
@@ -338,11 +338,11 @@ export default function WhatsAppAgendarEntrevistaModal({
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: '#15803D' }}>
-                      Alex IA · Agendamiento por WhatsApp
+                      Alex IA · Agendamiento de Prueba de Manejo
                     </div>
                     <p style={{ fontSize: '13px', color: '#166534', margin: '4px 0 0', lineHeight: 1.55 }}>
-                      Alex envía automáticamente un mensaje de felicitaciones e invita al candidato a elegir
-                      una franja horaria (AM/PM) y un horario concreto para la entrevista.
+                      Alex envía automáticamente un mensaje de felicitaciones e invita al conductor a elegir
+                      una franja horaria (AM/PM) y un horario concreto para la prueba presencial.
                     </p>
                   </div>
                 </div>
@@ -375,7 +375,7 @@ export default function WhatsAppAgendarEntrevistaModal({
                 </div>
 
                 {/* CTA: ver simulación */}
-                <button
+                  <button
                   onClick={() => setView('chat')}
                   style={{
                     width: '100%', padding: '14px', borderRadius: '12px',
@@ -402,7 +402,7 @@ export default function WhatsAppAgendarEntrevistaModal({
                     }}
                   >
                     <CheckCircle2 size={20} color="#128C7E" />
-                    Confirmar y agendar entrevista
+                    Confirmar y agendar prueba de manejo
                   </button>
                 )}
 
@@ -434,11 +434,11 @@ export default function WhatsAppAgendarEntrevistaModal({
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: '#fff' }}>
-                      Alex IA · Comfandi Talent
+                      Alex IA · Demo Transportes
                     </div>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
                       {isDone
-                        ? '✓ Entrevista agendada'
+                        ? '✓ Prueba agendada'
                         : isTyping
                         ? 'escribiendo...'
                         : chatPhase === 'awaiting_franja' || chatPhase === 'awaiting_slot'
@@ -594,7 +594,7 @@ export default function WhatsAppAgendarEntrevistaModal({
                   {isDone && (
                     <div style={{ textAlign: 'center', margin: '12px 0 4px', animation: 'waSlideIn2 0.3s ease' }}>
                       <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.85)', padding: '3px 10px', borderRadius: '12px', color: '#666' }}>
-                        Entrevista agendada ✅
+                        Prueba de manejo agendada ✅
                       </span>
                     </div>
                   )}
@@ -674,10 +674,10 @@ export default function WhatsAppAgendarEntrevistaModal({
                 {isDone && (
                   <div style={{ margin: '0 12px 12px', padding: '12px', borderRadius: '10px', background: '#F0FFF4', border: '1.5px solid #BBF7D0', animation: 'waSlideIn2 0.3s ease' }}>
                     <div style={{ fontWeight: 700, fontSize: '12px', color: '#16A34A', marginBottom: '4px' }}>
-                      ✓ Entrevista agendada
+                      ✓ Prueba de manejo agendada
                     </div>
                     <div style={{ fontSize: '11px', color: '#166534', lineHeight: 1.5 }}>
-                      El candidato confirmó horario · Se enviará enlace 30 min antes
+                      El conductor confirmó horario · Debe traer cédula y licencia
                     </div>
                   </div>
                 )}

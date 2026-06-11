@@ -100,11 +100,11 @@ export default function MainSidebar() {
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px' }}>
         <img
-          src={companyLogoUrl || assetUrl('/logo-comfandi.webp')}
-          alt={companyName || 'Comfandi'}
+          src={companyLogoUrl || assetUrl('/logo-demo-transportes.png')}
+          alt={companyName || 'Demo Transportes'}
           style={{
-            maxHeight: '56px',
-            maxWidth: '168px',
+            maxHeight: '110px',
+            maxWidth: '300px',
             width: 'auto',
             height: 'auto',
             display: 'block',

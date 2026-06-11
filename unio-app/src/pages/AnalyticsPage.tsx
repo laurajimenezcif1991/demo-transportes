@@ -730,7 +730,7 @@ export default function AnalyticsPage() {
           <Card id="seccion-kpi" style={sectionGap}>
             <SectionTitle>KPI Hiring Manager</SectionTitle>
             <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '16px', marginTop: '-10px' }}>
-              Entrevistas realizadas por contratado — eficiencia del proceso de entrevistas
+              Pruebas RUNT y documentales realizadas por contratado — eficiencia del proceso de selección
             </div>
 
             {/* Table */}
@@ -753,9 +753,9 @@ export default function AnalyticsPage() {
                 <span>Hiring Manager</span>
                 <span>Área</span>
                 <span>Vacantes</span>
-                <span>Entrevistas realizadas</span>
+                <span>Pruebas realizadas</span>
                 <span>Contratados</span>
-                <span>Entrevistas/contratado</span>
+                <span>Pruebas/contratado</span>
                 <span>Time-to-fill prom.</span>
               </div>
               {hmTable.map((row) => (

@@ -26,12 +26,12 @@ interface PhaseLabel {
 }
 
 const PHASES: PhaseLabel[] = [
-  { label: 'Apertura',        startIdx: 0  },
-  { label: 'Contexto',        startIdx: 3  },
-  { label: 'No negociables',  startIdx: 5  },
-  { label: 'Must-haves',      startIdx: 8  },
-  { label: 'Logros',          startIdx: 10 },
-  { label: 'Cierre',          startIdx: 12 },
+  { label: 'Apertura',               startIdx: 0  },
+  { label: 'Licencia y experiencia', startIdx: 3  },
+  { label: 'Historial vial',         startIdx: 6  },
+  { label: 'Disponibilidad',         startIdx: 9  },
+  { label: 'Expectativa salarial',   startIdx: 12 },
+  { label: 'Cierre',                 startIdx: 14 },
 ];
 
 function currentPhase(msgIdx: number): string {
@@ -49,36 +49,35 @@ function buildConversation(firstName: string, jobTitle: string, aspiration: stri
     return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
   };
   return [
-    // 0-1 Apertura
-    { from: 'alex',      time: fmt(0),  text: `Hola ${firstName}! 👋 Soy *Alex*, asistente de talento de Comfandi. Tu perfil quedó bien ranqueado para *${jobTitle}*. ¿Tienes unos 10 minutos?` },
-    { from: 'candidate', time: fmt(1),  text: '¡Hola! Claro, con gusto 😊' },
-    // 2-3 Rompe-hielo
-    { from: 'alex',      time: fmt(2),  text: '¡Perfecto!... Antes de entrar en lo del cargo, cuéntame un poco de ti más allá de lo profesional. ¿Qué te gusta hacer?' },
-    { from: 'candidate', time: fmt(3),  text: 'Me encanta leer sobre comportamiento humano y los domingos corro en la Ciclovía 🏃' },
-    // 4-5 Estado laboral → No negociables
-    { from: 'alex',      time: fmt(4),  text: '¡Qué bueno!... ¿Y laboralmente, estás trabajando actualmente o en qué estás?' },
-    { from: 'candidate', time: fmt(5),  text: 'Sí, trabajo actualmente como Research Manager en IPA Colombia.' },
-    // 6-7 Contexto empresa + negociable (ciudad)
-    { from: 'alex',      time: fmt(6),  text: `Mira, Comfandi acompaña a sus afiliados a lo largo de toda su vida... Para este rol necesitamos a alguien que diseñe intervenciones conductuales para mejorar hábitos y bienestar. El cargo es presencial en Bogotá, ¿eso te funciona?` },
-    { from: 'candidate', time: fmt(7),  text: '¡Me suena muy bien! Estoy en Bogotá sin problema ✅' },
-    // 8-9 Must-haves: herramientas
-    { from: 'alex',      time: fmt(8),  text: '¿Y con qué metodologías o herramientas has trabajado más en tus proyectos?' },
-    { from: 'candidate', time: fmt(9),  text: 'EAST, 3B y COMB para diseño de intervenciones. SPSS/R y Power BI para análisis y reportes de impacto.' },
-    // 10-11 Logro clave
-    { from: 'alex',      time: fmt(10), text: 'Cuéntame de un logro del que estés orgulloso, algo relevante para este tipo de rol.' },
-    { from: 'candidate', time: fmt(11), text: 'Diseñé un piloto de ahorro conductual para 500 empleados que incrementó la cotización un 23% en 6 meses 📈' },
-    // 12-13 Salario
-    { from: 'alex',      time: fmt(12), text: '¡Qué impacto!... ¿Y cuál sería tu expectativa salarial?' },
-    { from: 'candidate', time: fmt(13), text: aspiration || 'Entre $5.5M y $6M COP.' },
+    // 0-2 Apertura
+    { from: 'alex',      time: fmt(0),  text: `Hola ${firstName}! 👋 Soy *Alex*, asistente de selección de *Demo Transportes*. Tu perfil quedó bien ranqueado para *${jobTitle}*. ¿Tienes unos 10 minutos para una verificación rápida?` },
+    { from: 'candidate', time: fmt(1),  text: '¡Hola! Sí, claro. Cuente 😊' },
+    { from: 'alex',      time: fmt(2),  text: '¡Perfecto! Vamos directo a lo que necesitamos verificar para este cargo.' },
+    // 3-5 Licencia y experiencia
+    { from: 'alex',      time: fmt(3),  text: '¿Cuenta actualmente con *licencia C2 vigente*? 🪪' },
+    { from: 'candidate', time: fmt(4),  text: 'Sí, mi licencia C2 está vigente. Vence en noviembre de 2026.' },
+    { from: 'alex',      time: fmt(5),  text: `¡Excelente! ¿Y cuántos años de experiencia tiene conduciendo vehículos de carga o servicio público?` },
+    // 6-8 Historial vial
+    { from: 'candidate', time: fmt(6),  text: 'Llevo 8 años manejando. Los últimos 5 en rutas intermunicipales de carga.' },
+    { from: 'alex',      time: fmt(7),  text: '¿Tiene algún comparendo activo, multa sin pagar o suspensión de licencia registrada en el RUNT? 🚦' },
+    { from: 'candidate', time: fmt(8),  text: 'No, mi record está limpio. No tengo comparendos activos. ✅' },
+    // 9-11 Disponibilidad
+    { from: 'alex',      time: fmt(9),  text: '¿Tiene disponibilidad para *turnos rotativos* (incluyendo fines de semana y festivos)?  🗓️' },
+    { from: 'candidate', time: fmt(10), text: 'Sí, tengo disponibilidad total. He trabajado domingo a domingo con compensatorio.' },
+    { from: 'alex',      time: fmt(11), text: `¿Y para viajes *intermunicipales* de larga distancia si el cargo lo requiere?` },
+    // 12-13 Expectativa salarial
+    { from: 'candidate', time: fmt(12), text: 'Sin problema, estoy acostumbrado a rutas largas. 🛣️' },
+    { from: 'alex',      time: fmt(13), text: `¿Cuál es su expectativa salarial para este cargo?` },
     // 14-16 Cierre
-    { from: 'alex',      time: fmt(14), text: `¡Estamos alineados! 🙌... ${firstName}, muchas gracias por tu tiempo. El equipo de talento estará en contacto muy pronto. ¿Tienes alguna pregunta?` },
-    { from: 'candidate', time: fmt(15), text: 'No, ¡muchas gracias! Quedo pendiente 😊' },
-    { from: 'alex',      time: fmt(16), text: `¡Fue un gusto conocerte!... ¡Hasta pronto, ${firstName}! ✅` },
+    { from: 'candidate', time: fmt(14), text: aspiration || "$3'200.000 mensuales." },
+    { from: 'alex',      time: fmt(15), text: `¡Perfecto, ${firstName}! 🙌 Sus datos están bien. El equipo de selección revisará su información en RUNT y RNDC y le contactará para los próximos pasos. ¿Tiene alguna duda?` },
+    { from: 'candidate', time: fmt(16), text: 'No, todo claro. ¡Muchas gracias! 😊' },
+    { from: 'alex',      time: fmt(17), text: `¡Fue un gusto, ${firstName}! Le estaremos escribiendo pronto. ¡Mucho éxito! ✅` },
   ];
 }
 
 // typing delays per message index (ms): Alex messages longer, candidate shorter
-const TYPING_DELAYS = [1800, 900, 2200, 1400, 1800, 1200, 2600, 1400, 1800, 2200, 1800, 2800, 1600, 1300, 2300, 1200, 1800];
+const TYPING_DELAYS = [1800, 900, 1600, 1800, 900, 2000, 1200, 2200, 900, 1800, 1200, 2000, 1200, 1600, 1100, 2400, 1100, 1800];
 const PAUSE_BETWEEN = 250;
 
 // ─── Typing Bubbles ────────────────────────────────────────────────────────────
@@ -247,7 +246,7 @@ export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates
                     Pre-entrevista IA por WhatsApp
                   </div>
                   <div style={{ fontSize: '13px', color: '#666', marginTop: '1px' }}>
-                    Alex IA · Comfandi Talent
+                    Alex IA · Demo Transportes
                   </div>
                 </div>
                 <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: '4px', borderRadius: '8px' }}>
@@ -374,7 +373,7 @@ export default function WhatsAppPreEntrevistaModal({ isOpen, onClose, candidates
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: '#fff' }}>
-                      Alex IA · Comfandi Talent
+                      Alex IA · Demo Transportes
                     </div>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
                       {isDone ? '✓ Entrevista completada' : isTyping ? (typingFor === 'alex' ? 'escribiendo...' : `${firstName} está escribiendo...`) : 'en línea'}
