@@ -4,6 +4,8 @@ import type { PipelineStageKey } from '../data/mock';
 export type MockStageKey = PipelineStageKey | 'finalistas';
 
 const STORAGE_KEY = 'unio-mock-stage';
+// Bump this whenever pre-seeded mock candidates change, to clear stale localStorage.
+const STORAGE_VERSION = 'v4';
 
 const STAGE_ORDER: MockStageKey[] = [
   'scoring',
@@ -45,6 +47,14 @@ interface MockStageData {
 
 function loadFromStorage(): MockStageData {
   try {
+    // If the stored version doesn't match, discard stale state so pre-seeded
+    // candidates always appear correctly after a mock data update.
+    const storedVersion = localStorage.getItem(`${STORAGE_KEY}-version`);
+    if (storedVersion !== STORAGE_VERSION) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(`${STORAGE_KEY}-version`, STORAGE_VERSION);
+      return {};
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as MockStageData) : {};
   } catch {
@@ -55,6 +65,7 @@ function loadFromStorage(): MockStageData {
 function saveToStorage(data: MockStageData): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(`${STORAGE_KEY}-version`, STORAGE_VERSION);
   } catch {
     // storage full or unavailable
   }
@@ -125,10 +136,19 @@ export function useMockStageState() {
     [data],
   );
 
-  /** Highest unlocked stage for a mock vacancy (falls back to DEFAULT_MOCK_PROGRESS). */
+  /** Highest unlocked stage for a mock vacancy.
+   *  Always returns the FURTHEST stage between what's stored in localStorage
+   *  and DEFAULT_MOCK_PROGRESS, so updating defaults automatically upgrades
+   *  stale localStorage state without requiring a manual reset. */
   const getMockProgressStage = useCallback(
-    (jobId: string): MockStageKey =>
-      data[jobId]?.progressStage ?? DEFAULT_MOCK_PROGRESS[jobId] ?? 'scoring',
+    (jobId: string): MockStageKey => {
+      const stored = data[jobId]?.progressStage;
+      const defaultStage = (DEFAULT_MOCK_PROGRESS[jobId] ?? 'scoring') as MockStageKey;
+      if (!stored) return defaultStage;
+      const storedIdx  = STAGE_ORDER.indexOf(stored);
+      const defaultIdx = STAGE_ORDER.indexOf(defaultStage);
+      return storedIdx >= defaultIdx ? stored : defaultStage;
+    },
     [data],
   );
 

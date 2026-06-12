@@ -2174,7 +2174,8 @@ function _mkVigia(id: string, name: string, score: number, photo: string, initia
   const licYears = hi ? Math.max(4, Math.round((score - 75) / 4) + 4) : md ? 2 : 1;
   const wrongCity = city === 'Bucaramanga' || city === 'Barranquilla';
   const personal = idx < _vigiaPersonal.length ? _vigiaPersonal[idx] : _vigiaPersonal[0];
-  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+  const hasPrescreeningStageVigia = stage === 'prescreening' || stage === 'entrevistas';
+  const pre: Candidate['prescreeningAI'] = hasPrescreeningStageVigia ? {
     score: Math.round(score * 0.97),
     status: hi ? 'continua' : md ? 'continua' : 'pendiente',
     resumen: hi
@@ -2354,7 +2355,8 @@ function _mkTranspPub(id: string, name: string, score: number, photo: string, in
   const licYears = hi ? Math.max(3, Math.round((score - 75) / 5) + 3) : md ? 2 : 1;
   const wrongCity = city === 'Medellín' || city === 'Cali';
   const runt = _transpPubRunt[idx % _transpPubRunt.length];
-  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+  const hasPrescreeningStageTP = stage === 'prescreening' || stage === 'entrevistas';
+  const pre: Candidate['prescreeningAI'] = hasPrescreeningStageTP ? {
     score: Math.round(score * 0.96),
     status: hi ? 'continua' : md ? 'continua' : 'pendiente',
     resumen: hi
@@ -2506,7 +2508,8 @@ function _mkDistrib(id: string, name: string, score: number, photo: string, init
   const licYears = hi ? Math.max(3, Math.round((score - 75) / 5) + 3) : md ? 2 : 1;
   const wrongCity = city === 'Barranquilla' || city === 'Cali' || city === 'Medellín';
   const runt = _distribRunt[idx % _distribRunt.length];
-  const pre: Candidate['prescreeningAI'] = stage === 'prescreening' ? {
+  const hasPrescreeningStage = stage === 'prescreening' || stage === 'entrevistas';
+  const pre: Candidate['prescreeningAI'] = hasPrescreeningStage ? {
     score: Math.round(score * 0.97),
     status: hi ? 'continua' : md ? 'continua' : 'pendiente',
     resumen: hi
