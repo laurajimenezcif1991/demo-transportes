@@ -660,8 +660,8 @@ export default function CandidateOnepage() {
               }
               statusOk={!isPendingEntrevistas && entrevistasDone && !entrevistasDescarta}
               isOpen={entrevistasOpen}
-              onToggle={() => hasEntrevistas && setEntrevistasOpen(!entrevistasOpen)}
-              isLocked={!hasEntrevistas}
+              onToggle={() => setEntrevistasOpen(!entrevistasOpen)}
+              isLocked={false}
             >
               {/* For pending candidates, show the empty form so it's ready to fill */}
               <EntrevistasContent
@@ -678,29 +678,22 @@ export default function CandidateOnepage() {
             <AccordionSection
               number={4}
               title="Prueba Psicológica"
-              score={isPendingEvaluaciones ? undefined : (stage === 'evaluaciones' ? candidate.psychTest?.score : undefined)}
+              score={candidate.psychTest?.score}
               statusText={
-                isPendingEvaluaciones
-                  ? 'En proceso'
-                  : stage === 'evaluaciones' ? 'Continúa' : hasEntrevistas ? 'En proceso' : 'Por iniciar'
+                isPendingEvaluaciones ? 'En proceso'
+                  : candidate.psychTest ? 'Continúa' : 'Por iniciar'
               }
-              statusOk={!isPendingEvaluaciones && stage === 'evaluaciones'}
+              statusOk={!!candidate.psychTest && !isPendingEvaluaciones}
               isOpen={evaluacionesOpen}
-              onToggle={() => (hasEntrevistas || isPendingEvaluaciones) && setEvaluacionesOpen(!evaluacionesOpen)}
-              isLocked={!hasEntrevistas && !isPendingEvaluaciones}
+              onToggle={() => setEvaluacionesOpen(!evaluacionesOpen)}
+              isLocked={false}
             >
-              {(hasEntrevistas || isPendingEvaluaciones) && (
-                isPendingEvaluaciones ? (
-                  <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                    Pendiente: la prueba psicológica aún no ha sido completada por el candidato.
-                  </div>
-                ) : candidate.psychTest ? (
-                  <PruebaPsicologicaContent data={candidate.psychTest} />
-                ) : (
-                  <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px' }}>
-                    Pendiente: la prueba psicológica aún no ha sido completada por el candidato.
-                  </div>
-                )
+              {candidate.psychTest ? (
+                <PruebaPsicologicaContent data={candidate.psychTest} />
+              ) : (
+                <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                  Pendiente: la prueba psicológica aún no ha sido completada por el candidato.
+                </div>
               )}
             </AccordionSection>
 
@@ -708,26 +701,23 @@ export default function CandidateOnepage() {
               <AccordionSection
                 number={5}
                 title="Prueba Técnica"
-                score={(hasEntrevistas || isPendingEvaluaciones) ? techTestScore : undefined}
+                score={techTestScore ?? undefined}
                 statusText={
-                  (!hasEntrevistas && !isPendingEvaluaciones) ? 'Por iniciar' :
                   isPendingEvaluaciones && techTestScore === null ? 'En proceso' :
                   techTestScore === null ? 'Por iniciar' :
                   techTestRecomendacion === 'no_recomendar' ? 'Descartado' : 'Continúa'
                 }
                 statusOk={techTestScore !== null && techTestRecomendacion !== 'no_recomendar'}
                 isOpen={pruebaTecnicaOpen}
-                onToggle={() => (hasEntrevistas || isPendingEvaluaciones) && setPruebaTecnicaOpen(!pruebaTecnicaOpen)}
-                isLocked={!hasEntrevistas && !isPendingEvaluaciones}
+                onToggle={() => setPruebaTecnicaOpen(!pruebaTecnicaOpen)}
+                isLocked={false}
               >
-                {(hasEntrevistas || isPendingEvaluaciones) && (
-                  <PruebaTecnicaContent
-                    candidateId={candidateId}
-                    meta={isPendingEvaluaciones ? undefined : interview?.techTestMeta}
-                    onScoreChange={setTechTestScore}
-                    onRecomendacionChange={setTechTestRecomendacion}
-                  />
-                )}
+                <PruebaTecnicaContent
+                  candidateId={candidateId}
+                  meta={isPendingEvaluaciones ? undefined : interview?.techTestMeta}
+                  onScoreChange={setTechTestScore}
+                  onRecomendacionChange={setTechTestRecomendacion}
+                />
               </AccordionSection>
             </div>
 
@@ -744,21 +734,19 @@ export default function CandidateOnepage() {
                   <AccordionSection
                     number={6}
                     title="Validación de Antecedentes"
-                    score={(hasEntrevistas || isPendingEvaluaciones) ? antScore : undefined}
+                    score={antScore}
                     statusText={antStatusText}
-                    statusOk={!isPendingEvaluaciones && antVar === 'sin_novedad' && hasEntrevistas}
+                    statusOk={antVar === 'sin_novedad' && !isPendingEvaluaciones}
                     isOpen={antecedentesOpen}
-                    onToggle={() => (hasEntrevistas || isPendingEvaluaciones) && setAntecedentesOpen(!antecedentesOpen)}
-                    isLocked={!hasEntrevistas && !isPendingEvaluaciones}
+                    onToggle={() => setAntecedentesOpen(!antecedentesOpen)}
+                    isLocked={false}
                   >
-                    {(hasEntrevistas || isPendingEvaluaciones) && (
-                      isPendingEvaluaciones ? (
-                        <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                          Pendiente: la validación de antecedentes aún no ha sido completada.
-                        </div>
-                      ) : (
-                        <ValidacionAntecedentes variant={antVar} />
-                      )
+                    {isPendingEvaluaciones ? (
+                      <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                        Pendiente: la validación de antecedentes aún no ha sido completada.
+                      </div>
+                    ) : (
+                      <ValidacionAntecedentes variant={antVar} />
                     )}
                   </AccordionSection>
                 </div>

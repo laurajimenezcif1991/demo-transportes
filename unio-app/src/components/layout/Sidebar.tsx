@@ -100,28 +100,28 @@ export default function Sidebar({ activeItem }: SidebarProps) {
       label: stageLabel('prescreening', 'Pre screening IA'),
       Icon: AlignLeft,
       path: `${stageBase}/prescreening`,
-      locked: progressIdx < 1,
+      locked: false,
     },
     {
       id: 'entrevistas',
       label: stageLabel('entrevistas', 'Entrevistas'),
       Icon: MessageSquare,
       path: `${stageBase}/entrevistas`,
-      locked: progressIdx < 2,
+      locked: false,
     },
     {
       id: 'evaluaciones',
       label: stageLabel('evaluaciones', 'Pruebas'),
       Icon: CheckSquare,
       path: `${stageBase}/evaluaciones`,
-      locked: progressIdx < 3,
+      locked: false,
     },
     {
       id: 'finalistas',
       label: stageLabel('finalistas', 'Finalistas'),
       Icon: CheckCheck,
       path: `${stageBase}/finalistas`,
-      locked: finalistasLocked,
+      locked: false,
     },
   ];
 
