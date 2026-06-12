@@ -2673,9 +2673,9 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
   const transpPipeline = (scoring: number, pre: number, runt: number, doc: number) => [
     s('scoring',      'Verificación (RUNT/RNDC)', 'Verificación',  scoring > 0  ? (pre > 0 ? 'completed' : 'in_progress') : 'not_started', scoring, true),
     s('prescreening', 'Pre-entrevista IA',         'Pre-entrevista', pre > 0   ? (runt > 0 ? 'completed' : 'in_progress') : 'not_started', pre,    true),
-    s('entrevistas',  'Entrevistas',               'Entrevistas',    runt > 0  ? (doc > 0 ? 'completed' : 'in_progress') : 'not_started',  runt,   false),
-    s('evaluaciones', 'Prueba de Manejo',          'Prueba manejo',  doc > 0   ? 'in_progress' : 'not_started',                            doc,    false),
-    s('finalistas',   'Shortlist',                 'Shortlist',      'not_started', 0, false),
+    s('entrevistas',  'Entrevistas',   'Entrevistas', runt > 0  ? (doc > 0 ? 'completed' : 'in_progress') : 'not_started', runt,  false),
+    s('evaluaciones', 'Pruebas',       'Pruebas',     doc > 0   ? 'in_progress' : 'not_started',                            doc,   false),
+    s('finalistas',   'Shortlist',     'Shortlist',   'not_started', 0, false),
   ];
 
   switch (jobId) {
