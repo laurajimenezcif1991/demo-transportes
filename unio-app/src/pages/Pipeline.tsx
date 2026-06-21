@@ -322,7 +322,7 @@ export default function Pipeline() {
           marginLeft: '205px',
           flex: 1,
           padding: '40px',
-          maxWidth: '1000px',
+          maxWidth: '1200px',
         }}
       >
         {/* Back */}
@@ -420,7 +420,7 @@ export default function Pipeline() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '16px',
           }}
         >
