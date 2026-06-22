@@ -1173,7 +1173,7 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => window.open('https://www.rndc.org.co', '_blank')}
+            onClick={() => window.open('/manifiestos-vigia.pdf', '_blank')}
           >
             Ver Manifiestos
           </Button>

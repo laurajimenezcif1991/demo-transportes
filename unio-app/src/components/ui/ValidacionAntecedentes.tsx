@@ -99,51 +99,74 @@ export default function ValidacionAntecedentes({ variant = 'alto_riesgo', collap
   return (
     <div style={{ padding: '4px 0 8px' }}>
 
-      {/* ── Resumen ejecutivo ──────────────────────────────────────────── */}
-      <div
-        onClick={collapsible ? () => setOpen(o => !o) : undefined}
-        style={{
-          display: 'flex', alignItems: 'flex-start', gap: '14px',
-          padding: '14px 16px', borderRadius: open || !collapsible ? '10px' : '10px',
-          background: bg, border: `1.5px solid ${border}`,
-          marginBottom: open || !collapsible ? '18px' : 0,
-          cursor: collapsible ? 'pointer' : 'default',
-          userSelect: 'none',
-        }}
-      >
-        <div style={{ marginTop: 2 }}>
-          {isClean
-            ? <ShieldCheck size={22} color={color} />
-            : <AlertTriangle size={22} color={color} />}
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: collapsible ? 0 : '6px' }}>
-            <span style={{ fontWeight: 700, fontSize: '15px', color }}>{riskLabel}</span>
+      {/* ── Header colapsable con título ───────────────────────────────── */}
+      {collapsible ? (
+        <div
+          onClick={() => setOpen(o => !o)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px',
+            borderRadius: open ? '10px 10px 0 0' : '10px',
+            background: bg, border: `1.5px solid ${border}`,
+            borderBottom: open ? 'none' : `1.5px solid ${border}`,
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <ShieldCheck size={18} color={color} style={{ flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-text-primary)' }}>
+              Validación de Antecedentes
+            </span>
             <span style={{
-              fontSize: '15px', fontWeight: 800,
-              background: color, color: '#fff',
-              padding: '2px 12px', borderRadius: '20px', letterSpacing: '0.2px',
+              fontSize: '12px', fontWeight: 600, color,
+              background: `${color}18`, border: `1px solid ${border}`,
+              padding: '1px 10px', borderRadius: '20px',
             }}>
-              {score} / 100
+              {riskLabel}
             </span>
           </div>
-          {(!collapsible || open) && (
+          <div style={{ color, flexShrink: 0 }}>
+            {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </div>
+        </div>
+      ) : (
+        /* ── Resumen ejecutivo (modo no colapsable) ──────────────────── */
+        <div
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: '14px',
+            padding: '14px 16px', borderRadius: '10px',
+            background: bg, border: `1.5px solid ${border}`,
+            marginBottom: '18px',
+          }}
+        >
+          <div style={{ marginTop: 2 }}>
+            {isClean
+              ? <ShieldCheck size={22} color={color} />
+              : <AlertTriangle size={22} color={color} />}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '6px' }}>
+              <span style={{ fontWeight: 700, fontSize: '15px', color }}>{riskLabel}</span>
+              <span style={{
+                fontSize: '15px', fontWeight: 800,
+                background: color, color: '#fff',
+                padding: '2px 12px', borderRadius: '20px', letterSpacing: '0.2px',
+              }}>
+                {score} / 100
+              </span>
+            </div>
             <p style={{ fontSize: '13px', color, margin: '6px 0 0', lineHeight: 1.55 }}>
               {isClean
                 ? 'No se encontraron novedades en ninguna de las 10 fuentes consultadas. Apto para vinculación.'
                 : `${altoCnt} novedad${altoCnt !== 1 ? 'es' : ''} de riesgo alto · ${medioCnt} de riesgo medio. No recomendado para vinculación.`}
             </p>
-          )}
-        </div>
-        {collapsible && (
-          <div style={{ marginTop: 2, color, flexShrink: 0 }}>
-            {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ── Tabla de resultados ────────────────────────────────────────── */}
-      {(!collapsible || open) && <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--color-border-default)' }}>
+      {(!collapsible || open) && <div style={{ borderRadius: collapsible ? '0 0 10px 10px' : '10px', overflow: 'hidden', border: `1px solid ${collapsible ? border : 'var(--color-border-default)'}`, borderTop: collapsible ? 'none' : undefined, marginBottom: collapsible ? 0 : undefined }}>
         {/* Cabecera */}
         <div style={{
           display: 'grid', gridTemplateColumns: '110px 170px 1fr',
