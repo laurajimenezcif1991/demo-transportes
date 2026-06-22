@@ -9,13 +9,13 @@ type VoiceState = 'pending' | 'processing' | 'done';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const GUIDE_QUESTIONS = [
-  '¿Cómo describes tu situación familiar actual? ¿Tienes personas a cargo?',
-  '¿Has tenido conflictos laborales en trabajos anteriores? ¿Cómo los resolviste?',
-  '¿Cómo manejas la presión y situaciones de estrés en la operación?',
-  '¿Alguna vez te has visto involucrado en una situación de robo o pérdida de mercancía?',
-  '¿Qué tan estable es tu entorno económico actualmente?',
-  '¿Consumes o has consumido sustancias psicoactivas? ¿Con qué frecuencia?',
-  '¿Cómo es tu relación con figuras de autoridad o supervisores?',
+  '¿Cómo describió su situación familiar actual? ¿El/la candidato/a tiene personas a cargo?',
+  '¿Ha tenido conflictos laborales en trabajos anteriores? ¿Cómo los resolvió?',
+  '¿Cómo maneja la presión y situaciones de estrés en la operación?',
+  '¿Se ha visto involucrado/a alguna vez en una situación de robo o pérdida de mercancía?',
+  '¿Qué tan estable describió su entorno económico actualmente?',
+  '¿Consume o ha consumido sustancias psicoactivas? ¿Con qué frecuencia?',
+  '¿Cómo describió su relación con figuras de autoridad o supervisores?',
 ];
 
 const WAVEFORM_HEIGHTS = [8, 14, 22, 18, 28, 12, 24, 10, 20, 26, 8, 16, 22, 28, 14, 6, 18, 24, 10, 20, 28, 16, 8, 22, 14, 26, 10, 18, 24, 12, 20, 8];
