@@ -46,6 +46,7 @@ import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntr
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
 import {
   interviewData,
+  type Candidate,
   type InterviewFeedback,
   type PipelineStageKey,
   type RecomendacionValue,
@@ -633,7 +634,7 @@ export default function CandidateOnepage() {
                 >
                   {(hasPrescreening || waCompleted) && (
                     prescreeningData ? (
-                      <PrescreeningContent prescreening={prescreeningData} hasCV={candidate.hasCV} />
+                      <PrescreeningContent prescreening={prescreeningData} hasCV={candidate.hasCV} runt={candidate.runtVerification} />
                     ) : (
                       <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
                         Pendiente: la pre-entrevista IA aún no ha sido procesada para este candidato.
@@ -1251,9 +1252,112 @@ function ScoringContent({ candidate }: { candidate: (typeof candidates)[0] }) {
   );
 }
 
+// ─── RUNT Verification Modal ──────────────────────────────────────────────────
+
+type RuntData = {
+  cc: string;
+  totalManifiestos: number;
+  licenseCategories: { categoria: string; fechaExpedicion: string; fechaVencimiento: string }[];
+};
+
+function RuntModal({ runt, onClose }: { runt: RuntData; onClose: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.45)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '24px',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          minWidth: '460px',
+          maxWidth: '540px',
+          width: '100%',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Dark header */}
+        <div
+          style={{
+            background: '#1a1a2e',
+            padding: '16px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span style={{ color: '#fff', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '14px' }}>
+            Verificación RUNT — Licencia Nro: {runt.cc}
+          </span>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', padding: '2px' }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Table */}
+        <div style={{ padding: '0' }}>
+          {/* Table header */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#f5f5f7', borderBottom: '1px solid #e2e2e4' }}>
+            {['Categoría', 'Fecha expedición', 'Fecha vencimiento'].map((h) => (
+              <div key={h} style={{ padding: '10px 16px', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '13px', color: '#363539' }}>
+                {h}
+              </div>
+            ))}
+          </div>
+          {/* Table rows */}
+          {runt.licenseCategories.map((row, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                borderBottom: i < runt.licenseCategories.length - 1 ? '1px solid #e2e2e4' : 'none',
+              }}
+            >
+              <div style={{ padding: '10px 16px', fontFamily: 'var(--font-display)', fontSize: '13px', color: '#363539', fontWeight: 600 }}>{row.categoria}</div>
+              <div style={{ padding: '10px 16px', fontFamily: 'var(--font-display)', fontSize: '13px', color: '#363539' }}>{row.fechaExpedicion}</div>
+              <div style={{ padding: '10px 16px', fontFamily: 'var(--font-display)', fontSize: '13px', color: '#363539' }}>{row.fechaVencimiento}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Total manifiestos */}
+        <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e2e4', background: '#fafafa' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '13px', color: '#363539' }}>
+            Total de manifiestos expedidos en el rango de fechas solicitado:{' '}
+            <strong style={{ color: 'var(--color-brand-primary)' }}>{runt.totalManifiestos}</strong>
+          </span>
+        </div>
+
+        {/* Disclaimer */}
+        <div style={{ padding: '10px 16px', borderTop: '1px solid #e2e2e4', background: '#f5f5f7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '11px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+            Validado por medio de Runt Pro
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Prescreening content ─────────────────────────────────────────────────────
 
-function PrescreeningContent({ prescreening, hasCV }: { prescreening: NonNullable<typeof candidates[0]['prescreeningAI']>; hasCV?: boolean }) {
+function PrescreeningContent({ prescreening, hasCV, runt }: {
+  prescreening: NonNullable<Candidate['prescreeningAI']>;
+  hasCV?: boolean;
+  runt?: RuntData;
+}) {
+  const [runtModalOpen, setRuntModalOpen] = useState(false);
+
   return (
     <div style={{ paddingTop: '20px' }}>
       {/* WhatsApp profile pill — shown only when candidate has no CV */}
@@ -1281,7 +1385,7 @@ function PrescreeningContent({ prescreening, hasCV }: { prescreening: NonNullabl
       )}
 
       {/* Resumen candidato */}
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: runt ? '16px' : '24px' }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '15px', margin: '0 0 8px', color: 'var(--color-text-primary)' }}>
           Resumen del candidato
         </h3>
@@ -1289,6 +1393,27 @@ function PrescreeningContent({ prescreening, hasCV }: { prescreening: NonNullabl
           {prescreening.resumen}
         </p>
       </div>
+
+      {/* RUNT action buttons — only shown when runt data is available */}
+      {runt && (
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
+          <Button variant="secondary" size="sm" onClick={() => setRuntModalOpen(true)}>
+            Consulta Runt
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => window.open('https://www.rndc.org.co', '_blank')}
+          >
+            Ver Manifiestos
+          </Button>
+        </div>
+      )}
+
+      {/* RUNT Modal */}
+      {runtModalOpen && runt && (
+        <RuntModal runt={runt} onClose={() => setRuntModalOpen(false)} />
+      )}
 
       {/* No negociables with scores */}
       <div style={{ marginBottom: '24px' }}>
