@@ -39,7 +39,7 @@ import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
 import PruebaTecnicaContent from '../components/ui/PruebaTecnicaContent';
-import ValidacionAntecedentes, { getAntecedentesScore } from '../components/ui/ValidacionAntecedentes';
+import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
 import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntrevistaModal';
@@ -200,7 +200,6 @@ export default function CandidateOnepage() {
   const candidate = apiCandidate ?? { id: candidateId, name: '', role: '', sector: '', years: '', location: '', bio: '', score: 0, avatarInitials: candidateId.slice(0, 2).toUpperCase(), avatarColor: '#8750F6', hasCurrentJob: false, superpoder: '', aspiration: '', budget: '', salaryRange: 'en_rango' as const, currentStage: stage, scoringAI: { score: 0, status: 'pendiente' as const, resumen: '', noNegociables: [], logros: [], senales: [] } };
   // Show prescreening if URL stage implies it OR if the API returned prescreening data OR if candidate was advanced there
   const hasPrescreening = !!(apiCandidate?.prescreeningAI) || stage === 'prescreening' || stage === 'entrevistas' || stage === 'evaluaciones' || isPendingPrescreening;
-  const hasEntrevistas  = stage === 'entrevistas'  || stage === 'evaluaciones' || isPendingEntrevistas;
 
   const { setStatus } = useCandidateStatus();
   const { getFeedback } = useInterview();
@@ -227,7 +226,6 @@ export default function CandidateOnepage() {
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
   const [pruebaTecnicaOpen, setPruebaTecnicaOpen] = useState(false);
-  const [antecedentesOpen, setAntecedentesOpen] = useState(false);
   const [waModalOpen, setWaModalOpen] = useState(false);
   const [waAgendarOpen, setWaAgendarOpen] = useState(false);
 
@@ -634,7 +632,13 @@ export default function CandidateOnepage() {
                 >
                   {(hasPrescreening || waCompleted) && (
                     prescreeningData ? (
-                      <PrescreeningContent prescreening={prescreeningData} hasCV={candidate.hasCV} runt={candidate.runtVerification} />
+                      <PrescreeningContent
+                        prescreening={prescreeningData}
+                        hasCV={candidate.hasCV}
+                        runt={candidate.runtVerification}
+                        candidateScore={candidate.score}
+                        isPendingEvaluaciones={isPendingEvaluaciones}
+                      />
                     ) : (
                       <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
                         Pendiente: la pre-entrevista IA aún no ha sido procesada para este candidato.
@@ -722,37 +726,6 @@ export default function CandidateOnepage() {
               </AccordionSection>
             </div>
 
-            {/* 6. Validación de Antecedentes — variante por score del candidato */}
-            {(() => {
-              const antVar: VariantKey = candidate.score >= 80 ? 'sin_novedad' : 'alto_riesgo';
-              const antScore = getAntecedentesScore(antVar);
-              const antStatusText =
-                (!hasEntrevistas && !isPendingEvaluaciones) ? 'Por iniciar' :
-                isPendingEvaluaciones ? 'En proceso' :
-                antVar === 'sin_novedad' ? 'Sin novedad' : 'Riesgo Muy Alto';
-              return (
-                <div style={{ marginTop: 12 }}>
-                  <AccordionSection
-                    number={6}
-                    title="Validación de Antecedentes"
-                    score={antScore}
-                    statusText={antStatusText}
-                    statusOk={antVar === 'sin_novedad' && !isPendingEvaluaciones}
-                    isOpen={antecedentesOpen}
-                    onToggle={() => setAntecedentesOpen(!antecedentesOpen)}
-                    isLocked={false}
-                  >
-                    {isPendingEvaluaciones ? (
-                      <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                        Pendiente: la validación de antecedentes aún no ha sido completada.
-                      </div>
-                    ) : (
-                      <ValidacionAntecedentes variant={antVar} />
-                    )}
-                  </AccordionSection>
-                </div>
-              );
-            })()}
           </div>
         </div>
         </div>
@@ -1351,12 +1324,15 @@ function RuntModal({ runt, onClose }: { runt: RuntData; onClose: () => void }) {
 
 // ─── Prescreening content ─────────────────────────────────────────────────────
 
-function PrescreeningContent({ prescreening, hasCV, runt }: {
+function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, isPendingEvaluaciones = false }: {
   prescreening: NonNullable<Candidate['prescreeningAI']>;
   hasCV?: boolean;
   runt?: RuntData;
+  candidateScore?: number;
+  isPendingEvaluaciones?: boolean;
 }) {
   const [runtModalOpen, setRuntModalOpen] = useState(false);
+  const antVar: VariantKey = candidateScore >= 80 ? 'sin_novedad' : 'alto_riesgo';
 
   return (
     <div style={{ paddingTop: '20px' }}>
@@ -1546,6 +1522,17 @@ function PrescreeningContent({ prescreening, hasCV, runt }: {
             );
           })}
         </div>
+      </div>
+
+      {/* Validación de Antecedentes — colapsable al final del acordeón */}
+      <div style={{ marginTop: '24px' }}>
+        {isPendingEvaluaciones ? (
+          <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+            Pendiente: la validación de antecedentes aún no ha sido completada.
+          </div>
+        ) : (
+          <ValidacionAntecedentes variant={antVar} collapsible defaultOpen={false} />
+        )}
       </div>
     </div>
   );

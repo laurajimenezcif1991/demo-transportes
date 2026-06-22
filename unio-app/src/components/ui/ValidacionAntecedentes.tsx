@@ -1,4 +1,5 @@
-import { AlertTriangle, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 export type VariantKey = 'alto_riesgo' | 'sin_novedad';
@@ -81,9 +82,13 @@ function PillCat({ cat }: { cat: AntRow['categoria'] }) {
 // ─── Componente principal ─────────────────────────────────────────────────────
 interface Props {
   variant?: VariantKey;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }
 
-export default function ValidacionAntecedentes({ variant = 'alto_riesgo' }: Props) {
+export default function ValidacionAntecedentes({ variant = 'alto_riesgo', collapsible = false, defaultOpen = true }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
+
   const data     = variant === 'sin_novedad' ? DATA_POSITIVO : DATA_NEGATIVO;
   const score    = calcScore(data);
   const { label: riskLabel, color, bg, border } = getRisk(score);
@@ -95,19 +100,24 @@ export default function ValidacionAntecedentes({ variant = 'alto_riesgo' }: Prop
     <div style={{ padding: '4px 0 8px' }}>
 
       {/* ── Resumen ejecutivo ──────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: '14px',
-        padding: '14px 16px', borderRadius: '10px',
-        background: bg, border: `1.5px solid ${border}`,
-        marginBottom: '18px',
-      }}>
+      <div
+        onClick={collapsible ? () => setOpen(o => !o) : undefined}
+        style={{
+          display: 'flex', alignItems: 'flex-start', gap: '14px',
+          padding: '14px 16px', borderRadius: open || !collapsible ? '10px' : '10px',
+          background: bg, border: `1.5px solid ${border}`,
+          marginBottom: open || !collapsible ? '18px' : 0,
+          cursor: collapsible ? 'pointer' : 'default',
+          userSelect: 'none',
+        }}
+      >
         <div style={{ marginTop: 2 }}>
           {isClean
             ? <ShieldCheck size={22} color={color} />
             : <AlertTriangle size={22} color={color} />}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: collapsible ? 0 : '6px' }}>
             <span style={{ fontWeight: 700, fontSize: '15px', color }}>{riskLabel}</span>
             <span style={{
               fontSize: '15px', fontWeight: 800,
@@ -117,16 +127,23 @@ export default function ValidacionAntecedentes({ variant = 'alto_riesgo' }: Prop
               {score} / 100
             </span>
           </div>
-          <p style={{ fontSize: '13px', color, margin: 0, lineHeight: 1.55 }}>
-            {isClean
-              ? 'No se encontraron novedades en ninguna de las 10 fuentes consultadas. Apto para vinculación.'
-              : `${altoCnt} novedad${altoCnt !== 1 ? 'es' : ''} de riesgo alto · ${medioCnt} de riesgo medio. No recomendado para vinculación.`}
-          </p>
+          {(!collapsible || open) && (
+            <p style={{ fontSize: '13px', color, margin: '6px 0 0', lineHeight: 1.55 }}>
+              {isClean
+                ? 'No se encontraron novedades en ninguna de las 10 fuentes consultadas. Apto para vinculación.'
+                : `${altoCnt} novedad${altoCnt !== 1 ? 'es' : ''} de riesgo alto · ${medioCnt} de riesgo medio. No recomendado para vinculación.`}
+            </p>
+          )}
         </div>
+        {collapsible && (
+          <div style={{ marginTop: 2, color, flexShrink: 0 }}>
+            {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </div>
+        )}
       </div>
 
       {/* ── Tabla de resultados ────────────────────────────────────────── */}
-      <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--color-border-default)' }}>
+      {(!collapsible || open) && <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--color-border-default)' }}>
         {/* Cabecera */}
         <div style={{
           display: 'grid', gridTemplateColumns: '110px 170px 1fr',
@@ -173,14 +190,16 @@ export default function ValidacionAntecedentes({ variant = 'alto_riesgo' }: Prop
             </span>
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* ── Nota metodológica ──────────────────────────────────────────── */}
-      <p style={{ marginTop: '12px', fontSize: '11.5px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-        Score calculado automáticamente: –10 pts por novedad de categoría Alta · –5 pts por Media.
-        Fuentes consultadas: Antecedentes Penales, Judiciales, Rama Unificada, Registraduría,
-        Procuraduría, INPEC, RUNT y SIMIT.
-      </p>
+      {(!collapsible || open) && (
+        <p style={{ marginTop: '12px', fontSize: '11.5px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+          Score calculado automáticamente: –10 pts por novedad de categoría Alta · –5 pts por Media.
+          Fuentes consultadas: Antecedentes Penales, Judiciales, Rama Unificada, Registraduría,
+          Procuraduría, INPEC, RUNT y SIMIT.
+        </p>
+      )}
     </div>
   );
 }
