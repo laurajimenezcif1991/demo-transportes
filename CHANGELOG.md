@@ -9,6 +9,26 @@
 
 ---
 
+## [feat: CTAs Entrevista→Validaciones y Validaciones→Aprobados con modal] — 22 Jun 2026
+
+### Flujo de avance Entrevista → Validaciones → Aprobados
+
+- Crear `ConfirmAprobadosModal.tsx`: modal de confirmación con icono de warning neutro (sin semánticos), título dinámico singular/plural, descripción de irreversibilidad y botones Cancelar/Confirmar
+- `CandidateList.tsx`:
+  - Añadir `estudios` a la detección de `currentStage` desde pathname (fix: antes siempre retornaba `scoring`)
+  - Añadir `estudios` al `STAGE_ORDER` local para que `advanceCandidates` resuelva la ruta correcta
+  - Etapa `entrevistas`: renombrar botón de "Aprobar candidato" → "Pasar a Validaciones"
+  - Etapa `estudios`: nuevo botón primario "Aprobar candidato/candidatos" que abre `ConfirmAprobadosModal` antes de avanzar a `finalistas`
+  - Eliminar botón duplicado `finalistas → Pasar a Validaciones` (flujo incorrecto del commit anterior)
+  - Botón WhatsApp "Solicitar docs. de ingreso" queda solo en etapa `finalistas` (Aprobados)
+- `CandidateOnepage.tsx`:
+  - Añadir `estudios` y `finalistas` a `ONEPAGE_PIPELINE_STAGES`
+  - Etapa `entrevistas`: botón cambiado a "Pasar a Validaciones"
+  - Etapa `estudios`: botón "Aprobar candidato" abre modal de confirmación existente
+  - Eliminar estado duplicado `approveConfirmOpen`
+
+---
+
 ## [feat: flujo entrevistas→validaciones→aprobados + modal de confirmación] — 22 Jun 2026
 
 ### CandidateList.tsx

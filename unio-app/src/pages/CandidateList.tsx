@@ -35,7 +35,7 @@ export default function CandidateList() {
   const navigate = useNavigate();
   const { setStatuses, getStatus, seedStatuses } = useCandidateStatus();
 
-  const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas', 'finalistas'] as const;
+  const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas', 'estudios', 'finalistas'] as const;
 
   const priorStages = (stage: string) => {
     const idx = STAGE_ORDER.indexOf(stage as typeof STAGE_ORDER[number]);
