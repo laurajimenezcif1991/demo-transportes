@@ -8,6 +8,8 @@ import {
   CheckCheck,
   ClipboardCheck,
   RotateCcw,
+  Car,
+  BrainCircuit,
 } from 'lucide-react';
 import { usePipeline } from '../../context/PipelineContext';
 import { useMockStageState } from '../../hooks/useMockStageState';
@@ -33,7 +35,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     : true;
   const finalistasLocked = finalistaLocked || (isMockJob && !mockHasFinalists);
 
-  const PIPELINE_STAGES = ['scoring', 'prescreening', 'entrevistas', 'evaluaciones'] as const;
+  const PIPELINE_STAGES = ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas'] as const;
   const progressIdx = PIPELINE_STAGES.indexOf(progressStage as typeof PIPELINE_STAGES[number]);
 
   const getActiveId = (): string => {
@@ -44,7 +46,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     if (path.includes('/candidate/') || path.includes('/finalist/')) {
       const params = new URLSearchParams(location.search);
       const stage = params.get('stage');
-      if (stage && ['scoring', 'prescreening', 'entrevistas', 'evaluaciones'].includes(stage)) return stage;
+      if (stage && ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas'].includes(stage)) return stage;
       if (path.includes('/finalist/')) return 'finalistas';
       return 'pipeline';
     }
@@ -52,6 +54,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     if (path.includes('/estudios')) return 'estudios';
     if (path === '/finalistas') return 'finalistas';
     if (path.includes('/finalistas')) return 'finalistas';
+    if (path.includes('/prueba_manejo')) return 'prueba_manejo';
     if (path.includes('/evaluaciones')) return 'evaluaciones';
     if (path.includes('/entrevistas')) return 'entrevistas';
     if (path.includes('/prescreening')) return 'prescreening';
@@ -92,17 +95,24 @@ export default function Sidebar({ activeItem }: SidebarProps) {
       locked: false,
     },
     {
-      id: 'entrevistas',
-      label: 'Entrevistas',
-      Icon: MessageSquare,
-      path: `${stageBase}/entrevistas`,
+      id: 'prueba_manejo',
+      label: 'Prueba de manejo',
+      Icon: Car,
+      path: `${stageBase}/prueba_manejo`,
       locked: false,
     },
     {
       id: 'evaluaciones',
-      label: 'Pruebas',
-      Icon: CheckSquare,
+      label: 'Prueba Psicotécnica',
+      Icon: BrainCircuit,
       path: `${stageBase}/evaluaciones`,
+      locked: false,
+    },
+    {
+      id: 'entrevistas',
+      label: 'Entrevista',
+      Icon: MessageSquare,
+      path: `${stageBase}/entrevistas`,
       locked: false,
     },
     {

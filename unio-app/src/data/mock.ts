@@ -4,7 +4,7 @@ export type VacanteStatus = 'activa' | 'en_pausa' | 'cerrada';
 export type Priority = 'alta' | 'media' | 'baja';
 export type StageStatus = 'completed' | 'in_progress' | 'not_started';
 export type SalaryRange = 'en_rango' | 'fuera_de_rango';
-export type PipelineStageKey = 'scoring' | 'prescreening' | 'entrevistas' | 'evaluaciones';
+export type PipelineStageKey = 'scoring' | 'prescreening' | 'prueba_manejo' | 'evaluaciones' | 'entrevistas';
 
 export interface Vacante {
   id: string;
@@ -2963,18 +2963,20 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
     ({ id, label, stageBadge: badge, status, candidateCount: count, isAI, route: `/pipeline/${jobId}/${id}` });
 
   // ── Pipeline estándar Transporte & Logística ──
-  const transpPipeline = (scoring: number, pre: number, runt: number, doc: number) => [
-    s('scoring',      'Verificación (RUNT/RNDC)', 'Verificación',  scoring > 0  ? (pre > 0 ? 'completed' : 'in_progress') : 'not_started', scoring, true),
-    s('prescreening', 'Pre-entrevista IA',         'Pre-entrevista', pre > 0   ? (runt > 0 ? 'completed' : 'in_progress') : 'not_started', pre,    true),
-    s('entrevistas',  'Entrevistas',   'Entrevistas', runt > 0  ? (doc > 0 ? 'completed' : 'in_progress') : 'not_started', runt,  false),
-    s('evaluaciones', 'Pruebas',       'Pruebas',     doc > 0   ? 'in_progress' : 'not_started',                            doc,   false),
-    s('finalistas',   'Shortlist',     'Shortlist',   'not_started', 0, false),
+  // counts: scoring, pre, manejo, psicotech, entrevista
+  const transpPipeline = (scoring: number, pre: number, manejo: number, psicotech: number, ent: number) => [
+    s('scoring',       'Verificación (RUNT/RNDC)', 'Verificación',     scoring > 0   ? (pre > 0     ? 'completed'    : 'in_progress') : 'not_started', scoring,   true),
+    s('prescreening',  'Pre-entrevista IA',         'Pre-entrevista',   pre > 0       ? (manejo > 0  ? 'completed'    : 'in_progress') : 'not_started', pre,       true),
+    s('prueba_manejo', 'Prueba de manejo',           'Prueba manejo',    manejo > 0    ? (psicotech > 0 ? 'completed' : 'in_progress') : 'not_started', manejo,    false),
+    s('evaluaciones',  'Prueba Psicotécnica',        'Psicotécnica',     psicotech > 0 ? (ent > 0    ? 'completed'    : 'in_progress') : 'not_started', psicotech, false),
+    s('entrevistas',   'Entrevista',                 'Entrevista',       ent > 0       ? 'in_progress'                                : 'not_started', ent,       false),
+    s('finalistas',    'Aprobados',                  'Aprobados',        'not_started', 0, false),
   ];
 
   switch (jobId) {
-    case 'mock-transp-pub': return transpPipeline(20, 10, 5, 3);
-    case 'mock-vigia':      return transpPipeline(20, 10, 5, 3);
-    case 'mock-distrib':    return transpPipeline(20, 10, 5, 3);
+    case 'mock-transp-pub': return transpPipeline(20, 10, 7, 5, 3);
+    case 'mock-vigia':      return transpPipeline(20, 10, 7, 5, 3);
+    case 'mock-distrib':    return transpPipeline(20, 10, 7, 5, 3);
     case 'mock-recep':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'in_progress', 15, true),
@@ -3031,9 +3033,9 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
 export const mockCandidatesByStage: Record<string, Partial<Record<string, Candidate[]>>> = {
   // evaluaciones candidates (tp-e*, v-e*, d-e*) only appear in their own stage —
   // keeping them out of scoring/prescreening/entrevistas prevents duplicate cards.
-  'mock-transp-pub': { scoring: [...transpPubEntrevistas, ...transpPubPrescreening, ...transpPubScoring], prescreening: [...transpPubEntrevistas, ...transpPubPrescreening], entrevistas: transpPubEntrevistas, evaluaciones: transpPubEvaluaciones },
-  'mock-vigia':   { scoring: [...vigiaEntrevistas, ...vigiaPrescreening, ...vigiaScoring], prescreening: [...vigiaEntrevistas, ...vigiaPrescreening], entrevistas: vigiaEntrevistas, evaluaciones: vigiaEvaluaciones },
-  'mock-distrib': { scoring: [...distribEntrevistas, ...distribPrescreening, ...distribScoring], prescreening: [...distribEntrevistas, ...distribPrescreening], entrevistas: distribEntrevistas, evaluaciones: distribEvaluaciones },
+  'mock-transp-pub': { scoring: [...transpPubEntrevistas, ...transpPubPrescreening, ...transpPubScoring], prescreening: [...transpPubEntrevistas, ...transpPubPrescreening], prueba_manejo: transpPubEntrevistas, evaluaciones: transpPubEvaluaciones, entrevistas: transpPubEntrevistas },
+  'mock-vigia':   { scoring: [...vigiaEntrevistas, ...vigiaPrescreening, ...vigiaScoring], prescreening: [...vigiaEntrevistas, ...vigiaPrescreening], prueba_manejo: vigiaEntrevistas, evaluaciones: vigiaEvaluaciones, entrevistas: vigiaEntrevistas },
+  'mock-distrib': { scoring: [...distribEntrevistas, ...distribPrescreening, ...distribScoring], prescreening: [...distribEntrevistas, ...distribPrescreening], prueba_manejo: distribEntrevistas, evaluaciones: distribEvaluaciones, entrevistas: distribEntrevistas },
   'mock-recep':    { scoring: recepCandidates },
   'mock-bodega':   { scoring: [...bodegaPreCandidates, ...bodegaScoreOnly], prescreening: bodegaPreCandidates },
   'mock-th':       { scoring: [...thEntrevistasCandidates, ...thPreCandidates, ...thScoreOnly], prescreening: [...thEntrevistasCandidates, ...thPreCandidates], entrevistas: thEntrevistasCandidates },

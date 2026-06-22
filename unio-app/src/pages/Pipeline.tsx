@@ -23,8 +23,9 @@ import type { Phase } from '../types/dashboard';
 const stageColors: Record<string, { bg: string; fg: string }> = {
   scoring: { bg: 'var(--color-stage-1-bg)', fg: 'var(--color-stage-1-fg)' },
   prescreening: { bg: 'var(--color-stage-2-bg)', fg: 'var(--color-stage-2-fg)' },
-  entrevistas: { bg: 'var(--color-stage-3-bg)', fg: 'var(--color-stage-3-fg)' },
-  evaluaciones: { bg: 'var(--color-stage-4-bg)', fg: 'var(--color-stage-4-fg)' },
+  prueba_manejo: { bg: '#E8F5E9', fg: '#2E7D32' },
+  evaluaciones: { bg: 'var(--color-stage-3-bg)', fg: 'var(--color-stage-3-fg)' },
+  entrevistas: { bg: 'var(--color-stage-4-bg)', fg: 'var(--color-stage-4-fg)' },
   finalistas: { bg: '#FFE5F2', fg: '#990032' },
   estudios: { bg: 'var(--color-surface-muted)', fg: 'var(--color-text-muted)' },
 };
@@ -40,12 +41,13 @@ const stageBadgeVariants: Record<string, 'scoring' | 'prescreening' | 'entrevist
 const AI_STAGES = new Set(['scoring', 'prescreening']);
 
 const STAGE_META: Record<string, { label: string; stageBadge: string }> = {
-  scoring:      { label: 'Scoring IA',        stageBadge: 'Scoring' },
-  prescreening: { label: 'Prescreening IA',   stageBadge: 'Prescreening' },
-  entrevistas:  { label: 'Entrevistas',       stageBadge: 'Entrevistas' },
-  evaluaciones: { label: 'Pruebas',           stageBadge: 'Pruebas' },
-  finalistas:   { label: 'Aprobados',         stageBadge: 'Aprobados' },
-  estudios:     { label: 'Validaciones',      stageBadge: 'Validaciones' },
+  scoring:       { label: 'Scoring IA',          stageBadge: 'Scoring' },
+  prescreening:  { label: 'Prescreening IA',     stageBadge: 'Prescreening' },
+  prueba_manejo: { label: 'Prueba de manejo',    stageBadge: 'Prueba manejo' },
+  evaluaciones:  { label: 'Prueba Psicotécnica', stageBadge: 'Psicotécnica' },
+  entrevistas:   { label: 'Entrevista',          stageBadge: 'Entrevista' },
+  finalistas:    { label: 'Aprobados',           stageBadge: 'Aprobados' },
+  estudios:      { label: 'Validaciones',        stageBadge: 'Validaciones' },
 };
 
 function mapPhaseStatus(label?: string): 'completed' | 'in_progress' | 'not_started' {
@@ -56,15 +58,16 @@ function mapPhaseStatus(label?: string): 'completed' | 'in_progress' | 'not_star
   return 'not_started';
 }
 
-const STAGE_ORDER = ['scoring', 'prescreening', 'entrevistas', 'evaluaciones', 'finalistas', 'estudios'];
+const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas', 'finalistas', 'estudios'];
 
 // Normalize API phase type keys to internal stage IDs
 function normalizePhaseType(raw: string): string {
   const s = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[\s_-]/g, '');
   if (s.includes('prescreening') || s.includes('preseleccion') || s.includes('preentrevista')) return 'prescreening';
   if (s.includes('scoring') || s.includes('puntuacion') || s.includes('analisis')) return 'scoring';
+  if (s.includes('pruebamanejo') || s.includes('manejo')) return 'prueba_manejo';
+  if (s.includes('evaluacion') || s.includes('psicotecnica') || s.includes('psicologica')) return 'evaluaciones';
   if (s.includes('entrevista')) return 'entrevistas';
-  if (s.includes('evaluacion')) return 'evaluaciones';
   if (s.includes('finalista')) return 'finalistas';
   return s;
 }

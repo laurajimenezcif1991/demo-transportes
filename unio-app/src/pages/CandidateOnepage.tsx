@@ -37,7 +37,6 @@ import Button from '../components/ui/Button';
 import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
-import PruebaTecnicaContent from '../components/ui/PruebaTecnicaContent';
 import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
@@ -61,8 +60,9 @@ import { Skeleton, SkeletonCircle } from '../components/ui/Skeleton';
 const ONEPAGE_PIPELINE_STAGES: PipelineStageKey[] = [
   'scoring',
   'prescreening',
-  'entrevistas',
+  'prueba_manejo',
   'evaluaciones',
+  'entrevistas',
 ];
 
 function normalizeOnepageStage(raw: string | null): PipelineStageKey {
@@ -223,7 +223,6 @@ export default function CandidateOnepage() {
   const [prescreeningOpen, setPrescreeningOpen] = useState(() => stage === 'prescreening');
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
-  const [pruebaTecnicaOpen, setPruebaTecnicaOpen] = useState(false);
   const [waModalOpen, setWaModalOpen] = useState(false);
   const [waAgendarOpen, setWaAgendarOpen] = useState(false);
 
@@ -236,7 +235,7 @@ export default function CandidateOnepage() {
     setPrescreeningOpen(stage === 'prescreening');
     setEntrevistasOpen(stage === 'entrevistas');
     setEvaluacionesOpen(stage === 'evaluaciones');
-    setPruebaTecnicaOpen(false);
+
 
     const sectionEl: HTMLElement | null =
       stage === 'prescreening'
@@ -251,23 +250,6 @@ export default function CandidateOnepage() {
 
     return () => window.clearTimeout(t);
   }, [stage, candidateId, jobId]);
-  const [techTestScore, setTechTestScore] = useState<number | null>(() => {
-    try {
-      const raw = localStorage.getItem(`unio_tech_feedback_${candidateId}`);
-      if (!raw) return null;
-      const data = JSON.parse(raw);
-      const vals: number[] = Object.values(data.ratings ?? {});
-      if (!vals.length || vals.some((v) => !v)) return null;
-      return Math.round((vals.reduce((a: number, b: number) => a + b, 0) / vals.length) * 20);
-    } catch { return null; }
-  });
-  const [techTestRecomendacion, setTechTestRecomendacion] = useState<string | null>(() => {
-    try {
-      const raw = localStorage.getItem(`unio_tech_feedback_${candidateId}`);
-      if (!raw) return null;
-      return JSON.parse(raw)?.recomendacion ?? null;
-    } catch { return null; }
-  });
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -612,39 +594,28 @@ export default function CandidateOnepage() {
             );
           })()}
 
-          {/* 3. Entrevistas */}
-          <div ref={entrevistasSectionRef} style={{ scrollMarginTop: 24 }}>
+          {/* 2. Prueba de manejo */}
+          <div style={{ scrollMarginTop: 24 }}>
             <AccordionSection
               number={2}
-              title="Entrevistas"
-              score={isPendingEntrevistas ? undefined : entrevistaScore}
-              statusText={
-                isPendingEntrevistas
-                  ? 'En proceso'
-                  : entrevistasDescarta ? 'Descartado' :
-                  entrevistasDone     ? 'Continúa'   :
-                  entrevistaScore !== null ? 'En proceso' : 'Por iniciar'
-              }
-              statusOk={!isPendingEntrevistas && entrevistasDone && !entrevistasDescarta}
-              isOpen={entrevistasOpen}
-              onToggle={() => setEntrevistasOpen(!entrevistasOpen)}
-              isLocked={false}
+              title="Prueba de manejo"
+              statusText={stage === 'prueba_manejo' || stage === 'evaluaciones' || stage === 'entrevistas' ? 'Continúa' : 'Por iniciar'}
+              statusOk={stage === 'evaluaciones' || stage === 'entrevistas'}
+              isOpen={false}
+              onToggle={() => {}}
+              isLocked={stage !== 'prueba_manejo' && stage !== 'evaluaciones' && stage !== 'entrevistas'}
             >
-              {/* For pending candidates, show the empty form so it's ready to fill */}
-              <EntrevistasContent
-                candidateId={candidateId}
-                jobId={jobId}
-                interview={isPendingEntrevistas ? undefined : interview}
-                savedFeedback={savedFeedback}
-              />
+              <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                Resultado de la prueba de manejo pendiente de registro.
+              </div>
             </AccordionSection>
           </div>
 
-          {/* 4–5. Evaluaciones (scroll target: primera sub-etapa) */}
+          {/* 3. Prueba Psicotécnica (PRIMA) */}
           <div ref={evaluacionesSectionRef} style={{ scrollMarginTop: 24 }}>
             <AccordionSection
               number={3}
-              title="Prueba Psicológica"
+              title="Prueba Psicotécnica"
               score={candidate.psychTest?.score}
               statusText={
                 isPendingEvaluaciones ? 'En proceso'
@@ -659,35 +630,37 @@ export default function CandidateOnepage() {
                 <PruebaPsicologicaContent data={candidate.psychTest} />
               ) : (
                 <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                  Pendiente: la prueba psicológica aún no ha sido completada por el candidato.
+                  Pendiente: la prueba psicotécnica (PRIMA) aún no ha sido completada por el candidato.
                 </div>
               )}
             </AccordionSection>
+          </div>
 
-            <div style={{ marginTop: 12 }}>
-              <AccordionSection
-                number={4}
-                title="Prueba Técnica"
-                score={techTestScore ?? undefined}
-                statusText={
-                  isPendingEvaluaciones && techTestScore === null ? 'En proceso' :
-                  techTestScore === null ? 'Por iniciar' :
-                  techTestRecomendacion === 'no_recomendar' ? 'Descartado' : 'Continúa'
-                }
-                statusOk={techTestScore !== null && techTestRecomendacion !== 'no_recomendar'}
-                isOpen={pruebaTecnicaOpen}
-                onToggle={() => setPruebaTecnicaOpen(!pruebaTecnicaOpen)}
-                isLocked={false}
-              >
-                <PruebaTecnicaContent
-                  candidateId={candidateId}
-                  meta={isPendingEvaluaciones ? undefined : interview?.techTestMeta}
-                  onScoreChange={setTechTestScore}
-                  onRecomendacionChange={setTechTestRecomendacion}
-                />
-              </AccordionSection>
-            </div>
-
+          {/* 4. Entrevista */}
+          <div ref={entrevistasSectionRef} style={{ scrollMarginTop: 24 }}>
+            <AccordionSection
+              number={4}
+              title="Entrevista"
+              score={isPendingEntrevistas ? undefined : entrevistaScore}
+              statusText={
+                isPendingEntrevistas
+                  ? 'En proceso'
+                  : entrevistasDescarta ? 'Descartado' :
+                  entrevistasDone     ? 'Continúa'   :
+                  entrevistaScore !== null ? 'En proceso' : 'Por iniciar'
+              }
+              statusOk={!isPendingEntrevistas && entrevistasDone && !entrevistasDescarta}
+              isOpen={entrevistasOpen}
+              onToggle={() => setEntrevistasOpen(!entrevistasOpen)}
+              isLocked={false}
+            >
+              <EntrevistasContent
+                candidateId={candidateId}
+                jobId={jobId}
+                interview={isPendingEntrevistas ? undefined : interview}
+                savedFeedback={savedFeedback}
+              />
+            </AccordionSection>
           </div>
         </div>
         </div>
@@ -733,7 +706,7 @@ export default function CandidateOnepage() {
               }}
             >
               <WaIcon size={20} color="white" />
-              Agendar entrevista
+              Agendar prueba de manejo
             </button>
           )}
           {stage !== 'scoring' && stage !== 'prescreening' && (
@@ -751,8 +724,9 @@ export default function CandidateOnepage() {
                 }}
               >
                 <CheckCircle2 size={16} />
-                {stage === 'entrevistas' ? 'Pasar a Pruebas'
-                  : stage === 'evaluaciones' ? 'Pasar a Finalistas'
+                {stage === 'prueba_manejo' ? 'Pasar a Prueba Psicotécnica'
+                  : stage === 'evaluaciones' ? 'Pasar a Entrevista'
+                  : stage === 'entrevistas' ? 'Pasar a Finalistas'
                   : 'Pasar etapa'}
               </Button>
           )}

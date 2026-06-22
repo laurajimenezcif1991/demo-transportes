@@ -33,7 +33,7 @@ export default function CandidateList() {
   const navigate = useNavigate();
   const { setStatuses, getStatus, seedStatuses } = useCandidateStatus();
 
-  const STAGE_ORDER = ['scoring', 'prescreening', 'entrevistas', 'evaluaciones'] as const;
+  const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas'] as const;
 
   const priorStages = (stage: string) => {
     const idx = STAGE_ORDER.indexOf(stage as typeof STAGE_ORDER[number]);
@@ -52,10 +52,11 @@ export default function CandidateList() {
   const currentStage = (() => {
     const path = location.pathname;
     if (path.includes('/prescreening')) return 'prescreening';
-    if (path.includes('/entrevistas')) return 'entrevistas';
+    if (path.includes('/prueba_manejo')) return 'prueba_manejo';
     if (path.includes('/evaluaciones')) return 'evaluaciones';
+    if (path.includes('/entrevistas')) return 'entrevistas';
     return stage;
-  })() as 'scoring' | 'prescreening' | 'entrevistas' | 'evaluaciones';
+  })() as 'scoring' | 'prescreening' | 'prueba_manejo' | 'evaluaciones' | 'entrevistas';
 
   useEffect(() => {
     setJobId(jobId);
@@ -523,8 +524,9 @@ export default function CandidateList() {
               onClick={() => handleBulkAction('pasar')}
             >
               <CheckCircle2 size={18} />
-              {currentStage === 'entrevistas' ? 'Pasar a Pruebas'
-                : currentStage === 'evaluaciones' ? 'Pasar a Finalistas'
+              {currentStage === 'prueba_manejo' ? 'Pasar a Prueba Psicotécnica'
+                : currentStage === 'evaluaciones' ? 'Pasar a Entrevista'
+                : currentStage === 'entrevistas' ? 'Pasar a Finalistas'
                 : 'Pasar etapa'}
             </Button>
           )}
@@ -563,7 +565,7 @@ export default function CandidateList() {
           const nextStage = advanceCandidates(jobId, 'prescreening', ids);
           if (nextStage) setProgressStage(nextStage as Parameters<typeof setProgressStage>[0]);
           setSelected(new Set());
-          setToastMessage(`${ids.length} candidato${ids.length !== 1 ? 's' : ''} pasado${ids.length !== 1 ? 's' : ''} a Entrevistas`);
+          setToastMessage(`${ids.length} candidato${ids.length !== 1 ? 's' : ''} agendado${ids.length !== 1 ? 's' : ''} para Prueba de manejo`);
           setToastVisible(true);
         }}
       />
