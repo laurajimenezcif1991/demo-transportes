@@ -665,12 +665,6 @@ export default function CandidateOnepage() {
               onToggle={() => setEntrevistasOpen(!entrevistasOpen)}
               isLocked={false}
             >
-              <EntrevistasContent
-                candidateId={candidateId}
-                jobId={jobId}
-                interview={isPendingEntrevistas ? undefined : interview}
-                savedFeedback={savedFeedback}
-              />
               <VoiceInterviewSection />
             </AccordionSection>
           </div>

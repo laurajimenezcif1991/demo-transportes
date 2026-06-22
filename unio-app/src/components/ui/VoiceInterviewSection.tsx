@@ -67,12 +67,15 @@ function GuideCard() {
       padding: '16px 20px',
     }}>
       <p style={{
-        margin: '0 0 12px',
+        margin: '0 0 4px',
         fontFamily: 'var(--font-display)', fontWeight: 700,
         fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em',
         color: 'var(--color-text-muted)',
       }}>
         Guía de entrevista
+      </p>
+      <p style={{ margin: '0 0 12px', fontFamily: 'var(--font-display)', fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+        Referencia para el psicólogo al grabar el resumen post-entrevista
       </p>
       <ol style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {GUIDE_QUESTIONS.map((q, i) => (
@@ -276,7 +279,7 @@ function DoneView({ onReset }: { onReset: () => void }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function VoiceInterviewSection() {
-  const [voiceState, setVoiceState] = useState<VoiceState>('pending');
+  const [voiceState, setVoiceState] = useState<VoiceState>('done');
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
