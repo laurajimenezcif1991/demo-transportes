@@ -61,6 +61,7 @@ export default function App() {
             {/* Rutas con processId (estructura definida por backend) */}
             <Route path="/pipeline/:jobId/process/:processId/scoring" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/process/:processId/prescreening" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
+            <Route path="/pipeline/:jobId/process/:processId/prueba_manejo" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/process/:processId/entrevistas" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/process/:processId/evaluaciones" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/process/:processId/candidate/:candidateId" element={<ProtectedRoute><CandidateOnepage /></ProtectedRoute>} />
@@ -69,9 +70,11 @@ export default function App() {
             {/* Rutas legacy sin processId (fallback para back-nav y rutas existentes) */}
             <Route path="/pipeline/:jobId/scoring" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/prescreening" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
+            <Route path="/pipeline/:jobId/prueba_manejo" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/entrevistas" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/evaluaciones" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/pipeline/:jobId/finalistas" element={<ProtectedRoute><Shortlist /></ProtectedRoute>} />
+            <Route path="/pipeline/:jobId/estudios" element={<ProtectedRoute><CandidateList /></ProtectedRoute>} />
             <Route path="/finalistas" element={<ProtectedRoute><Shortlist /></ProtectedRoute>} />
 
             {/* Deep-link routes for candidate & finalist detail (keep for back-nav) */}
