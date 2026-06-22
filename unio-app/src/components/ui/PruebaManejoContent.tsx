@@ -162,7 +162,7 @@ function calcScore(ratings: ManejoRatings): number {
 
 // ─── Meta row ─────────────────────────────────────────────────────────────────
 
-function MetaRow({ meta }: { meta: typeof DEFAULT_META }) {
+function MetaRow({ meta, resultado }: { meta: typeof DEFAULT_META; resultado?: ResultadoManejo | null }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '20px' }}>
       {[
@@ -183,6 +183,7 @@ function MetaRow({ meta }: { meta: typeof DEFAULT_META }) {
           {text}
         </div>
       ))}
+      {resultado && <ResultadoBadge value={resultado} />}
     </div>
   );
 }
@@ -216,30 +217,9 @@ function ReadOnlyView({
   meta: typeof DEFAULT_META;
   onEdit: () => void;
 }) {
-  const score = calcScore(form.ratings);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <MetaRow meta={meta} />
-
-      {/* Score summary */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 18px', background: 'var(--color-neutral-50)',
-        borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-default)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ ...roLabelStyle, margin: 0 }}>Puntaje general</span>
-          <span style={{
-            fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '22px',
-            color: score >= 80 ? 'var(--color-positive-600)' : score >= 60 ? 'var(--color-warning-700, #A37800)' : 'var(--color-negative-600)',
-          }}>
-            {score}
-          </span>
-          <span style={{ ...roLabelStyle, margin: 0 }}>/100</span>
-        </div>
-        {form.resultado && <ResultadoBadge value={form.resultado} />}
-      </div>
+      <MetaRow meta={meta} resultado={form.resultado} />
 
       <hr style={dividerStyle} />
 
