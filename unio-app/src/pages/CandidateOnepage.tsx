@@ -37,6 +37,7 @@ import Button from '../components/ui/Button';
 import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
+import PruebaManejoContent from '../components/ui/PruebaManejoContent';
 import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
@@ -221,6 +222,8 @@ export default function CandidateOnepage() {
     entrevistasDone && (hrRecomendacion === 'no_recomiendo' || hmRecomendacion === 'no_recomiendo');
 
   const [prescreeningOpen, setPrescreeningOpen] = useState(() => stage === 'prescreening');
+  const [pruebaManejoOpen, setPruebaManejoOpen] = useState(() => stage === 'prueba_manejo');
+  const [pruebaManejoScore, setPruebaManejoScore] = useState<number | undefined>(undefined);
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
   const [waModalOpen, setWaModalOpen] = useState(false);
@@ -233,6 +236,7 @@ export default function CandidateOnepage() {
 
   useEffect(() => {
     setPrescreeningOpen(stage === 'prescreening');
+    setPruebaManejoOpen(stage === 'prueba_manejo');
     setEntrevistasOpen(stage === 'entrevistas');
     setEvaluacionesOpen(stage === 'evaluaciones');
 
@@ -599,15 +603,21 @@ export default function CandidateOnepage() {
             <AccordionSection
               number={2}
               title="Prueba de manejo"
-              statusText={stage === 'prueba_manejo' || stage === 'evaluaciones' || stage === 'entrevistas' ? 'Continúa' : 'Por iniciar'}
+              score={pruebaManejoScore}
+              statusText={
+                stage === 'evaluaciones' || stage === 'entrevistas' ? 'Continúa'
+                : stage === 'prueba_manejo' ? 'En proceso'
+                : 'Por iniciar'
+              }
               statusOk={stage === 'evaluaciones' || stage === 'entrevistas'}
-              isOpen={false}
-              onToggle={() => {}}
+              isOpen={pruebaManejoOpen}
+              onToggle={() => setPruebaManejoOpen(o => !o)}
               isLocked={stage !== 'prueba_manejo' && stage !== 'evaluaciones' && stage !== 'entrevistas'}
             >
-              <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                Resultado de la prueba de manejo pendiente de registro.
-              </div>
+              <PruebaManejoContent
+                candidateId={candidateId}
+                onScoreChange={setPruebaManejoScore}
+              />
             </AccordionSection>
           </div>
 
