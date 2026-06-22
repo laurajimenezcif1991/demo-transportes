@@ -113,18 +113,29 @@ export default function ValidacionAntecedentes({ variant = 'alto_riesgo', collap
             userSelect: 'none',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <ShieldCheck size={18} color={color} style={{ flexShrink: 0 }} />
-            <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-text-primary)' }}>
-              Validación de Antecedentes
-            </span>
-            <span style={{
-              fontSize: '12px', fontWeight: 600, color,
-              background: `${color}18`, border: `1px solid ${border}`,
-              padding: '1px 10px', borderRadius: '20px',
-            }}>
-              {riskLabel}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
+            <div style={{ marginTop: 2, flexShrink: 0 }}>
+              <ShieldCheck size={18} color={color} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-text-primary)' }}>
+                  Validación de Antecedentes
+                </span>
+                <span style={{
+                  fontSize: '12px', fontWeight: 600, color,
+                  background: `${color}18`, border: `1px solid ${border}`,
+                  padding: '1px 10px', borderRadius: '20px',
+                }}>
+                  {riskLabel}
+                </span>
+              </div>
+              <span style={{ fontSize: '13px', color, lineHeight: 1.5 }}>
+                {isClean
+                  ? 'No se encontraron novedades en ninguna de las 10 fuentes consultadas. Apto para vinculación.'
+                  : `${altoCnt} novedad${altoCnt !== 1 ? 'es' : ''} de riesgo alto · ${medioCnt} de riesgo medio. No recomendado para vinculación.`}
+              </span>
+            </div>
           </div>
           <div style={{ color, flexShrink: 0 }}>
             {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
