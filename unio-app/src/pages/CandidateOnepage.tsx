@@ -600,27 +600,38 @@ export default function CandidateOnepage() {
           })()}
 
           {/* 2. Prueba de manejo */}
-          <div style={{ scrollMarginTop: 24 }}>
-            <AccordionSection
-              number={2}
-              title="Prueba de manejo"
-              score={pruebaManejoScore}
-              statusText={
-                stage === 'evaluaciones' || stage === 'entrevistas' ? 'Continúa'
-                : stage === 'prueba_manejo' ? 'En proceso'
-                : 'Por iniciar'
-              }
-              statusOk={stage === 'evaluaciones' || stage === 'entrevistas'}
-              isOpen={pruebaManejoOpen}
-              onToggle={() => setPruebaManejoOpen(o => !o)}
-              isLocked={stage !== 'prueba_manejo' && stage !== 'evaluaciones' && stage !== 'entrevistas'}
-            >
-              <PruebaManejoContent
-                candidateId={candidateId}
-                onScoreChange={setPruebaManejoScore}
-              />
-            </AccordionSection>
-          </div>
+          {(() => {
+            // Data is available once the candidate has passed prueba_manejo
+            const hasManejoData = stage === 'evaluaciones' || stage === 'entrevistas';
+            const manejoStatusText = pruebaManejoScore !== undefined
+              ? 'Continúa'
+              : stage === 'prueba_manejo' ? 'En proceso' : 'Por iniciar';
+            return (
+              <div style={{ scrollMarginTop: 24 }}>
+                <AccordionSection
+                  number={2}
+                  title="Prueba de manejo"
+                  score={pruebaManejoScore}
+                  statusText={manejoStatusText}
+                  statusOk={pruebaManejoScore !== undefined}
+                  isOpen={pruebaManejoOpen}
+                  onToggle={() => setPruebaManejoOpen(o => !o)}
+                  isLocked={stage !== 'prueba_manejo' && !hasManejoData}
+                >
+                  {hasManejoData ? (
+                    <PruebaManejoContent
+                      candidateId={candidateId}
+                      onScoreChange={setPruebaManejoScore}
+                    />
+                  ) : (
+                    <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                      Pendiente: la prueba de manejo aún no ha sido completada.
+                    </div>
+                  )}
+                </AccordionSection>
+              </div>
+            );
+          })()}
 
           {/* 3. Prueba Psicotécnica (PRIMA) */}
           <div ref={evaluacionesSectionRef} style={{ scrollMarginTop: 24 }}>

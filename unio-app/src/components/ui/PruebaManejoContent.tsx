@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Check, Pencil, Upload, X as XIcon, Calendar, Clock, User, MapPin, Truck } from 'lucide-react';
 import StarRating from './StarRating';
 import Button from './Button';
@@ -570,6 +570,12 @@ export default function PruebaManejoContent({
   const [form, setForm] = useState<PruebaManejoFeedback>(initial);
   const [isEditing, setIsEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Notify parent of initial score on mount so accordion header reflects it immediately
+  useEffect(() => {
+    onScoreChange?.(calcScore(initial.ratings));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = () => {
     setSaved(true);
