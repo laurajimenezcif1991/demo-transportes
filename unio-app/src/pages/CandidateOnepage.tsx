@@ -38,7 +38,7 @@ import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
 import VoiceInterviewSection from '../components/ui/VoiceInterviewSection';
-import PruebaManejoContent from '../components/ui/PruebaManejoContent';
+import PruebaManejoContent, { PREFILLED, PREFILLED_NO_APTO, calcManejoScore } from '../components/ui/PruebaManejoContent';
 import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import ValidacionesContent, { getValidacionesStatus } from '../components/ui/ValidacionesContent';
@@ -240,9 +240,10 @@ export default function CandidateOnepage() {
 
   const [prescreeningOpen, setPrescreeningOpen] = useState(() => effectiveStage === 'prescreening');
   const [pruebaManejoOpen, setPruebaManejoOpen] = useState(() => effectiveStage === 'prueba_manejo');
-  // Score only exists for candidates who have completed prueba de manejo (stage ≥ prueba_manejo)
+  // Pick driving test preset based on candidate score: red (<45) → no_apto, else standard
+  const pruebaManejoPreset = candidate.score < 45 ? PREFILLED_NO_APTO : PREFILLED;
   const [pruebaManejoScore, setPruebaManejoScore] = useState<number | undefined>(
-    stageReached('prueba_manejo') ? 84 : undefined
+    stageReached('prueba_manejo') ? calcManejoScore(pruebaManejoPreset) : undefined
   );
   // Voice interview only done if candidate reached entrevistas stage
   const [voiceInterviewDone, setVoiceInterviewDone] = useState(() => stageReached('entrevistas'));
@@ -285,7 +286,7 @@ export default function CandidateOnepage() {
     setEntrevistasOpen(effectiveStage === 'entrevistas');
     setEvaluacionesOpen(effectiveStage === 'evaluaciones');
     setValidacionesOpen(stageReached('estudios'));
-    setPruebaManejoScore(stageReached('prueba_manejo') ? 84 : undefined);
+    setPruebaManejoScore(stageReached('prueba_manejo') ? calcManejoScore(pruebaManejoPreset) : undefined);
     setVoiceInterviewDone(stageReached('entrevistas'));
 
 
@@ -663,6 +664,7 @@ export default function CandidateOnepage() {
                 pruebaManejoScore !== undefined ? (
                   <PruebaManejoContent
                     candidateId={candidateId}
+                    initialData={pruebaManejoPreset}
                     onScoreChange={setPruebaManejoScore}
                   />
                 ) : (

@@ -66,7 +66,7 @@ const DEFAULT_META = {
   route: 'Calle 80 – Zona Industrial Norte',
 };
 
-const PREFILLED: PruebaManejoFeedback = {
+export const PREFILLED: PruebaManejoFeedback = {
   ratings: {
     control_vehiculo:  4,
     manejo_defensivo:  5,
@@ -92,6 +92,37 @@ const PREFILLED: PruebaManejoFeedback = {
     { name: 'foto_inicio_prueba.jpg',    size: 87000 },
   ],
 };
+
+// Preset for candidates who did not pass the driving test (score < 40)
+export const PREFILLED_NO_APTO: PruebaManejoFeedback = {
+  ratings: {
+    control_vehiculo:  2,
+    manejo_defensivo:  1,
+    velocidad:         2,
+    espejos:           2,
+    cambio_marcha:     1,
+    reversa:           1,
+    conocimiento_ruta: 2,
+    senales_transito:  2,
+    actitud:           3,
+    manejo_presion:    2,
+  },
+  observaciones:
+    'El candidato presentó dificultades significativas en el manejo del vehículo. ' +
+    'Se observaron problemas de control en maniobras básicas, uso inadecuado de los retrovisores y ' +
+    'exceso de velocidad en tramos residenciales. No identificó las señales de prioridad en dos intersecciones.',
+  senalAlerta:
+    'No supera los criterios mínimos de seguridad vial requeridos para operación de carga C2. ' +
+    'Se recomienda no avanzar en el proceso de selección para este cargo.',
+  resultado: 'no_apto',
+  files: [],
+};
+
+export function calcManejoScore(data: PruebaManejoFeedback): number {
+  const vals = Object.values(data.ratings);
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  return Math.round((avg / 5) * 100);
+}
 
 const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.mp4,.mov';
 
