@@ -4,7 +4,13 @@ import Avatar from './Avatar';
 import { getScoreColors } from './ScorePill';
 import Badge from './Badge';
 import { useState } from 'react';
-import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle } from 'lucide-react';
+
+const VEREDICTO_CONFIG = {
+  apto:          { label: 'Apto',                icon: <CheckCheck size={12} />,     color: '#15803d', bg: '#dcfce7', border: '#86efac' },
+  apto_reservas: { label: 'Apto con reservas',   icon: <AlertTriangle size={12} />,  color: '#92400e', bg: '#fef3c7', border: '#fcd34d' },
+  no_apto:       { label: 'No apto',             icon: <XCircle size={12} />,        color: '#991b1b', bg: '#fee2e2', border: '#fca5a5' },
+} as const;
 
 type StatusConfig = {
   icon: React.ReactNode;
@@ -190,6 +196,22 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
               {candidate.location}
             </span>
           )}
+          {candidate.veredictoEntrevista && (() => {
+            const v = VEREDICTO_CONFIG[candidate.veredictoEntrevista];
+            return (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                fontSize: '11px', fontWeight: 700,
+                color: v.color, background: v.bg,
+                border: `1px solid ${v.border}`,
+                borderRadius: '20px', padding: '2px 9px',
+                fontFamily: 'var(--font-display)',
+              }}>
+                {v.icon}
+                {v.label}
+              </span>
+            );
+          })()}
           {showStageChip && (
             <Badge variant={candidate.currentStage} small>
               {stageLabelMap[candidate.currentStage]}
@@ -240,27 +262,29 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
         </p>
       </div>
 
-      {/* Score */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
-        <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Total</span>
-        <div
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '12px',
-            background: scoreBg,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 800,
-            fontSize: '18px',
-            color: scoreFg,
-          }}
-        >
-          {candidate.score}
+      {/* Score — hidden when veredicto chip is present (qualitative evaluation stages) */}
+      {!candidate.veredictoEntrevista && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+          <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Total</span>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: scoreBg,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 800,
+              fontSize: '18px',
+              color: scoreFg,
+            }}
+          >
+            {candidate.score}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -88,6 +88,8 @@ export interface Candidate {
     anosExperiencia?: number;
   };
   pruebaManejo?: { status: 'agendada'; fecha: string; hora: string; lugar: string } | { status: 'pendiente' };
+  /** Interview verdict — shown as chip on candidate cards in entrevistas/estudios/finalistas */
+  veredictoEntrevista?: 'apto' | 'apto_reservas' | 'no_apto';
 }
 
 export interface NoNegociable {
@@ -2788,6 +2790,9 @@ function _mkTranspPubEval(id: string, name: string, score: number, photo: string
       ],
     },
     psychTest: _psychTransp(score, name),
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
   };
 }
 
@@ -2864,6 +2869,9 @@ function _mkDistribEval(id: string, name: string, score: number, photo: string, 
       ],
     },
     psychTest: _psychTransp(score, name),
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
   };
 }
 
@@ -2930,6 +2938,9 @@ function _mkVigiaEval(id: string, name: string, score: number, photo: string, in
       ],
     },
     psychTest: _psychTransp(score, name),
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
   };
 }
 
@@ -3291,6 +3302,11 @@ function _mkBulk(
       // Prueba Psicotécnica: 2 PRIMA permutations, applied for evaluaciones+ stages
       psychTest: (['evaluaciones','entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
         ? (idx % 2 === 0 ? _primaTranspA(name, score) : _primaTranspB(name, score))
+        : undefined,
+      // Interview verdict: score-based for entrevistas/estudios/finalistas
+      // ≥78 = Apto (top ~8), 62–77 = Apto con reservas (~7), <62 = No apto (rest)
+      veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+        ? (score >= 78 ? 'apto' : score >= 62 ? 'apto_reservas' : 'no_apto')
         : undefined,
       runtVerification: {
         cc: `${10000000 + idx * 137}`,
