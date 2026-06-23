@@ -3078,6 +3078,110 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
   ];
 }
 
+// ── PRIMA psychometric test — 2 permutations for transport candidates ──────────
+// Applied randomly (odd/even index) to any bulk candidate at evaluaciones+ stage.
+function _primaTranspA(name: string, score: number): PsychTestResult {
+  const s = Math.min(96, Math.max(55, score));
+  return {
+    score: s,
+    insight: `${name} presenta un perfil conductual altamente compatible con operación de transporte de carga. Demuestra equilibrio entre autonomía en ruta y adherencia a normas operativas. Alta tolerancia al estrés y disciplina en contextos de larga jornada.`,
+    fitCards: [
+      {
+        axis: 'Seguridad vial y gestión del riesgo',
+        idealScore: 90, candidateScore: s,
+        summary: 'Alta conciencia del riesgo en operación de carga.',
+        detail: 'Anticipa riesgos en vía, respeta protocolos de carga y descarga, y actúa con prudencia ante condiciones adversas. Perfil ideal para operación de camiones C2 en zonas urbanas e intermunicipales.',
+      },
+      {
+        axis: 'Tolerancia al estrés y jornadas extensas',
+        idealScore: 85, candidateScore: Math.max(50, s - 4),
+        summary: 'Estabilidad emocional en turnos rotativos.',
+        detail: 'Mantiene rendimiento constante en jornadas nocturnas y turnos extendidos. Gestiona la presión de cumplir tiempos de entrega sin comprometer la seguridad vial.',
+      },
+      {
+        axis: 'Autonomía en ruta',
+        idealScore: 80, candidateScore: Math.max(50, s - 2),
+        summary: 'Toma de decisiones en campo sin supervisión constante.',
+        detail: 'Opera con independencia ante imprevistos como desvíos, averías menores o cambios de ruta. Comunica novedades de forma oportuna al despachador.',
+      },
+      {
+        axis: 'Orientación a procedimientos',
+        idealScore: 88, candidateScore: Math.max(50, s - 6),
+        summary: 'Adherencia a protocolos de carga, RNDC y documentación.',
+        detail: 'Cumple rigurosamente con el diligenciamiento de manifiestos, guías de transporte y registros RNDC. Crucial para evitar sanciones y garantizar trazabilidad de la carga.',
+      },
+    ],
+    radarPoints: [
+      { label: 'Seg. vial',        value: s      },
+      { label: 'Estrés/jornada',   value: s - 4  },
+      { label: 'Autonomía',        value: s - 2  },
+      { label: 'Procedimientos',   value: s - 6  },
+      { label: 'Comunicación',     value: s - 8  },
+      { label: 'Responsabilidad',  value: s - 1  },
+      { label: 'Adaptabilidad',    value: s - 5  },
+    ],
+    veredicto: [
+      { title: 'Quién es conductualmente', body: `Perfil equilibrado entre autonomía y cumplimiento normativo. Trabaja con disciplina en contextos de alta exigencia operativa y larga jornada. Su fortaleza está en la autorregulación emocional y la toma de decisiones en campo sin supervisión constante.` },
+      { title: 'Fit con este rol', body: `El perfil de conductor C2 de carga requiere exactamente las competencias más sólidas de este candidato: tolerancia al estrés en ruta, adherencia a procedimientos de carga/descarga y autonomía operativa. Se recomienda avanzar en el proceso.` },
+    ],
+    preguntas: [
+      { tag: 'Para: Jefe de Operaciones', question: '"Cuéntame una situación donde tuviste un imprevisto en ruta — avería, cierre vial o cambio de cliente — y cómo lo resolviste sin perder el tiempo de entrega."', validates: 'Autonomía y gestión de imprevistos en campo' },
+      { tag: 'Para: RRHH', question: '"¿Cómo manejas las jornadas nocturnas y los cambios de turno? ¿Qué rutinas tienes para mantener el rendimiento y la seguridad?"', validates: 'Autogestión y disciplina en turnos rotativos' },
+    ],
+  };
+}
+
+function _primaTranspB(name: string, score: number): PsychTestResult {
+  const s = Math.min(72, Math.max(38, score));
+  return {
+    score: s,
+    insight: `${name} presenta un perfil con competencias operativas básicas para el cargo, aunque con algunas áreas de desarrollo en gestión del estrés y adherencia a procedimientos documentales. Se sugieren validaciones adicionales antes de vinculación.`,
+    fitCards: [
+      {
+        axis: 'Seguridad vial y gestión del riesgo',
+        idealScore: 90, candidateScore: Math.max(40, s - 8),
+        summary: 'Conciencia de riesgo en desarrollo.',
+        detail: 'Conoce los protocolos de seguridad pero muestra tendencia a saltarse pasos en situaciones de presión. Se recomienda reforzar durante la inducción el protocolo ante emergencias viales y carga especial.',
+      },
+      {
+        axis: 'Tolerancia al estrés y jornadas extensas',
+        idealScore: 85, candidateScore: Math.max(35, s - 12),
+        summary: 'Estrés moderado en condiciones de alta demanda.',
+        detail: 'Puede mostrar deterioro del rendimiento en jornadas nocturnas prolongadas o ante acumulación de presión. Se recomienda evaluar rotación de turno y acompañamiento inicial en campo.',
+      },
+      {
+        axis: 'Autonomía en ruta',
+        idealScore: 80, candidateScore: Math.max(40, s - 5),
+        summary: 'Requiere acompañamiento en decisiones complejas.',
+        detail: 'En situaciones de imprevistos tiende a buscar validación externa antes de actuar. Mejora con experiencia acumulada en rutas conocidas, pero puede ser una limitante en rutas nuevas o condiciones adversas.',
+      },
+      {
+        axis: 'Orientación a procedimientos',
+        idealScore: 88, candidateScore: Math.max(35, s - 15),
+        summary: 'Áreas de mejora en documentación RNDC.',
+        detail: 'El diligenciamiento de manifiestos y registros digitales presenta inconsistencias bajo presión. Se sugiere acompañamiento durante el primer mes y verificación de registros RNDC en la fase de inducción.',
+      },
+    ],
+    radarPoints: [
+      { label: 'Seg. vial',        value: Math.max(40, s - 8)  },
+      { label: 'Estrés/jornada',   value: Math.max(35, s - 12) },
+      { label: 'Autonomía',        value: Math.max(40, s - 5)  },
+      { label: 'Procedimientos',   value: Math.max(35, s - 15) },
+      { label: 'Comunicación',     value: Math.max(40, s - 10) },
+      { label: 'Responsabilidad',  value: Math.max(40, s - 7)  },
+      { label: 'Adaptabilidad',    value: Math.max(38, s - 9)  },
+    ],
+    veredicto: [
+      { title: 'Quién es conductualmente', body: `Perfil con potencial operativo básico pero con limitaciones en la gestión del estrés y la autonomía ante situaciones complejas. Requiere estructura, acompañamiento inicial y un entorno con rutas definidas para rendir de forma consistente.` },
+      { title: 'Fit con este rol', body: `El cargo exige un nivel de autonomía y tolerancia al estrés superior al que evidencia el candidato en esta evaluación. Se recomienda avanzar solo si el equipo puede brindar acompañamiento durante los primeros meses de operación o si el cargo tiene rutas fijas y supervisión cercana.` },
+    ],
+    preguntas: [
+      { tag: 'Para: Jefe de Operaciones', question: '"¿Cómo actúas cuando la ruta asignada tiene cambios de último minuto o el vehículo presenta una falla menor? Dame un ejemplo concreto."', validates: 'Capacidad de respuesta autónoma ante imprevistos' },
+      { tag: 'Para: RRHH', question: '"Cuéntame un momento en que sentiste mucha presión en el trabajo. ¿Qué pasó y cómo lo manejaste?"', validates: 'Gestión del estrés y resiliencia operativa' },
+    ],
+  };
+}
+
 // ── Bulk candidate generator for funnel demo ──────────────────────────────────
 // Generates lightweight placeholder candidates to fill realistic funnel counts.
 const _BULK_NAMES: [string, string][] = [
@@ -3184,6 +3288,10 @@ function _mkBulk(
       salaryRange,
       currentStage: stage,
       hasCV: idx % 4 !== 0, // ~25% perfil por WhatsApp
+      // Prueba Psicotécnica: 2 PRIMA permutations, applied for evaluaciones+ stages
+      psychTest: (['evaluaciones','entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+        ? (idx % 2 === 0 ? _primaTranspA(name, score) : _primaTranspB(name, score))
+        : undefined,
       runtVerification: {
         cc: `${10000000 + idx * 137}`,
         totalManifiestos: yrs * 80 + (idx % 50),
