@@ -17,6 +17,7 @@ import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPre
 import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntrevistaModal';
 import WhatsAppDocumentosModal from '../components/ui/WhatsAppDocumentosModal';
 import ConfirmAprobadosModal from '../components/ui/ConfirmAprobadosModal';
+import DescartarModal from '../components/ui/DescartarModal';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
 
 type FilterTab = 'todos' | 'high' | 'mid' | 'low';
@@ -158,6 +159,10 @@ export default function CandidateList() {
   // Confirm approval modal (estudios → finalistas)
   const [approveConfirmOpen, setApproveConfirmOpen] = useState(false);
 
+  // Discard modal
+  const [descartarModalOpen, setDescartarModalOpen] = useState(false);
+  const [pendingDiscardIds, setPendingDiscardIds] = useState<string[]>([]);
+
   const statusPriority = (id: string) => {
     const s = getStatus(id, currentStage);
     return s === undefined || s === 'por_validar' ? 0 : 1;
@@ -272,11 +277,21 @@ export default function CandidateList() {
         setToastMessage(`${ids.length} candidato${ids.length !== 1 ? 's' : ''} marcado${ids.length !== 1 ? 's' : ''} como Continúa`);
       }
     } else {
-      setStatuses(ids, currentStage, 'descartado');
-      setToastMessage(`${ids.length} candidato${ids.length !== 1 ? 's' : ''} descartado${ids.length !== 1 ? 's' : ''}`);
+      setPendingDiscardIds(ids);
+      setDescartarModalOpen(true);
+      return;
     }
     setToastVisible(true);
     setSelected(new Set());
+  };
+
+  const handleDescartarConfirm = (_reasonId: string, _type: string, _comments: string) => {
+    setStatuses(pendingDiscardIds, currentStage, 'descartado');
+    setToastMessage(`${pendingDiscardIds.length} candidato${pendingDiscardIds.length !== 1 ? 's' : ''} descartado${pendingDiscardIds.length !== 1 ? 's' : ''}`);
+    setToastVisible(true);
+    setSelected(new Set());
+    setPendingDiscardIds([]);
+    setDescartarModalOpen(false);
   };
 
   return (
@@ -712,6 +727,16 @@ export default function CandidateList() {
         onConfirm={() => {
           handleBulkAction('pasar');
         }}
+      />
+
+      <DescartarModal
+        open={descartarModalOpen}
+        onClose={() => { setDescartarModalOpen(false); setPendingDiscardIds([]); }}
+        onConfirm={handleDescartarConfirm}
+        candidateCount={pendingDiscardIds.length > 1 ? pendingDiscardIds.length : undefined}
+        candidateName={pendingDiscardIds.length === 1
+          ? (candidates.find(c => c.id === pendingDiscardIds[0])?.name)
+          : undefined}
       />
 
       <Toast

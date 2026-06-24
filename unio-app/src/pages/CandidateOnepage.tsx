@@ -45,6 +45,7 @@ import ValidacionesContent, { getValidacionesStatus } from '../components/ui/Val
 import type { ValidacionesState } from '../components/ui/ValidacionesContent';
 import WhatsAppDocumentosModal from '../components/ui/WhatsAppDocumentosModal';
 import ConfirmAprobadosModal from '../components/ui/ConfirmAprobadosModal';
+import DescartarModal from '../components/ui/DescartarModal';
 import WhatsAppPreEntrevistaModal, { WaIcon } from '../components/ui/WhatsAppPreEntrevistaModal';
 import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntrevistaModal';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
@@ -270,6 +271,7 @@ export default function CandidateOnepage() {
   const [validacionesState, setValidacionesState] = useState<ValidacionesState>(mockValidaciones);
   const [waDoctosOpen, setWaDoctosOpen] = useState(false);
   const [approveConfirmOpen, setApproveConfirmOpen] = useState(false);
+  const [descartarModalOpen, setDescartarModalOpen] = useState(false);
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
   const [waModalOpen, setWaModalOpen] = useState(false);
@@ -851,16 +853,24 @@ export default function CandidateOnepage() {
           <Button
             variant="danger-outline"
             size="md"
-            onClick={() => {
-              setStatus(candidateId, stage, 'descartado');
-              showToast('Candidato descartado');
-            }}
+            onClick={() => setDescartarModalOpen(true)}
           >
             <X size={16} />
             Descartar
           </Button>
         </div>
       </WizardBar>
+
+      <DescartarModal
+        open={descartarModalOpen}
+        onClose={() => setDescartarModalOpen(false)}
+        candidateName={candidate?.name}
+        onConfirm={(_reasonId, _type, _comments) => {
+          setStatus(candidateId, stage, 'descartado');
+          setDescartarModalOpen(false);
+          showToast('Candidato descartado');
+        }}
+      />
 
       <Toast
         message={toastMessage}
