@@ -549,7 +549,7 @@ export default function CandidateList() {
         {/* ── Row 2: Status chips ────────────────────────────────────────────── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
           {([
-            { id: 'no_revisado' as StatusFilter, label: 'No revisados', activeColor: '#ea580c', activeBorder: '#ea580c', inactiveColor: '#c2410c', inactiveBorder: '#fed7aa', inactiveBg: '#fff7ed' },
+            { id: 'no_revisado' as StatusFilter, label: 'No revisados', activeColor: '#2563eb', activeBorder: '#2563eb', inactiveColor: '#1d4ed8', inactiveBorder: '#bfdbfe', inactiveBg: '#eff6ff' },
             { id: 'rechazados'  as StatusFilter, label: 'Rechazados',   activeColor: '#dc2626', activeBorder: '#dc2626', inactiveColor: '#991b1b', inactiveBorder: '#fca5a5', inactiveBg: '#fff1f2' },
           ]).map((s) => {
             const active = statusFilter === s.id;
