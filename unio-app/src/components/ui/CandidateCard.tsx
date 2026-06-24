@@ -152,8 +152,8 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Pending chip — shown for newly advanced candidates */}
-        {isPending && (
+        {/* Pending chip — shown for newly advanced candidates, not in finalistas */}
+        {isPending && (viewStage ?? candidate.currentStage) !== 'finalistas' && (
           <div
             style={{
               display: 'inline-flex',
