@@ -46,6 +46,18 @@ const stageLabelMap: Record<PipelineStageKey, string> = {
   finalistas:   'Aprobados',
 };
 
+const MANEJO_RESULT_CONFIG = {
+  apto:          { label: 'Apto',               color: '#15803d', bg: '#dcfce7', border: '#86efac' },
+  apto_reservas: { label: 'Apto con reservas',  color: '#92400e', bg: '#fef3c7', border: '#fcd34d' },
+  no_apto:       { label: 'No apto',            color: '#991b1b', bg: '#fee2e2', border: '#fca5a5' },
+} as const;
+
+function getManejoResult(score: number): keyof typeof MANEJO_RESULT_CONFIG {
+  if (score >= 78) return 'apto';
+  if (score >= 45) return 'apto_reservas';
+  return 'no_apto';
+}
+
 function getValidacionesProgress(id: string): { medico: boolean; seguridad: boolean } {
   const n = parseInt(id.replace(/\D/g, '') || '0', 10);
   return {
@@ -208,6 +220,22 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
               {candidate.location}
             </span>
           )}
+          {(viewStage ?? candidate.currentStage) === 'prueba_manejo' && (() => {
+            const key = getManejoResult(candidate.score);
+            const m = MANEJO_RESULT_CONFIG[key];
+            return (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                fontSize: '11px', fontWeight: 700,
+                color: m.color, background: m.bg,
+                border: `1px solid ${m.border}`,
+                borderRadius: '20px', padding: '2px 9px',
+                fontFamily: 'var(--font-display)',
+              }}>
+                {m.label}
+              </span>
+            );
+          })()}
           {candidate.veredictoEntrevista && (viewStage ?? candidate.currentStage) === 'entrevistas' && (() => {
             const v = VEREDICTO_CONFIG[candidate.veredictoEntrevista];
             return (
