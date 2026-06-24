@@ -498,6 +498,24 @@ export default function CandidateList() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+            {/* Search */}
+            <div style={{ position: 'relative' }}>
+              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
+              <input
+                type="text"
+                placeholder="Buscar candidato..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  height: '36px', padding: '0 16px 0 32px',
+                  border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
+                  background: '#ffffff', fontFamily: 'var(--font-display)',
+                  fontSize: '13px', color: 'var(--color-text-primary)',
+                  width: '220px', outline: 'none',
+                }}
+              />
+            </div>
+
             {/* Date range picker */}
             <DateRangePicker
               value={dateFilter}
@@ -526,11 +544,11 @@ export default function CandidateList() {
           </div>
         </div>
 
-        {/* ── Row 2: Global status chips + search ───────────────────────────── */}
+        {/* ── Row 2: Status chips ────────────────────────────────────────────── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
           {([
-            { id: 'no_revisado' as StatusFilter, label: 'No revisados' },
-            { id: 'rechazados'  as StatusFilter, label: 'Rechazados' },
+            { id: 'no_revisado' as StatusFilter, label: 'No revisados', activeColor: '#ea580c', activeBorder: '#ea580c', inactiveColor: '#c2410c', inactiveBorder: '#fed7aa', inactiveBg: '#fff7ed' },
+            { id: 'rechazados'  as StatusFilter, label: 'Rechazados',   activeColor: '#dc2626', activeBorder: '#dc2626', inactiveColor: '#991b1b', inactiveBorder: '#fca5a5', inactiveBg: '#fff1f2' },
           ]).map((s) => {
             const active = statusFilter === s.id;
             return (
@@ -538,37 +556,19 @@ export default function CandidateList() {
                 key={s.id}
                 onClick={() => setStatusFilter(active ? 'all' : s.id)}
                 style={{
-                  display: 'inline-flex', alignItems: 'center',
-                  padding: '3px 10px', height: '26px', borderRadius: '20px',
-                  border: active ? '1px solid #6b7280' : '1px solid var(--color-border-default)',
-                  background: active ? '#6b7280' : '#fafafa',
-                  color: active ? '#ffffff' : 'var(--color-text-muted)',
-                  fontFamily: 'var(--font-display)', fontSize: '11px', fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.15s ease',
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  padding: '4px 8px', height: '28px', borderRadius: '20px',
+                  border: active ? 'none' : `1px solid ${s.inactiveBorder}`,
+                  background: active ? s.activeColor : s.inactiveBg,
+                  color: active ? '#ffffff' : s.inactiveColor,
+                  fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 600,
+                  cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
                 }}
               >
                 {s.label}
               </button>
             );
           })}
-
-          {/* Search — pushed to the right */}
-          <div style={{ position: 'relative', marginLeft: 'auto' }}>
-            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
-            <input
-              type="text"
-              placeholder="Buscar candidato..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                height: '36px', padding: '0 16px 0 32px',
-                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
-                background: '#ffffff', fontFamily: 'var(--font-display)',
-                fontSize: '13px', color: 'var(--color-text-primary)',
-                width: '260px', outline: 'none',
-              }}
-            />
-          </div>
         </div>
 
         {/* Candidate cards */}
