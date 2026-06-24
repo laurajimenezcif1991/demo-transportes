@@ -19,15 +19,94 @@ import WhatsAppDocumentosModal from '../components/ui/WhatsAppDocumentosModal';
 import ConfirmAprobadosModal from '../components/ui/ConfirmAprobadosModal';
 import DescartarModal from '../components/ui/DescartarModal';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
+import { useVisitedCandidates } from '../hooks/useVisitedCandidates';
 
-type FilterTab = 'todos' | 'high' | 'mid' | 'low';
+// ── Filter types ─────────────────────────────────────────────────────────────
+type StageFilter =
+  | 'todos'
+  // scoring
+  | 'high' | 'mid' | 'low'
+  // entrevistas (veredicto)
+  | 'apto' | 'apto_reservas' | 'no_apto'
+  // estudios (validaciones progress)
+  | 'val_sin_iniciar' | 'val_en_progreso' | 'val_completo'
+  // finalistas (docs)
+  | 'docs_sin_solicitar' | 'docs_solicitado' | 'docs_recibido';
 
-const filterConfig = [
-  { id: 'todos' as FilterTab, label: 'Todos' },
-  { id: 'high' as FilterTab, label: 'Por encima de 80%' },
-  { id: 'mid' as FilterTab, label: 'Medio 40-79%' },
-  { id: 'low' as FilterTab, label: 'Bajo 50%' },
+type StatusFilter = 'all' | 'no_revisado' | 'rechazados';
+
+type FilterTab = StageFilter; // kept for backward compat
+
+type ChipDef = { id: StageFilter; label: string };
+
+const SCORING_CHIPS: ChipDef[] = [
+  { id: 'todos',  label: 'Todos' },
+  { id: 'high',   label: 'Por encima de 80%' },
+  { id: 'mid',    label: 'Medio 40–79%' },
+  { id: 'low',    label: 'Bajo 50%' },
 ];
+
+const VEREDICTO_CHIPS: ChipDef[] = [
+  { id: 'todos',         label: 'Todos' },
+  { id: 'apto',          label: 'Apto' },
+  { id: 'apto_reservas', label: 'Apto con reservas' },
+  { id: 'no_apto',       label: 'No apto' },
+];
+
+const VALIDACION_CHIPS: ChipDef[] = [
+  { id: 'todos',            label: 'Todos' },
+  { id: 'val_sin_iniciar',  label: 'Sin iniciar' },
+  { id: 'val_en_progreso',  label: 'En progreso' },
+  { id: 'val_completo',     label: 'Validaciones completas' },
+];
+
+const DOCS_CHIPS: ChipDef[] = [
+  { id: 'todos',               label: 'Todos' },
+  { id: 'docs_sin_solicitar',  label: 'Sin solicitar' },
+  { id: 'docs_solicitado',     label: 'En progreso' },
+  { id: 'docs_recibido',       label: 'Docs recibidos' },
+];
+
+const STAGE_CHIPS: Record<string, ChipDef[]> = {
+  scoring:       SCORING_CHIPS,
+  prescreening:  SCORING_CHIPS,
+  prueba_manejo: SCORING_CHIPS,
+  evaluaciones:  SCORING_CHIPS,
+  entrevistas:   VEREDICTO_CHIPS,
+  estudios:      VALIDACION_CHIPS,
+  finalistas:    DOCS_CHIPS,
+};
+
+const SCORING_STAGES = new Set(['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones']);
+
+// Deterministic mock date: spreads candidates over the last 90 days
+const DEMO_TODAY = new Date('2026-06-23');
+function getMockAppliedDate(id: string): Date {
+  const n = parseInt(id.replace(/\D/g, '') || '0', 10);
+  const daysAgo = (n * 13 + 7) % 90;
+  const d = new Date(DEMO_TODAY);
+  d.setDate(d.getDate() - daysAgo);
+  return d;
+}
+
+function getDocsStatusKey(id: string): 'docs_sin_solicitar' | 'docs_solicitado' | 'docs_recibido' {
+  const n = parseInt(id.replace(/\D/g, '') || '0', 10);
+  const keys = ['docs_sin_solicitar', 'docs_solicitado', 'docs_recibido'] as const;
+  return keys[n % 3];
+}
+
+function getValidacionKey(id: string): 'val_sin_iniciar' | 'val_en_progreso' | 'val_completo' {
+  const n = parseInt(id.replace(/\D/g, '') || '0', 10);
+  const medico    = n % 5 !== 0;
+  const seguridad = n % 3 === 0;
+  const done = (medico ? 1 : 0) + (seguridad ? 1 : 0);
+  if (done === 2) return 'val_completo';
+  if (done === 1) return 'val_en_progreso';
+  return 'val_sin_iniciar';
+}
+
+// filterConfig kept only for backward compat — not used in new render
+const filterConfig = SCORING_CHIPS;
 
 
 export default function CandidateList() {
@@ -129,15 +208,23 @@ export default function CandidateList() {
   const candidatesLoading = isMock ? false : loading;
   const candidatesError = isMock ? null : error;
 
+  const { markVisited, getAllVisited, visitedVersion } = useVisitedCandidates();
+
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [filter, setFilter] = useState<FilterTab>('todos');
+  const [filter, setFilter] = useState<StageFilter>('todos');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [dateFilter, setDateFilter] = useState('');
   const [search, setSearch] = useState('');
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
 
-  // Clear selection when navigating between stages
+  const isScoringStageFn = () => SCORING_STAGES.has(currentStage);
+
+  // Clear all filters when navigating between stages
   useEffect(() => {
     setSelected(new Set());
     setFilter('todos');
+    setStatusFilter('all');
+    setDateFilter('');
   }, [currentStage]);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -182,50 +269,106 @@ export default function CandidateList() {
   })();
 
   const filteredCandidates = useMemo(() => {
-    let list = candidates
-      .filter((c) => !isEliminatedBefore(c.id, currentStage));
+    let list = candidates.filter((c) => !isEliminatedBefore(c.id, currentStage));
 
+    // ── Search ───────────────────────────────────────────────────────────────
     if (search) {
-      list = list.filter(
-        (c) =>
-          c.name.toLowerCase().includes(search.toLowerCase()) ||
-          c.sector.toLowerCase().includes(search.toLowerCase())
+      list = list.filter((c) =>
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.sector.toLowerCase().includes(search.toLowerCase())
       );
     }
 
+    // ── Stage chips ──────────────────────────────────────────────────────────
     switch (filter) {
-      case 'high':
-        list = list.filter((c) => c.score >= 80);
-        break;
-      case 'mid':
-        list = list.filter((c) => c.score >= 40 && c.score < 80);
-        break;
-      case 'low':
-        list = list.filter((c) => c.score < 50);
-        break;
+      // scoring
+      case 'high': list = list.filter((c) => c.score >= 80); break;
+      case 'mid':  list = list.filter((c) => c.score >= 40 && c.score < 80); break;
+      case 'low':  list = list.filter((c) => c.score < 50); break;
+      // veredicto entrevistas
+      case 'apto':          list = list.filter((c) => c.veredictoEntrevista === 'apto'); break;
+      case 'apto_reservas': list = list.filter((c) => c.veredictoEntrevista === 'apto_reservas'); break;
+      case 'no_apto':       list = list.filter((c) => c.veredictoEntrevista === 'no_apto'); break;
+      // validaciones estudios
+      case 'val_sin_iniciar': list = list.filter((c) => getValidacionKey(c.id) === 'val_sin_iniciar'); break;
+      case 'val_en_progreso': list = list.filter((c) => getValidacionKey(c.id) === 'val_en_progreso'); break;
+      case 'val_completo':    list = list.filter((c) => getValidacionKey(c.id) === 'val_completo'); break;
+      // docs finalistas
+      case 'docs_sin_solicitar': list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_sin_solicitar'); break;
+      case 'docs_solicitado':    list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_solicitado'); break;
+      case 'docs_recibido':      list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_recibido'); break;
     }
 
+    // ── Status filter (global) ───────────────────────────────────────────────
+    if (statusFilter === 'rechazados') {
+      list = list.filter((c) => getStatus(c.id, currentStage) === 'descartado');
+    } else if (statusFilter === 'no_revisado') {
+      const visited = getAllVisited();
+      list = list.filter((c) => !visited.has(c.id));
+    }
+
+    // ── Date filter ──────────────────────────────────────────────────────────
+    if (dateFilter) {
+      list = list.filter((c) => {
+        const d = getMockAppliedDate(c.id);
+        const iso = d.toISOString().slice(0, 10);
+        return iso === dateFilter;
+      });
+    }
+
+    // ── Sort ─────────────────────────────────────────────────────────────────
     return [...list].sort((a, b) => {
       const pDiff = statusPriority(a.id) - statusPriority(b.id);
       if (pDiff !== 0) return pDiff;
-      return sortDir === 'desc' ? b.score - a.score : a.score - b.score;
+      if (isScoringStageFn()) {
+        return sortDir === 'desc' ? b.score - a.score : a.score - b.score;
+      }
+      const aT = getMockAppliedDate(a.id).getTime();
+      const bT = getMockAppliedDate(b.id).getTime();
+      return sortDir === 'desc' ? bT - aT : aT - bT;
     });
-  }, [candidates, currentStage, filter, search, sortDir, getStatus]);
+  }, [candidates, currentStage, filter, statusFilter, dateFilter, search, sortDir, getStatus, visitedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filterCounts = useMemo(() => {
-    const total    = funnelCount ?? candidates.length;
+  const filterCounts = useMemo((): Record<string, number> => {
+    const total     = funnelCount ?? candidates.length;
     const realTotal = candidates.length || 1;
-    const highReal = candidates.filter((c) => c.score >= 80).length;
-    const midReal  = candidates.filter((c) => c.score >= 40 && c.score < 80).length;
-    const lowReal  = candidates.filter((c) => c.score < 50).length;
-    const scale    = funnelCount ? funnelCount / realTotal : 1;
-    return {
-      todos: total,
-      high: funnelCount ? Math.round(highReal * scale) : highReal,
-      mid:  funnelCount ? Math.round(midReal  * scale) : midReal,
-      low:  funnelCount ? Math.round(lowReal  * scale) : lowReal,
-    };
-  }, [candidates]); // eslint-disable-line react-hooks/exhaustive-deps
+    const scale     = funnelCount ? funnelCount / realTotal : 1;
+    const sc        = (n: number) => funnelCount ? Math.round(n * scale) : n;
+
+    if (SCORING_STAGES.has(currentStage)) {
+      return {
+        todos: total,
+        high: sc(candidates.filter((c) => c.score >= 80).length),
+        mid:  sc(candidates.filter((c) => c.score >= 40 && c.score < 80).length),
+        low:  sc(candidates.filter((c) => c.score < 50).length),
+      };
+    }
+    if (currentStage === 'entrevistas') {
+      return {
+        todos:         total,
+        apto:          sc(candidates.filter((c) => c.veredictoEntrevista === 'apto').length),
+        apto_reservas: sc(candidates.filter((c) => c.veredictoEntrevista === 'apto_reservas').length),
+        no_apto:       sc(candidates.filter((c) => c.veredictoEntrevista === 'no_apto').length),
+      };
+    }
+    if (currentStage === 'estudios') {
+      return {
+        todos:            total,
+        val_sin_iniciar:  sc(candidates.filter((c) => getValidacionKey(c.id) === 'val_sin_iniciar').length),
+        val_en_progreso:  sc(candidates.filter((c) => getValidacionKey(c.id) === 'val_en_progreso').length),
+        val_completo:     sc(candidates.filter((c) => getValidacionKey(c.id) === 'val_completo').length),
+      };
+    }
+    if (currentStage === 'finalistas') {
+      return {
+        todos:               total,
+        docs_sin_solicitar:  sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_sin_solicitar').length),
+        docs_solicitado:     sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_solicitado').length),
+        docs_recibido:       sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_recibido').length),
+      };
+    }
+    return { todos: total };
+  }, [candidates, currentStage, funnelCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleSelect = (id: string) => {
     const next = new Set(selected);
@@ -324,53 +467,30 @@ export default function CandidateList() {
           </p>
         </div>
 
-        {/* Filters + Search row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '20px',
-            gap: '12px',
-          }}
-        >
+        {/* ── Row 1: Stage chips + date picker + sort ───────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {filterConfig.map((f) => (
+            {(STAGE_CHIPS[currentStage] ?? SCORING_CHIPS).map((f) => (
               <button
                 key={f.id}
                 onClick={() => setFilter(f.id)}
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '4px 8px',
-                  height: '28px',
-                  borderRadius: '20px',
-                  border: filter === f.id
-                    ? 'none'
-                    : '1px solid var(--color-brand-accent)',
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  padding: '4px 8px', height: '28px', borderRadius: '20px',
+                  border: filter === f.id ? 'none' : '1px solid var(--color-brand-accent)',
                   background: filter === f.id ? 'var(--color-brand-accent)' : '#f7f7f8',
                   color: filter === f.id ? '#ffffff' : 'var(--color-brand-accent)',
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  whiteSpace: 'nowrap',
+                  fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 600,
+                  cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
                 }}
               >
                 {f.label}
-                {f.id !== 'todos' && (
-                  <span
-                    style={{
-                      background: filter === f.id ? 'rgba(255,255,255,0.25)' : 'rgba(135,80,246,0.12)',
-                      color: filter === f.id ? '#ffffff' : 'var(--color-brand-accent)',
-                      borderRadius: '10px',
-                      padding: '0 5px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                    }}
-                  >
+                {f.id !== 'todos' && filterCounts[f.id] !== undefined && (
+                  <span style={{
+                    background: filter === f.id ? 'rgba(255,255,255,0.25)' : 'rgba(135,80,246,0.12)',
+                    color: filter === f.id ? '#ffffff' : 'var(--color-brand-accent)',
+                    borderRadius: '10px', padding: '0 5px', fontSize: '11px', fontWeight: 700,
+                  }}>
                     {filterCounts[f.id]}
                   </span>
                 )}
@@ -378,72 +498,101 @@ export default function CandidateList() {
             ))}
           </div>
 
-          {/* Sort + Search */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+            {/* Date picker */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                style={{
+                  height: '36px', padding: '0 28px 0 10px',
+                  border: dateFilter ? '1.5px solid var(--color-brand-accent)' : '1px solid var(--color-border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  background: dateFilter ? 'rgba(135,80,246,0.04)' : '#ffffff',
+                  fontFamily: 'var(--font-display)', fontSize: '12px',
+                  color: dateFilter ? 'var(--color-brand-accent)' : 'var(--color-text-muted)',
+                  cursor: 'pointer', outline: 'none', width: '148px',
+                }}
+              />
+              {dateFilter && (
+                <button
+                  onClick={() => setDateFilter('')}
+                  style={{
+                    position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '2px',
+                    color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center',
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </div>
+
+            {/* Sort button */}
             <button
               onClick={() => setSortDir((d) => d === 'desc' ? 'asc' : 'desc')}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--color-surface-subtle)';
-                e.currentTarget.style.borderColor = 'var(--color-neutral-400)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.borderColor = 'var(--color-border-default)';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = 'var(--color-border-default)'; }}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '0 14px',
-                height: '40px',
-                border: '1px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-md)',
-                background: '#ffffff',
-                fontFamily: 'var(--font-display)',
-                fontSize: '13px',
-                color: 'var(--color-text-muted)',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '0 14px', height: '36px',
+                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
+                background: '#ffffff', fontFamily: 'var(--font-display)',
+                fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer', whiteSpace: 'nowrap',
               }}
             >
-              <ArrowUpDown size={14} />
-              {sortDir === 'desc'
-                ? 'Puntuaci\u00f3n: mayor a menor'
-                : 'Puntuaci\u00f3n: menor a mayor'}
+              <ArrowUpDown size={13} />
+              {isScoringStageFn()
+                ? (sortDir === 'desc' ? 'Mayor a menor' : 'Menor a mayor')
+                : (sortDir === 'desc' ? 'Más reciente' : 'Más antiguo')}
             </button>
           </div>
         </div>
 
-        {/* Search bar */}
-        <div style={{ position: 'relative', marginBottom: '20px' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--color-text-placeholder)',
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Buscar candidato..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              height: '44px',
-              padding: '0 16px 0 40px',
-              border: '1px solid var(--color-border-default)',
-              borderRadius: 'var(--radius-md)',
-              background: '#ffffff',
-              fontFamily: 'var(--font-display)',
-              fontSize: '14px',
-              color: 'var(--color-text-primary)',
-              width: '320px',
-              outline: 'none',
-            }}
-          />
+        {/* ── Row 2: Global status chips + search ───────────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+          {([
+            { id: 'no_revisado' as StatusFilter, label: 'No revisados' },
+            { id: 'rechazados'  as StatusFilter, label: 'Rechazados' },
+          ]).map((s) => {
+            const active = statusFilter === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setStatusFilter(active ? 'all' : s.id)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center',
+                  padding: '3px 10px', height: '26px', borderRadius: '20px',
+                  border: active ? '1px solid #6b7280' : '1px solid var(--color-border-default)',
+                  background: active ? '#6b7280' : '#fafafa',
+                  color: active ? '#ffffff' : 'var(--color-text-muted)',
+                  fontFamily: 'var(--font-display)', fontSize: '11px', fontWeight: 600,
+                  cursor: 'pointer', transition: 'all 0.15s ease',
+                }}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+
+          {/* Search — pushed to the right */}
+          <div style={{ position: 'relative', marginLeft: 'auto' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
+            <input
+              type="text"
+              placeholder="Buscar candidato..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                height: '36px', padding: '0 16px 0 32px',
+                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
+                background: '#ffffff', fontFamily: 'var(--font-display)',
+                fontSize: '13px', color: 'var(--color-text-primary)',
+                width: '260px', outline: 'none',
+              }}
+            />
+          </div>
         </div>
 
         {/* Candidate cards */}
@@ -488,6 +637,7 @@ export default function CandidateList() {
               showStageChip={false}
               viewStage={currentStage}
               onClick={() => {
+                markVisited(candidate.id);
                 const base = processId
                   ? `/pipeline/${jobId}/process/${processId}/candidate/${candidate.id}`
                   : `/pipeline/${jobId}/candidate/${candidate.id}`;
