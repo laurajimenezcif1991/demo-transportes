@@ -4,7 +4,7 @@ import Avatar from './Avatar';
 import { getScoreColors } from './ScorePill';
 import Badge from './Badge';
 import { useState } from 'react';
-import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle } from 'lucide-react';
+import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle, Circle } from 'lucide-react';
 
 const VEREDICTO_CONFIG = {
   apto:          { label: 'Apto',                icon: <CheckCheck size={12} />,     color: '#15803d', bg: '#dcfce7', border: '#86efac' },
@@ -39,9 +39,20 @@ const statusConfig: Record<string, StatusConfig> = {
 const stageLabelMap: Record<PipelineStageKey, string> = {
   scoring:      'Scoring',
   prescreening: 'Pre-screening',
-  entrevistas:  'Entrevistas',
+  prueba_manejo:'Prueba manejo',
   evaluaciones: 'Pruebas',
+  entrevistas:  'Entrevistas',
+  estudios:     'Validaciones',
+  finalistas:   'Aprobados',
 };
+
+function getValidacionesProgress(id: string): { medico: boolean; seguridad: boolean } {
+  const n = parseInt(id.replace(/\D/g, '') || '0', 10);
+  return {
+    medico:    n % 5 !== 0,
+    seguridad: n % 3 === 0,
+  };
+}
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -262,8 +273,40 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
         </p>
       </div>
 
-      {/* Score — hidden when veredicto chip is present (qualitative evaluation stages) */}
-      {!candidate.veredictoEntrevista && (
+      {/* Right-side widget: validaciones for estudios, score otherwise */}
+      {candidate.currentStage === 'estudios' ? (() => {
+        const { medico, seguridad } = getValidacionesProgress(candidate.id);
+        const done = [medico, seguridad].filter(Boolean).length;
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0, minWidth: '90px' }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.3px', fontFamily: 'var(--font-display)' }}>
+              {done}/2 validaciones
+            </span>
+            {[
+              { label: 'Resultados médicos', done: medico },
+              { label: 'Estudio de seguridad', done: seguridad },
+            ].map(({ label, done: isDone }) => (
+              <div
+                key={label}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-display)',
+                  color: isDone ? '#15803d' : 'var(--color-text-muted)',
+                }}
+              >
+                {isDone
+                  ? <CheckCircle2 size={12} color="#15803d" />
+                  : <Circle size={12} color="#d1d5db" />}
+                {label}
+              </div>
+            ))}
+          </div>
+        );
+      })() : !candidate.veredictoEntrevista ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
           <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Total</span>
           <div
@@ -284,7 +327,7 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
             {candidate.score}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
