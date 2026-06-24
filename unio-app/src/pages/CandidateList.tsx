@@ -466,7 +466,27 @@ export default function CandidateList() {
           </p>
         </div>
 
-        {/* ── Row 1: Stage chips + date picker + sort ───────────────────────── */}
+        {/* ── Row 1: Search bar ──────────────────────────────────────────────── */}
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
+            <input
+              type="text"
+              placeholder="Buscar candidato..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                height: '36px', padding: '0 16px 0 32px',
+                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
+                background: '#ffffff', fontFamily: 'var(--font-display)',
+                fontSize: '13px', color: 'var(--color-text-primary)',
+                width: '260px', outline: 'none',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* ── Row 2: Stage chips + date picker + sort ────────────────────────── */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {(STAGE_CHIPS[currentStage] ?? SCORING_CHIPS).map((f) => (
@@ -498,24 +518,6 @@ export default function CandidateList() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-            {/* Search */}
-            <div style={{ position: 'relative' }}>
-              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
-              <input
-                type="text"
-                placeholder="Buscar candidato..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  height: '36px', padding: '0 16px 0 32px',
-                  border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
-                  background: '#ffffff', fontFamily: 'var(--font-display)',
-                  fontSize: '13px', color: 'var(--color-text-primary)',
-                  width: '220px', outline: 'none',
-                }}
-              />
-            </div>
-
             {/* Date range picker */}
             <DateRangePicker
               value={dateFilter}
