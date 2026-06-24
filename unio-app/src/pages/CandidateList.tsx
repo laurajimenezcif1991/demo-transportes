@@ -18,6 +18,7 @@ import WhatsAppAgendarEntrevistaModal from '../components/ui/WhatsAppAgendarEntr
 import WhatsAppDocumentosModal from '../components/ui/WhatsAppDocumentosModal';
 import ConfirmAprobadosModal from '../components/ui/ConfirmAprobadosModal';
 import DescartarModal from '../components/ui/DescartarModal';
+import DateRangePicker, { type DateRange } from '../components/ui/DateRangePicker';
 import { useWaPrescreening } from '../context/WaPrescreeningContext';
 import { useVisitedCandidates } from '../hooks/useVisitedCandidates';
 
@@ -213,7 +214,7 @@ export default function CandidateList() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<StageFilter>('todos');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [dateFilter, setDateFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState<DateRange>({ start: null, end: null });
   const [search, setSearch] = useState('');
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
 
@@ -224,7 +225,7 @@ export default function CandidateList() {
     setSelected(new Set());
     setFilter('todos');
     setStatusFilter('all');
-    setDateFilter('');
+    setDateFilter({ start: null, end: null });
   }, [currentStage]);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -308,11 +309,12 @@ export default function CandidateList() {
     }
 
     // ── Date filter ──────────────────────────────────────────────────────────
-    if (dateFilter) {
+    if (dateFilter.start) {
+      const from = dateFilter.start.getTime();
+      const to   = dateFilter.end ? dateFilter.end.getTime() : dateFilter.start.getTime();
       list = list.filter((c) => {
-        const d = getMockAppliedDate(c.id);
-        const iso = d.toISOString().slice(0, 10);
-        return iso === dateFilter;
+        const t = getMockAppliedDate(c.id).getTime();
+        return t >= from && t <= to + 86_400_000 - 1; // inclusive end day
       });
     }
 
@@ -327,7 +329,7 @@ export default function CandidateList() {
       const bT = getMockAppliedDate(b.id).getTime();
       return sortDir === 'desc' ? bT - aT : aT - bT;
     });
-  }, [candidates, currentStage, filter, statusFilter, dateFilter, search, sortDir, getStatus, visitedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [candidates, currentStage, filter, statusFilter, dateFilter.start, dateFilter.end, search, sortDir, getStatus, visitedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filterCounts = useMemo((): Record<string, number> => {
     const total     = funnelCount ?? candidates.length;
@@ -499,35 +501,11 @@ export default function CandidateList() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-            {/* Date picker */}
-            <div style={{ position: 'relative' }}>
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                style={{
-                  height: '36px', padding: '0 28px 0 10px',
-                  border: dateFilter ? '1.5px solid var(--color-brand-accent)' : '1px solid var(--color-border-default)',
-                  borderRadius: 'var(--radius-md)',
-                  background: dateFilter ? 'rgba(135,80,246,0.04)' : '#ffffff',
-                  fontFamily: 'var(--font-display)', fontSize: '12px',
-                  color: dateFilter ? 'var(--color-brand-accent)' : 'var(--color-text-muted)',
-                  cursor: 'pointer', outline: 'none', width: '148px',
-                }}
-              />
-              {dateFilter && (
-                <button
-                  onClick={() => setDateFilter('')}
-                  style={{
-                    position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', padding: '2px',
-                    color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center',
-                  }}
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
+            {/* Date range picker — same UI as analytics */}
+            <DateRangePicker
+              value={dateFilter}
+              onChange={setDateFilter}
+            />
 
             {/* Sort button */}
             <button
