@@ -78,9 +78,12 @@ function buildCalendar(year: number, month: number) {
 export interface DateRangePickerProps {
   value: DateRange;
   onChange: (range: DateRange) => void;
+  placeholder?: string;
+  showPresets?: boolean;
+  dropdownAlign?: 'left' | 'right';
 }
 
-export default function DateRangePicker({ value, onChange }: DateRangePickerProps) {
+export default function DateRangePicker({ value, onChange, placeholder = 'Seleccionar período', showPresets = true, dropdownAlign = 'left' }: DateRangePickerProps) {
   const today = new Date();
 
   const PRESETS: Preset[] = [
@@ -144,7 +147,7 @@ export default function DateRangePicker({ value, onChange }: DateRangePickerProp
 
   // Trigger button label
   const buttonLabel = (() => {
-    if (!value.start) return 'Seleccionar período';
+    if (!value.start) return placeholder;
     for (const p of PRESETS) {
       const r = p.getRange();
       if (
@@ -253,19 +256,18 @@ export default function DateRangePicker({ value, onChange }: DateRangePickerProp
           style={{
             position: 'absolute',
             top: 'calc(100% + 6px)',
-            left: 0,
-            zIndex: 100,
+            ...(dropdownAlign === 'right' ? { right: 0 } : { left: 0 }),
+            zIndex: 200,
             background: '#ffffff',
             border: '1px solid var(--color-border-default)',
             borderRadius: 'var(--radius-md)',
             boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
             display: 'flex',
             overflow: 'hidden',
-            minWidth: '500px',
           }}
         >
-          {/* Left: presets */}
-          <div
+          {/* Left: presets (optional) */}
+          {showPresets && <div
             style={{
               width: '160px',
               borderRight: '1px solid var(--color-border-default)',
@@ -343,7 +345,7 @@ export default function DateRangePicker({ value, onChange }: DateRangePickerProp
             >
               Restablecer
             </button>
-          </div>
+          </div>}
 
           {/* Right: calendar */}
           <div style={{ padding: '16px', flexShrink: 0 }}>
@@ -515,6 +517,23 @@ export default function DateRangePicker({ value, onChange }: DateRangePickerProp
                 ? 'Selecciona fecha de inicio'
                 : 'Selecciona fecha de fin'}
             </div>
+
+            {/* Reset button when no presets panel */}
+            {!showPresets && (
+              <div style={{ marginTop: '8px', borderTop: '1px solid var(--color-border-default)', paddingTop: '8px' }}>
+                <button
+                  onClick={handleReset}
+                  style={{
+                    display: 'block', width: '100%', padding: '7px 0',
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    fontFamily: 'var(--font-display)', fontSize: '13px',
+                    color: 'var(--color-brand-accent)', fontWeight: 500, textAlign: 'center',
+                  }}
+                >
+                  Restablecer
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

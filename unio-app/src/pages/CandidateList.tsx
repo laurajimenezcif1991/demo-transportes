@@ -498,10 +498,13 @@ export default function CandidateList() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-            {/* Date range picker — same UI as analytics */}
+            {/* Date range picker */}
             <DateRangePicker
               value={dateFilter}
               onChange={setDateFilter}
+              placeholder="Fecha de aplicación"
+              showPresets={false}
+              dropdownAlign="right"
             />
 
             {/* Sort button */}
