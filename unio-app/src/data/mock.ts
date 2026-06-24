@@ -2288,6 +2288,9 @@ function _mkVigia(id: string, name: string, score: number, photo: string, initia
               : 'Período de expedición de licencia inferior al mínimo requerido de 2 años',
           ],
     },
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
     ...extras,
   };
 }
@@ -2465,6 +2468,9 @@ function _mkTranspPub(id: string, name: string, score: number, photo: string, in
         ? ['Validar historial completo de servicios en plataforma SITP', 'Confirmar disponibilidad en festivos directamente en entrevista']
         : [wrongCity ? `Candidato residente en ${city} — fuera del área metropolitana de Bogotá` : 'Historial de servicios insuficiente o comparendos sin regularizar'],
     },
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
     ...extras,
   };
 }
@@ -2637,6 +2643,9 @@ function _mkDistrib(id: string, name: string, score: number, photo: string, init
         ? ['Validar manifiestos faltantes', 'Confirmar disponibilidad para cargue físico']
         : [wrongCity ? `Candidato en ${city} — fuera del área de operación de Bogotá` : 'Historial insuficiente o aspiración salarial fuera de rango'],
     },
+    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
+      : undefined,
     ...extras,
   };
 }
@@ -2790,9 +2799,6 @@ function _mkTranspPubEval(id: string, name: string, score: number, photo: string
       ],
     },
     psychTest: _psychTransp(score, name),
-    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
-      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
-      : undefined,
   };
 }
 
@@ -2869,9 +2875,6 @@ function _mkDistribEval(id: string, name: string, score: number, photo: string, 
       ],
     },
     psychTest: _psychTransp(score, name),
-    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
-      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
-      : undefined,
   };
 }
 
@@ -2938,9 +2941,6 @@ function _mkVigiaEval(id: string, name: string, score: number, photo: string, in
       ],
     },
     psychTest: _psychTransp(score, name),
-    veredictoEntrevista: (['entrevistas','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
-      ? (score >= 78 ? 'apto' as const : score >= 62 ? 'apto_reservas' as const : 'no_apto' as const)
-      : undefined,
   };
 }
 
