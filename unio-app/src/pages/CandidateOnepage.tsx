@@ -577,7 +577,15 @@ export default function CandidateOnepage() {
 
           {/* Right: Gauge */}
           <div style={{ flexShrink: 0 }}>
-            <Gauge score={candidate.score} size={160} label="Consolidado" animated reducedMotion={reducedMotion} animationDurationMs={1100} />
+            <Gauge
+              score={candidate.score}
+              size={160}
+              label="Consolidado"
+              animated
+              reducedMotion={reducedMotion}
+              animationDurationMs={1100}
+              disabled={candidate.prescreeningAI?.status === 'no_realizada'}
+            />
           </div>
         </div>
 

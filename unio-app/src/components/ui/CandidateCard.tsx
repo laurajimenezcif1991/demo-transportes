@@ -4,7 +4,7 @@ import Avatar from './Avatar';
 import { getScoreColors } from './ScorePill';
 import Badge from './Badge';
 import { useState } from 'react';
-import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle, FileText, Send, FolderCheck, MessageCircle } from 'lucide-react';
+import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle, Circle, FileText, Send, FolderCheck } from 'lucide-react';
 
 const VEREDICTO_CONFIG = {
   apto:          { label: 'Apto',                icon: <CheckCheck size={12} />,     color: '#15803d', bg: '#dcfce7', border: '#86efac' },
@@ -45,12 +45,6 @@ const stageLabelMap: Record<PipelineStageKey, string> = {
   estudios:     'Validaciones',
   finalistas:   'Aprobados',
 };
-
-const WA_PRESCREENING_CONFIG = {
-  pasa:        { label: 'Sí pasa',                  color: '#15803d', bg: '#dcfce7', border: '#86efac', icon: <CheckCircle2 size={11} /> },
-  no_pasa:     { label: 'No pasa',                  color: '#991b1b', bg: '#fee2e2', border: '#fca5a5', icon: <XCircle size={11} /> },
-  no_realizada:{ label: 'Validación no realizada',  color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db', icon: <MessageCircle size={11} /> },
-} as const;
 
 const MANEJO_RESULT_CONFIG = {
   apto:          { label: 'Apto',               color: '#15803d', bg: '#dcfce7', border: '#86efac' },
@@ -103,6 +97,7 @@ const gradientBorderBg = (innerColor: string) =>
 
 export default function CandidateCard({ candidate, statusLabel, selected, onSelect, onClick, showStageChip = true, isPending = false, viewStage }: CandidateCardProps) {
   const { bg: scoreBg, fg: scoreFg } = getScoreColors(candidate.score);
+  const isNoRealizada = candidate.prescreeningAI?.status === 'no_realizada';
   const [hovered, setHovered] = useState(false);
   const showGradient = hovered || !!selected;
   const innerBg = selected ? 'var(--color-secondary-50)' : '#ffffff';
@@ -253,22 +248,6 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
                 fontFamily: 'var(--font-display)',
               }}>
                 {m.label}
-              </span>
-            );
-          })()}
-          {candidate.waPrescreeningStatus && (viewStage ?? candidate.currentStage) === 'prescreening' && (() => {
-            const wp = WA_PRESCREENING_CONFIG[candidate.waPrescreeningStatus!];
-            return (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '4px',
-                fontSize: '11px', fontWeight: 700,
-                color: wp.color, background: wp.bg,
-                border: `1px solid ${wp.border}`,
-                borderRadius: '20px', padding: '2px 9px',
-                fontFamily: 'var(--font-display)',
-              }}>
-                {wp.icon}
-                {wp.label}
               </span>
             );
           })()}
@@ -433,17 +412,17 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: scoreBg,
+              background: isNoRealizada ? 'var(--color-surface-muted)' : scoreBg,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: 'var(--font-display)',
               fontWeight: 800,
-              fontSize: '18px',
-              color: scoreFg,
+              fontSize: isNoRealizada ? '22px' : '18px',
+              color: isNoRealizada ? 'var(--color-text-muted)' : scoreFg,
             }}
           >
-            {candidate.score}
+            {isNoRealizada ? '—' : candidate.score}
           </div>
         </div>
       ) : null}

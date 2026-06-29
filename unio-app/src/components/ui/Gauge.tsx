@@ -11,6 +11,8 @@ interface GaugeProps {
   reducedMotion?: boolean;
   /** Total ms for ring + number (ease-out). Default 1050. */
   animationDurationMs?: number;
+  /** Show gray ring with '--' when scoring was not performed. */
+  disabled?: boolean;
 }
 
 function easeOutCubic(t: number): number {
@@ -24,6 +26,7 @@ export default function Gauge({
   animated = false,
   reducedMotion = false,
   animationDurationMs = 1050,
+  disabled = false,
 }: GaugeProps) {
   const { fg } = getScoreColors(score);
   const radius = (size - 24) / 2;
@@ -102,17 +105,19 @@ export default function Gauge({
           strokeWidth={10}
           strokeLinecap="round"
         />
-        <path
-          d={fullArcD}
-          fill="none"
-          stroke={fg}
-          strokeWidth={10}
-          strokeLinecap="round"
-          pathLength={pathMetric}
-          strokeDasharray={pathMetric}
-          strokeDashoffset={dashOffset}
-          style={{ transition: reducedMotion ? 'none' : undefined }}
-        />
+        {!disabled && (
+          <path
+            d={fullArcD}
+            fill="none"
+            stroke={fg}
+            strokeWidth={10}
+            strokeLinecap="round"
+            pathLength={pathMetric}
+            strokeDasharray={pathMetric}
+            strokeDashoffset={dashOffset}
+            style={{ transition: reducedMotion ? 'none' : undefined }}
+          />
+        )}
       </svg>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1 }}>
@@ -121,14 +126,18 @@ export default function Gauge({
             fontFamily: 'var(--font-display)',
             fontWeight: 800,
             fontSize: `${size * 0.22}px`,
-            color: 'var(--color-brand-primary)',
+            color: disabled ? 'var(--color-text-muted)' : 'var(--color-brand-primary)',
             lineHeight: 1,
           }}
         >
-          {displayScore}
-          <span style={{ fontSize: `${size * 0.1}px`, fontWeight: 600, color: 'var(--color-text-muted)' }}>
-            /100
-          </span>
+          {disabled ? '—' : (
+            <>
+              {displayScore}
+              <span style={{ fontSize: `${size * 0.1}px`, fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                /100
+              </span>
+            </>
+          )}
         </div>
         <div
           style={{
