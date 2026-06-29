@@ -1397,26 +1397,12 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
         </p>
       </div>
 
-      {/* RUNT + RNDC buttons — always shown */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
-        <Button variant="secondary" size="sm" onClick={() => runt ? setRuntModalOpen(true) : undefined} style={{ opacity: runt ? 1 : 0.55 }}>
-          Consulta Runt
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => window.open('/manifiestos-vigia.pdf', '_blank')}
-        >
-          Ver Manifiestos
-        </Button>
-      </div>
-
       {/* RUNT Modal */}
       {runtModalOpen && runt && (
         <RuntModal runt={runt} onClose={() => setRuntModalOpen(false)} />
       )}
 
-      {/* No negociables — 2-column table (removed "Detalle / Evidencia" header) */}
+      {/* No negociables — 2-column table */}
       <div style={{ marginBottom: '24px' }}>
         <div
           style={{
@@ -1426,7 +1412,7 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
             background: 'rgba(255,255,255,0.43)',
           }}
         >
-          {/* Header — 2 columns */}
+          {/* Header */}
           <div
             style={{
               display: 'grid',
@@ -1443,19 +1429,19 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
             </div>
           </div>
 
-          {/* Data rows — fixed no negociables for transport */}
+          {/* Standard rows */}
           {[
             'Cuenta con Licencia de conducción C2 vigente con mínimo 2 años desde su expedición.',
             'Tiene mínimo 2 años de experiencia certificada en conducción de carga.',
             'Vive en Cota, municipios aledaños o Bogotá.',
             'Cuenta con medio de transporte para llegar a la sede en vía Cota-Siberia.',
-          ].map((label, i, arr) => (
+          ].map((label, i) => (
             <div
               key={i}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 120px',
-                borderBottom: i === arr.length - 1 ? 'none' : '1px solid #d4d4d5',
+                borderBottom: '1px solid #d4d4d5',
                 alignItems: 'center',
               }}
             >
@@ -1468,6 +1454,56 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
               </div>
             </div>
           ))}
+
+          {/* RUNT/RNDC row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 120px',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ padding: '14px 24px', fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '13px', lineHeight: '21px', color: '#363539' }}>
+              <div style={{ marginBottom: '6px' }}>Validación RUNT / RNDC verificada sin infracciones graves ni suspensiones vigentes.</div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => runt ? setRuntModalOpen(true) : undefined}
+                  style={{
+                    background: 'none', border: 'none', padding: 0, cursor: runt ? 'pointer' : 'default',
+                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
+                    color: runt ? 'var(--color-brand-accent)' : 'var(--color-text-muted)',
+                    textDecoration: 'underline', opacity: runt ? 1 : 0.5,
+                  }}
+                >
+                  Consultar RUNT
+                </button>
+                <button
+                  onClick={() => window.open('/manifiestos-vigia.pdf', '_blank')}
+                  style={{
+                    background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
+                    color: 'var(--color-brand-accent)',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Ver Manifiestos
+                </button>
+              </div>
+            </div>
+            <div style={{ padding: '14px 16px', borderLeft: '1px solid #d4d4d5', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', alignSelf: 'stretch' }}>
+              {runt ? (
+                <>
+                  <CheckCircle2 size={15} color="#15803d" />
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#15803d' }}>Cumple</span>
+                </>
+              ) : (
+                <>
+                  <X size={15} color="#b91c1c" />
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#b91c1c' }}>No cumple</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
