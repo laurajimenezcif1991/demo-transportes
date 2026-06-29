@@ -390,7 +390,6 @@ export default function Pipeline() {
           marginLeft: '205px',
           flex: 1,
           padding: '40px',
-          maxWidth: '900px',
         }}
       >
         {/* Back */}
@@ -484,6 +483,7 @@ export default function Pipeline() {
             border: '1px solid var(--color-border-default)',
             borderRadius: 'var(--radius-lg)',
             padding: '24px',
+            maxWidth: '900px',
           }}
         >
           {/* Section title */}
