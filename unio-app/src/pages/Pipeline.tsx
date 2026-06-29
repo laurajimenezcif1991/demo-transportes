@@ -142,13 +142,6 @@ function FunnelRow({
   const barPct = maxCount > 0 ? Math.max((stage.candidateCount / maxCount) * 100, 0.5) : 0.5;
   const colors = stageColors[stage.id] || stageColors.scoring;
 
-  const statusDotColor =
-    stage.status === 'completed'
-      ? 'var(--color-positive-500)'
-      : stage.status === 'in_progress'
-      ? 'var(--color-warning-500)'
-      : 'var(--color-neutral-300)';
-
   return (
     <div
       onClick={() => !isNotStarted && navigate(stage.route)}
@@ -170,16 +163,6 @@ function FunnelRow({
         (e.currentTarget as HTMLDivElement).style.background = 'transparent';
       }}
     >
-      {/* Status dot */}
-      <div
-        style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: statusDotColor,
-          flexShrink: 0,
-        }}
-      />
 
       {/* Stage label */}
       <div
