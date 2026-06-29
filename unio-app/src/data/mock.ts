@@ -2954,12 +2954,13 @@ export const MOCK_INITIAL_STATUSES: Record<string, Partial<Record<string, Record
   'mock-vigia': {
     scoring: {
       'mvc-11': 'continua', 'mvc-12': 'continua', 'mvc-13': 'continua',
-      'mvc-14': 'por_validar', 'mvc-15': 'por_validar', 'mvc-16': 'por_validar',
-      'mvc-17': 'descartado', 'mvc-18': 'descartado', 'mvc-19': 'descartado', 'mvc-20': 'descartado',
+      'mvc-14': 'por_validar', 'mvc-15': 'por_validar',
+      'mvc-16': 'continua', 'mvc-17': 'continua', 'mvc-18': 'continua', 'mvc-19': 'continua', 'mvc-20': 'continua',
     },
     prescreening: {
       'mvc-6': 'continua', 'mvc-7': 'continua',
       'mvc-8': 'por_validar', 'mvc-9': 'por_validar', 'mvc-10': 'descartado',
+      'mvc-16': 'por_validar', 'mvc-17': 'por_validar', 'mvc-18': 'por_validar', 'mvc-19': 'por_validar', 'mvc-20': 'por_validar',
     },
     evaluaciones: {
       'v-e1': 'continua',
