@@ -26,9 +26,7 @@ import { useVisitedCandidates } from '../hooks/useVisitedCandidates';
 type StageFilter =
   | 'todos'
   // scoring
-  | 'high' | 'mid' | 'low'
-  // prescreening (WA validation status)
-  | 'wa_pasa' | 'wa_no_pasa' | 'wa_no_realizada'
+  | 'high' | 'mid' | 'low' | 'no_validado'
   // entrevistas (veredicto)
   | 'apto' | 'apto_reservas' | 'no_apto'
   // estudios (validaciones progress)
@@ -47,6 +45,11 @@ const SCORING_CHIPS: ChipDef[] = [
   { id: 'high',   label: 'Por encima de 80%' },
   { id: 'mid',    label: 'Medio 40–79%' },
   { id: 'low',    label: 'Bajo 50%' },
+];
+
+const PRESCREENING_CHIPS: ChipDef[] = [
+  ...SCORING_CHIPS,
+  { id: 'no_validado', label: 'No validados' },
 ];
 
 const VEREDICTO_CHIPS: ChipDef[] = [
@@ -68,13 +71,6 @@ const DOCS_CHIPS: ChipDef[] = [
   { id: 'docs_sin_solicitar',  label: 'Sin solicitar' },
   { id: 'docs_solicitado',     label: 'En progreso' },
   { id: 'docs_recibido',       label: 'Docs recibidos' },
-];
-
-const PRESCREENING_CHIPS: ChipDef[] = [
-  { id: 'todos',            label: 'Todos' },
-  { id: 'wa_pasa',          label: 'Sí pasa' },
-  { id: 'wa_no_pasa',       label: 'No pasa' },
-  { id: 'wa_no_realizada',  label: 'No realizada' },
 ];
 
 const STAGE_CHIPS: Record<string, ChipDef[]> = {
@@ -292,13 +288,10 @@ export default function CandidateList() {
     // ── Stage chips ──────────────────────────────────────────────────────────
     switch (filter) {
       // scoring
-      case 'high': list = list.filter((c) => c.score >= 80); break;
-      case 'mid':  list = list.filter((c) => c.score >= 40 && c.score < 80); break;
-      case 'low':  list = list.filter((c) => c.score < 50); break;
-      // prescreening WA validation
-      case 'wa_pasa':         list = list.filter((c) => c.waPrescreeningStatus === 'pasa'); break;
-      case 'wa_no_pasa':      list = list.filter((c) => c.waPrescreeningStatus === 'no_pasa'); break;
-      case 'wa_no_realizada': list = list.filter((c) => !c.waPrescreeningStatus || c.waPrescreeningStatus === 'no_realizada'); break;
+      case 'high':        list = list.filter((c) => c.score >= 80); break;
+      case 'mid':         list = list.filter((c) => c.score >= 40 && c.score < 80); break;
+      case 'low':         list = list.filter((c) => c.score < 50); break;
+      case 'no_validado': list = list.filter((c) => c.prescreeningAI?.status === 'no_realizada'); break;
       // veredicto entrevistas
       case 'apto':          list = list.filter((c) => c.veredictoEntrevista === 'apto'); break;
       case 'apto_reservas': list = list.filter((c) => c.veredictoEntrevista === 'apto_reservas'); break;
@@ -347,14 +340,6 @@ export default function CandidateList() {
     const scale     = funnelCount ? funnelCount / realTotal : 1;
     const sc        = (n: number) => funnelCount ? Math.round(n * scale) : n;
 
-    if (currentStage === 'prescreening') {
-      return {
-        todos:           total,
-        wa_pasa:         sc(candidates.filter((c) => c.waPrescreeningStatus === 'pasa').length),
-        wa_no_pasa:      sc(candidates.filter((c) => c.waPrescreeningStatus === 'no_pasa').length),
-        wa_no_realizada: sc(candidates.filter((c) => !c.waPrescreeningStatus || c.waPrescreeningStatus === 'no_realizada').length),
-      };
-    }
     if (SCORING_STAGES.has(currentStage)) {
       return {
         todos: total,
