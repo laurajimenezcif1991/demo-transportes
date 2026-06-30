@@ -25,62 +25,71 @@ import { useVisitedCandidates } from '../hooks/useVisitedCandidates';
 // ── Filter types ─────────────────────────────────────────────────────────────
 type StageFilter =
   | 'todos'
-  // scoring
-  | 'high' | 'mid' | 'low' | 'no_validado'
-  // entrevistas (veredicto)
+  // scoring ranges (Resultado dropdown)
+  | 'high' | 'mid' | 'low'
+  // entrevistas veredicto
   | 'apto' | 'apto_reservas' | 'no_apto'
-  // estudios (validaciones progress)
+  // estudios validaciones
   | 'val_sin_iniciar' | 'val_en_progreso' | 'val_completo'
-  // finalistas (docs)
+  // finalistas docs
   | 'docs_sin_solicitar' | 'docs_solicitado' | 'docs_recibido';
 
-type StatusFilter = 'all' | 'no_revisado' | 'rechazados';
+// Estado dropdown — global candidate status filter
+type StatusFilter = 'all' | 'visitado' | 'no_revisado' | 'continua' | 'rechazados' | 'no_validado';
 
 type FilterTab = StageFilter; // kept for backward compat
 
+// ── Resultado dropdown options per stage ──────────────────────────────────────
+type ResultOption = { value: StageFilter; label: string };
+
+const RESULT_SCORING: ResultOption[] = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'high',  label: 'Alto: por encima de 80%' },
+  { value: 'mid',   label: 'Medio: 40% – 79%' },
+  { value: 'low',   label: 'Bajo: menos de 50%' },
+];
+
+const RESULT_ENTREVISTAS: ResultOption[] = [
+  { value: 'todos',         label: 'Todos' },
+  { value: 'apto',          label: 'Apto' },
+  { value: 'apto_reservas', label: 'Apto con reservas' },
+  { value: 'no_apto',       label: 'No apto' },
+];
+
+const RESULT_VALIDACIONES: ResultOption[] = [
+  { value: 'todos',            label: 'Todos' },
+  { value: 'val_sin_iniciar',  label: 'Sin iniciar' },
+  { value: 'val_en_progreso',  label: 'En progreso' },
+  { value: 'val_completo',     label: 'Validaciones completadas' },
+];
+
+const RESULT_DOCS: ResultOption[] = [
+  { value: 'todos',               label: 'Todos' },
+  { value: 'docs_sin_solicitar',  label: 'Sin solicitar' },
+  { value: 'docs_solicitado',     label: 'En progreso' },
+  { value: 'docs_recibido',       label: 'Documentos recibidos' },
+];
+
+const RESULT_OPTIONS_BY_STAGE: Record<string, ResultOption[]> = {
+  scoring:       RESULT_SCORING,
+  prescreening:  RESULT_SCORING,
+  prueba_manejo: RESULT_SCORING,
+  evaluaciones:  RESULT_SCORING,
+  entrevistas:   RESULT_ENTREVISTAS,
+  estudios:      RESULT_VALIDACIONES,
+  finalistas:    RESULT_DOCS,
+};
+
+// Kept for filterCounts internal logic (not rendered as chips)
 type ChipDef = { id: StageFilter; label: string };
-
 const SCORING_CHIPS: ChipDef[] = [
-  { id: 'todos',  label: 'Todos' },
-  { id: 'high',   label: 'Por encima de 80%' },
-  { id: 'mid',    label: 'Medio 40–79%' },
-  { id: 'low',    label: 'Bajo 50%' },
+  { id: 'todos', label: 'Todos' }, { id: 'high', label: 'Alto' }, { id: 'mid', label: 'Medio' }, { id: 'low', label: 'Bajo' },
 ];
-
-const PRESCREENING_CHIPS: ChipDef[] = [
-  ...SCORING_CHIPS,
-  { id: 'no_validado', label: 'No validados' },
-];
-
-const VEREDICTO_CHIPS: ChipDef[] = [
-  { id: 'todos',         label: 'Todos' },
-  { id: 'apto',          label: 'Apto' },
-  { id: 'apto_reservas', label: 'Apto con reservas' },
-  { id: 'no_apto',       label: 'No apto' },
-];
-
-const VALIDACION_CHIPS: ChipDef[] = [
-  { id: 'todos',            label: 'Todos' },
-  { id: 'val_sin_iniciar',  label: 'Sin iniciar' },
-  { id: 'val_en_progreso',  label: 'En progreso' },
-  { id: 'val_completo',     label: 'Validaciones completas' },
-];
-
-const DOCS_CHIPS: ChipDef[] = [
-  { id: 'todos',               label: 'Todos' },
-  { id: 'docs_sin_solicitar',  label: 'Sin solicitar' },
-  { id: 'docs_solicitado',     label: 'En progreso' },
-  { id: 'docs_recibido',       label: 'Docs recibidos' },
-];
-
 const STAGE_CHIPS: Record<string, ChipDef[]> = {
-  scoring:       SCORING_CHIPS,
-  prescreening:  PRESCREENING_CHIPS,
-  prueba_manejo: SCORING_CHIPS,
-  evaluaciones:  SCORING_CHIPS,
-  entrevistas:   VEREDICTO_CHIPS,
-  estudios:      VALIDACION_CHIPS,
-  finalistas:    DOCS_CHIPS,
+  scoring: SCORING_CHIPS, prescreening: SCORING_CHIPS, prueba_manejo: SCORING_CHIPS, evaluaciones: SCORING_CHIPS,
+  entrevistas: [{ id: 'todos', label: '' }, { id: 'apto', label: '' }, { id: 'apto_reservas', label: '' }, { id: 'no_apto', label: '' }],
+  estudios: [{ id: 'todos', label: '' }, { id: 'val_sin_iniciar', label: '' }, { id: 'val_en_progreso', label: '' }, { id: 'val_completo', label: '' }],
+  finalistas: [{ id: 'todos', label: '' }, { id: 'docs_sin_solicitar', label: '' }, { id: 'docs_solicitado', label: '' }, { id: 'docs_recibido', label: '' }],
 };
 
 const SCORING_STAGES = new Set(['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones']);
@@ -285,13 +294,12 @@ export default function CandidateList() {
       );
     }
 
-    // ── Stage chips ──────────────────────────────────────────────────────────
+    // ── Resultado filter (stage-specific) ────────────────────────────────────
     switch (filter) {
-      // scoring
-      case 'high':        list = list.filter((c) => c.score >= 80); break;
-      case 'mid':         list = list.filter((c) => c.score >= 40 && c.score < 80); break;
-      case 'low':         list = list.filter((c) => c.score < 50); break;
-      case 'no_validado': list = list.filter((c) => c.prescreeningAI?.status === 'no_realizada'); break;
+      // scoring ranges
+      case 'high': list = list.filter((c) => c.score >= 80); break;
+      case 'mid':  list = list.filter((c) => c.score >= 40 && c.score < 80); break;
+      case 'low':  list = list.filter((c) => c.score < 50); break;
       // veredicto entrevistas
       case 'apto':          list = list.filter((c) => c.veredictoEntrevista === 'apto'); break;
       case 'apto_reservas': list = list.filter((c) => c.veredictoEntrevista === 'apto_reservas'); break;
@@ -306,12 +314,27 @@ export default function CandidateList() {
       case 'docs_recibido':      list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_recibido'); break;
     }
 
-    // ── Status filter (global) ───────────────────────────────────────────────
-    if (statusFilter === 'rechazados') {
-      list = list.filter((c) => getStatus(c.id, currentStage) === 'descartado');
-    } else if (statusFilter === 'no_revisado') {
-      const visited = getAllVisited();
-      list = list.filter((c) => !visited.has(c.id));
+    // ── Estado filter ─────────────────────────────────────────────────────────
+    switch (statusFilter) {
+      case 'rechazados':
+        list = list.filter((c) => getStatus(c.id, currentStage) === 'descartado');
+        break;
+      case 'no_revisado': {
+        const visited = getAllVisited();
+        list = list.filter((c) => !visited.has(c.id));
+        break;
+      }
+      case 'visitado': {
+        const visited = getAllVisited();
+        list = list.filter((c) => visited.has(c.id));
+        break;
+      }
+      case 'continua':
+        list = list.filter((c) => getStatus(c.id, currentStage) === 'continua');
+        break;
+      case 'no_validado':
+        list = list.filter((c) => c.prescreeningAI?.status === 'no_realizada');
+        break;
     }
 
     // ── Date filter ──────────────────────────────────────────────────────────
@@ -493,39 +516,73 @@ export default function CandidateList() {
           </div>
         </div>
 
-        {/* ── Row 2: Stage chips + date picker + sort ────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: '12px' }}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {(STAGE_CHIPS[currentStage] ?? SCORING_CHIPS).map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFilter(f.id)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 8px', height: '28px', borderRadius: '20px',
-                  border: filter === f.id ? 'none' : '1px solid var(--color-brand-accent)',
-                  background: filter === f.id ? 'var(--color-brand-accent)' : '#f7f7f8',
-                  color: filter === f.id ? '#ffffff' : 'var(--color-brand-accent)',
-                  fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-                }}
-              >
-                {f.label}
-                {f.id !== 'todos' && filterCounts[f.id] !== undefined && (
-                  <span style={{
-                    background: filter === f.id ? 'rgba(255,255,255,0.25)' : 'rgba(135,80,246,0.12)',
-                    color: filter === f.id ? '#ffffff' : 'var(--color-brand-accent)',
-                    borderRadius: '10px', padding: '0 5px', fontSize: '11px', fontWeight: 700,
-                  }}>
-                    {filterCounts[f.id]}
-                  </span>
-                )}
-              </button>
-            ))}
+        {/* ── Row 2: Estado + Resultado dropdowns + sort ─────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+
+          {/* Dropdown: Estado */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <label style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.6px', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
+              Estado
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              style={{
+                height: '36px', padding: '0 28px 0 10px',
+                border: statusFilter !== 'all' ? '1px solid var(--color-brand-accent)' : '1px solid var(--color-border-default)',
+                borderRadius: 'var(--radius-sm)',
+                background: statusFilter !== 'all' ? 'var(--color-secondary-50)' : '#ffffff',
+                color: statusFilter !== 'all' ? 'var(--color-brand-accent)' : 'var(--color-text-primary)',
+                fontFamily: 'var(--font-display)', fontSize: '13px', cursor: 'pointer',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2368686a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
+                minWidth: '160px',
+              }}
+            >
+              <option value="all">Todos</option>
+              <option value="visitado">Vistos</option>
+              <option value="no_revisado">Sin revisar</option>
+              <option value="continua">Continúa</option>
+              <option value="rechazados">Rechazados</option>
+              {currentStage === 'prescreening' && (
+                <option value="no_validado">Validación no realizada</option>
+              )}
+            </select>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-            {/* Date range picker */}
+          {/* Dropdown: Resultado */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <label style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.6px', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
+              Resultado
+            </label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as StageFilter)}
+              style={{
+                height: '36px', padding: '0 28px 0 10px',
+                border: filter !== 'todos' ? '1px solid var(--color-brand-accent)' : '1px solid var(--color-border-default)',
+                borderRadius: 'var(--radius-sm)',
+                background: filter !== 'todos' ? 'var(--color-secondary-50)' : '#ffffff',
+                color: filter !== 'todos' ? 'var(--color-brand-accent)' : 'var(--color-text-primary)',
+                fontFamily: 'var(--font-display)', fontSize: '13px', cursor: 'pointer',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2368686a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
+                minWidth: '200px',
+              }}
+            >
+              {(RESULT_OPTIONS_BY_STAGE[currentStage] ?? RESULT_SCORING).map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+
+          {/* Date range picker — hidden from UI but logic kept */}
+          <div style={{ display: 'none' }}>
             <DateRangePicker
               value={dateFilter}
               onChange={setDateFilter}
@@ -533,8 +590,13 @@ export default function CandidateList() {
               showPresets={false}
               dropdownAlign="right"
             />
+          </div>
 
-            {/* Sort button */}
+          {/* Sort button */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <label style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.6px', color: 'transparent', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
+              &nbsp;
+            </label>
             <button
               onClick={() => setSortDir((d) => d === 'desc' ? 'asc' : 'desc')}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
@@ -542,7 +604,7 @@ export default function CandidateList() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '0 14px', height: '36px',
-                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-sm)',
                 background: '#ffffff', fontFamily: 'var(--font-display)',
                 fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer', whiteSpace: 'nowrap',
               }}
@@ -553,32 +615,7 @@ export default function CandidateList() {
           </div>
         </div>
 
-        {/* ── Row 2: Status chips ────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-          {([
-            { id: 'no_revisado' as StatusFilter, label: 'No revisados', activeColor: '#2563eb', activeBorder: '#2563eb', inactiveColor: '#1d4ed8', inactiveBorder: '#bfdbfe', inactiveBg: '#eff6ff' },
-            { id: 'rechazados'  as StatusFilter, label: 'Rechazados',   activeColor: '#dc2626', activeBorder: '#dc2626', inactiveColor: '#991b1b', inactiveBorder: '#fca5a5', inactiveBg: '#fff1f2' },
-          ]).map((s) => {
-            const active = statusFilter === s.id;
-            return (
-              <button
-                key={s.id}
-                onClick={() => setStatusFilter(active ? 'all' : s.id)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 8px', height: '28px', borderRadius: '20px',
-                  border: active ? 'none' : `1px solid ${s.inactiveBorder}`,
-                  background: active ? s.activeColor : s.inactiveBg,
-                  color: active ? '#ffffff' : s.inactiveColor,
-                  fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-                }}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-        </div>
+        {/* LEGACY status chips — hidden, logic preserved in Estado dropdown */}
 
         {/* Candidate cards */}
         <div>
