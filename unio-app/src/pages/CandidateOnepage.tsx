@@ -44,6 +44,8 @@ import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
 import type { VariantKey } from '../components/ui/ValidacionAntecedentes';
 import ValidacionesContent, { getValidacionesStatus } from '../components/ui/ValidacionesContent';
 import type { ValidacionesState } from '../components/ui/ValidacionesContent';
+import ContratacionContent, { getContratacionStatus } from '../components/ui/ContratacionContent';
+import type { ContratacionState } from '../components/ui/ContratacionContent';
 import WhatsAppDocumentosModal from '../components/ui/WhatsAppDocumentosModal';
 import ConfirmAprobadosModal from '../components/ui/ConfirmAprobadosModal';
 import DescartarModal from '../components/ui/DescartarModal';
@@ -251,6 +253,22 @@ export default function CandidateOnepage() {
   const [voiceInterviewDone, setVoiceInterviewDone] = useState(() => stageReached('entrevistas'));
   // Validaciones open by default when candidate is in estudios or finalistas
   const [validacionesOpen, setValidacionesOpen] = useState(() => stageReached('estudios'));
+
+  // Contratación open by default when candidate has reached finalistas stage
+  const [contrataciónOpen, setContrataciónOpen] = useState(() => stageReached('finalistas'));
+  const [contrataciónState, setContrataciónState] = useState<ContratacionState>(() => {
+    // Pre-load cédula if candidate is already in finalistas (simulates WhatsApp delivery)
+    const n = parseInt((candidateId ?? '').replace(/\D/g, '') || '0', 10);
+    return {
+      cedula:         stageReached('finalistas') && n % 3 !== 0
+        ? { name: `Cedula_${candidateId}.pdf`, size: 0, uploadedAt: new Date('2026-06-15') }
+        : null,
+      cuentaBancaria: null,
+      eps:            null,
+      pensiones:      null,
+      referencias:    null,
+    };
+  });
 
   // Pre-loaded docs only for candidates who reached estudios/finalistas
   const mockValidaciones: ValidacionesState = stageReached('estudios') ? {
@@ -828,6 +846,29 @@ export default function CandidateOnepage() {
               isLocked={!stageReached('estudios')}
             >
               <ValidacionesContent defaultState={mockValidaciones} onChange={setValidacionesState} />
+            </AccordionSection>
+          </div>
+
+          {/* 6. Contratación — always rendered, locked until finalistas */}
+          <div style={{ scrollMarginTop: 24 }}>
+            <AccordionSection
+              number={6}
+              title="Contratación"
+              statusText={
+                !stageReached('finalistas') ? 'Sin iniciar'
+                : getContratacionStatus(contrataciónState) === 'completado' ? 'Completo'
+                : getContratacionStatus(contrataciónState) === 'en_proceso' ? 'En proceso'
+                : 'Sin iniciar'
+              }
+              statusOk={stageReached('finalistas') && getContratacionStatus(contrataciónState) === 'completado'}
+              isOpen={contrataciónOpen}
+              onToggle={() => setContrataciónOpen(!contrataciónOpen)}
+              isLocked={!stageReached('finalistas')}
+            >
+              <ContratacionContent
+                defaultState={contrataciónState}
+                onChange={setContrataciónState}
+              />
             </AccordionSection>
           </div>
         </div>
