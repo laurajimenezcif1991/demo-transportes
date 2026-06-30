@@ -496,28 +496,8 @@ export default function CandidateList() {
           </p>
         </div>
 
-        {/* ── Row 1: Search bar ──────────────────────────────────────────────── */}
-        <div style={{ marginBottom: '10px' }}>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
-            <input
-              type="text"
-              placeholder="Buscar candidato..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                height: '36px', padding: '0 16px 0 32px',
-                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)',
-                background: '#ffffff', fontFamily: 'var(--font-display)',
-                fontSize: '13px', color: 'var(--color-text-primary)',
-                width: '260px', outline: 'none',
-              }}
-            />
-          </div>
-        </div>
-
-        {/* ── Row 2: Estado + Resultado dropdowns + sort ─────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        {/* ── Filter row: Estado + Resultado + Sort + Search ─────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
 
           {/* Dropdown: Estado */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -593,25 +573,38 @@ export default function CandidateList() {
           </div>
 
           {/* Sort button */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <label style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.6px', color: 'transparent', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
-              &nbsp;
-            </label>
-            <button
-              onClick={() => setSortDir((d) => d === 'desc' ? 'asc' : 'desc')}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = 'var(--color-border-default)'; }}
+          <button
+            onClick={() => setSortDir((d) => d === 'desc' ? 'asc' : 'desc')}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = 'var(--color-border-default)'; }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '0 14px', height: '36px',
+              border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-sm)',
+              background: '#ffffff', fontFamily: 'var(--font-display)',
+              fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer', whiteSpace: 'nowrap',
+            }}
+          >
+            <ArrowUpDown size={13} />
+            {sortDir === 'desc' ? 'Más recientes primero' : 'Más antiguos primero'}
+          </button>
+
+          {/* Search bar */}
+          <div style={{ position: 'relative' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-placeholder)' }} />
+            <input
+              type="text"
+              placeholder="Buscar candidato..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '0 14px', height: '36px',
+                height: '36px', padding: '0 16px 0 32px',
                 border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-sm)',
                 background: '#ffffff', fontFamily: 'var(--font-display)',
-                fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer', whiteSpace: 'nowrap',
+                fontSize: '13px', color: 'var(--color-text-primary)',
+                width: '220px', outline: 'none',
               }}
-            >
-              <ArrowUpDown size={13} />
-              {sortDir === 'desc' ? 'Más recientes primero' : 'Más antiguos primero'}
-            </button>
+            />
           </div>
         </div>
 
