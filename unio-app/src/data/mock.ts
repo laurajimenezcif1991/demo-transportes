@@ -3029,7 +3029,7 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
     s('scoring',       'Verificación (RUNT/RNDC)', 'Verificación',     scoring > 0   ? (pre > 0       ? 'completed'    : 'in_progress') : 'not_started', scoring,   true),
     s('prescreening',  'Pre-entrevista IA',         'Pre-entrevista',   pre > 0       ? (manejo > 0    ? 'completed'    : 'in_progress') : 'not_started', pre,       true),
     s('prueba_manejo', 'Prueba de manejo',           'Prueba manejo',    manejo > 0    ? (psicotech > 0 ? 'completed'    : 'in_progress') : 'not_started', manejo,    false),
-    s('evaluaciones',  'Prueba Psicotécnica',        'Psicotécnica',     psicotech > 0 ? (ent > 0      ? 'completed'    : 'in_progress') : 'not_started', psicotech, false),
+    s('evaluaciones',  'Prueba Psicométrica',        'Psicométrica',     psicotech > 0 ? (ent > 0      ? 'completed'    : 'in_progress') : 'not_started', psicotech, false),
     s('entrevistas',   'Entrevista',                 'Entrevista',       ent > 0       ? (est > 0      ? 'completed'    : 'in_progress') : 'not_started', ent,       false),
     s('estudios',      'Validaciones',               'Validaciones',     est > 0       ? (fin > 0      ? 'in_progress'  : 'in_progress') : 'not_started', est,       false),
     s('finalistas',    'Aprobados',                  'Aprobados',        fin > 0       ? 'in_progress'                                  : 'not_started', fin,       false),

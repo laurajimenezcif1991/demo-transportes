@@ -782,11 +782,11 @@ export default function CandidateOnepage() {
             </AccordionSection>
           </div>
 
-          {/* 3. Prueba Psicotécnica (PRIMA) */}
+          {/* 3. Prueba Psicométrica (PRIMA) */}
           <div ref={evaluacionesSectionRef} style={{ scrollMarginTop: 24 }}>
             <AccordionSection
               number={3}
-              title="Prueba Psicotécnica"
+              title="Prueba Psicométrica"
               score={candidate.psychTest?.score}
               statusText={
                 !stageReached('evaluaciones') ? 'Sin iniciar'
@@ -803,7 +803,7 @@ export default function CandidateOnepage() {
                 <PruebaPsicologicaContent data={candidate.psychTest} />
               ) : (
                 <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                  Pendiente: la prueba psicotécnica (PRIMA) aún no ha sido completada por el candidato.
+                  Pendiente: la prueba psicométrica (PRIMA) aún no ha sido completada por el candidato.
                 </div>
               )}
             </AccordionSection>
@@ -949,7 +949,7 @@ export default function CandidateOnepage() {
                 }}
               >
                 <CheckCircle2 size={16} />
-                {stage === 'prueba_manejo' ? 'Pasar a Prueba Psicotécnica'
+                {stage === 'prueba_manejo' ? 'Pasar a Prueba Psicométrica'
                   : stage === 'evaluaciones' ? 'Pasar a Entrevista'
                   : stage === 'entrevistas' ? 'Pasar a Validaciones'
                   : 'Pasar etapa'}

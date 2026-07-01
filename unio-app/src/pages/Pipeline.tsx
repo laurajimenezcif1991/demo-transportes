@@ -42,7 +42,7 @@ const STAGE_META: Record<string, { label: string; stageBadge: string }> = {
   scoring:       { label: 'Scoring',          stageBadge: 'Scoring' },
   prescreening:  { label: 'Prescreening',     stageBadge: 'Prescreening' },
   prueba_manejo: { label: 'Prueba de manejo',    stageBadge: 'Prueba manejo' },
-  evaluaciones:  { label: 'Prueba Psicotécnica', stageBadge: 'Psicotécnica' },
+  evaluaciones:  { label: 'Prueba Psicométrica', stageBadge: 'Psicométrica' },
   entrevistas:   { label: 'Entrevista',          stageBadge: 'Entrevista' },
   finalistas:    { label: 'Aprobados',           stageBadge: 'Aprobados' },
   estudios:      { label: 'Validaciones',        stageBadge: 'Validaciones' },

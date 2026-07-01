@@ -812,7 +812,7 @@ export default function CandidateList() {
               onClick={() => handleBulkAction('pasar')}
             >
               <CheckCircle2 size={18} />
-              {currentStage === 'prueba_manejo' ? 'Pasar a Prueba Psicotécnica'
+              {currentStage === 'prueba_manejo' ? 'Pasar a Prueba Psicométrica'
                 : currentStage === 'evaluaciones' ? 'Pasar a Entrevista'
                 : 'Pasar etapa'}
             </Button>

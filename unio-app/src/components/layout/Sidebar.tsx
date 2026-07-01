@@ -103,7 +103,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     },
     {
       id: 'evaluaciones',
-      label: 'Prueba Psicotécnica',
+      label: 'Prueba Psicométrica',
       Icon: BrainCircuit,
       path: `${stageBase}/evaluaciones`,
       locked: false,
