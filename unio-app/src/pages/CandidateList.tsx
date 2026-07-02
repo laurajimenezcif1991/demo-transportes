@@ -32,7 +32,7 @@ type StageFilter =
   // estudios validaciones
   | 'val_sin_iniciar' | 'val_en_progreso' | 'val_completo'
   // finalistas docs
-  | 'docs_sin_solicitar' | 'docs_solicitado' | 'docs_recibido';
+  | 'docs_sin_solicitar' | 'docs_solicitado' | 'docs_recibido' | 'docs_contratado';
 
 // Estado dropdown — global candidate status filter
 type StatusFilter = 'all' | 'visitado' | 'no_revisado' | 'continua' | 'rechazados' | 'no_validado';
@@ -68,6 +68,7 @@ const RESULT_DOCS: ResultOption[] = [
   { value: 'docs_sin_solicitar',  label: 'Sin solicitar' },
   { value: 'docs_solicitado',     label: 'En progreso' },
   { value: 'docs_recibido',       label: 'Documentos recibidos' },
+  { value: 'docs_contratado',     label: 'Contratados' },
 ];
 
 const RESULT_OPTIONS_BY_STAGE: Record<string, ResultOption[]> = {
@@ -89,7 +90,7 @@ const STAGE_CHIPS: Record<string, ChipDef[]> = {
   scoring: SCORING_CHIPS, prescreening: SCORING_CHIPS, prueba_manejo: SCORING_CHIPS, evaluaciones: SCORING_CHIPS, prueba_conocimiento: SCORING_CHIPS,
   entrevistas: [{ id: 'todos', label: '' }, { id: 'apto', label: '' }, { id: 'apto_reservas', label: '' }, { id: 'no_apto', label: '' }],
   estudios: [{ id: 'todos', label: '' }, { id: 'val_sin_iniciar', label: '' }, { id: 'val_en_progreso', label: '' }, { id: 'val_completo', label: '' }],
-  finalistas: [{ id: 'todos', label: '' }, { id: 'docs_sin_solicitar', label: '' }, { id: 'docs_solicitado', label: '' }, { id: 'docs_recibido', label: '' }],
+  finalistas: [{ id: 'todos', label: '' }, { id: 'docs_sin_solicitar', label: '' }, { id: 'docs_solicitado', label: '' }, { id: 'docs_recibido', label: '' }, { id: 'docs_contratado', label: '' }],
 };
 
 const SCORING_STAGES = new Set(['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'prueba_conocimiento']);
@@ -317,6 +318,7 @@ export default function CandidateList() {
       case 'docs_sin_solicitar': list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_sin_solicitar'); break;
       case 'docs_solicitado':    list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_solicitado'); break;
       case 'docs_recibido':      list = list.filter((c) => getDocsStatusKey(c.id) === 'docs_recibido'); break;
+      case 'docs_contratado':    list = list.filter((c) => isContratado(c.id)); break;
     }
 
     // ── Estado filter ─────────────────────────────────────────────────────────
@@ -404,6 +406,7 @@ export default function CandidateList() {
         docs_sin_solicitar:  sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_sin_solicitar').length),
         docs_solicitado:     sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_solicitado').length),
         docs_recibido:       sc(candidates.filter((c) => getDocsStatusKey(c.id) === 'docs_recibido').length),
+        docs_contratado:     sc(candidates.filter((c) => isContratado(c.id)).length),
       };
     }
     return { todos: total };
