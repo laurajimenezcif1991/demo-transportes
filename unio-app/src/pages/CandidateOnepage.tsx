@@ -28,6 +28,7 @@ import {
   GraduationCap,
   FileText,
   CalendarDays,
+  MinusCircle,
 } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import WizardBar from '../components/layout/WizardBar';
@@ -1548,35 +1549,40 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 120px',
+              borderBottom: '1px solid #d4d4d5',
               alignItems: 'center',
             }}
           >
-            <div style={{ padding: '14px 24px', fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '13px', lineHeight: '21px', color: '#363539' }}>
-              <div style={{ marginBottom: '6px' }}>Validación RUNT / RNDC verificada sin infracciones graves ni suspensiones vigentes.</div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => runt ? setRuntModalOpen(true) : undefined}
-                  style={{
-                    background: 'none', border: 'none', padding: 0, cursor: runt ? 'pointer' : 'default',
-                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
-                    color: runt ? 'var(--color-brand-accent)' : 'var(--color-text-muted)',
-                    textDecoration: 'underline', opacity: runt ? 1 : 0.5,
-                  }}
-                >
-                  Consultar RUNT
-                </button>
-                <button
-                  onClick={() => window.open('/manifiestos-vigia.pdf', '_blank')}
-                  style={{
-                    background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
-                    color: 'var(--color-brand-accent)',
-                    textDecoration: 'underline',
-                  }}
-                >
-                  Ver Manifiestos
-                </button>
-              </div>
+            <div style={{ padding: '14px 24px', fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '13px', lineHeight: '21px', color: runt ? '#363539' : '#9ca3af' }}>
+              {runt ? (
+                <>
+                  <div style={{ marginBottom: '6px' }}>Validación RUNT / RNDC verificada sin infracciones graves ni suspensiones vigentes.</div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                      onClick={() => setRuntModalOpen(true)}
+                      style={{
+                        background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                        fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
+                        color: 'var(--color-brand-accent)', textDecoration: 'underline',
+                      }}
+                    >
+                      Consultar RUNT
+                    </button>
+                    <button
+                      onClick={() => window.open('/manifiestos-vigia.pdf', '_blank')}
+                      style={{
+                        background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                        fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '12px',
+                        color: 'var(--color-brand-accent)', textDecoration: 'underline',
+                      }}
+                    >
+                      Ver Manifiestos
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <span>Validación RUNT / RNDC no verificada — candidato no cumplió criterios previos.</span>
+              )}
             </div>
             <div style={{ padding: '14px 16px', borderLeft: '1px solid #d4d4d5', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', alignSelf: 'stretch' }}>
               {runt ? (
@@ -1586,8 +1592,38 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
                 </>
               ) : (
                 <>
-                  <X size={15} color="#b91c1c" />
-                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#b91c1c' }}>No cumple</span>
+                  <MinusCircle size={15} color="#9ca3af" />
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#9ca3af' }}>Sin Validar</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Antecedentes row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 120px',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ padding: '14px 24px', fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '13px', lineHeight: '21px', color: (!runt || isPendingEvaluaciones) ? '#9ca3af' : '#363539' }}>
+              {(!runt || isPendingEvaluaciones) ? (
+                <span>Validación de antecedentes no verificada — pendiente de etapas previas.</span>
+              ) : (
+                <span>Validación de antecedentes verificada sin registros judiciales ni disciplinarios activos.</span>
+              )}
+            </div>
+            <div style={{ padding: '14px 16px', borderLeft: '1px solid #d4d4d5', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', alignSelf: 'stretch' }}>
+              {(!runt || isPendingEvaluaciones) ? (
+                <>
+                  <MinusCircle size={15} color="#9ca3af" />
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#9ca3af' }}>Sin Validar</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={15} color="#15803d" />
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '13px', color: '#15803d' }}>Cumple</span>
                 </>
               )}
             </div>
@@ -1597,16 +1633,12 @@ function PrescreeningContent({ prescreening, hasCV, runt, candidateScore = 0, is
 
       {/* Plus detectados + Señales — ocultos */}
 
-      {/* Validación de Antecedentes — colapsable al final del acordeón */}
-      <div style={{ marginTop: '24px' }}>
-        {isPendingEvaluaciones ? (
-          <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-            Pendiente: la validación de antecedentes aún no ha sido completada.
-          </div>
-        ) : (
+      {/* Validación de Antecedentes expandible — solo cuando hay datos completos */}
+      {!isPendingEvaluaciones && runt && (
+        <div style={{ marginTop: '24px' }}>
           <ValidacionAntecedentes variant={antVar} collapsible defaultOpen={false} />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
