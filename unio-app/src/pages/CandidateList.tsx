@@ -232,6 +232,9 @@ export default function CandidateList() {
   const [dateFilter, setDateFilter] = useState<DateRange>({ start: null, end: null });
   const [search, setSearch] = useState('');
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
+  const [scoreSort, setScoreSort] = useState<'desc' | 'asc' | 'none'>(() =>
+    SCORING_STAGES.has(currentStage) ? 'desc' : 'none'
+  );
 
   const isScoringStageFn = () => SCORING_STAGES.has(currentStage);
 
@@ -241,6 +244,7 @@ export default function CandidateList() {
     setFilter('todos');
     setStatusFilter('all');
     setDateFilter({ start: null, end: null });
+    setScoreSort(SCORING_STAGES.has(currentStage) ? 'desc' : 'none');
   }, [currentStage]);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -348,15 +352,20 @@ export default function CandidateList() {
       });
     }
 
-    // ── Sort by application date ──────────────────────────────────────────────
+    // ── Sort ─────────────────────────────────────────────────────────────────
     return [...list].sort((a, b) => {
       const pDiff = statusPriority(a.id) - statusPriority(b.id);
       if (pDiff !== 0) return pDiff;
+      // Score sort takes priority in scoring stages when active
+      if (SCORING_STAGES.has(currentStage) && scoreSort !== 'none') {
+        const diff = scoreSort === 'desc' ? b.score - a.score : a.score - b.score;
+        if (diff !== 0) return diff;
+      }
       const aT = getMockAppliedDate(a.id).getTime();
       const bT = getMockAppliedDate(b.id).getTime();
       return sortDir === 'desc' ? bT - aT : aT - bT;
     });
-  }, [candidates, currentStage, filter, statusFilter, dateFilter.start, dateFilter.end, search, sortDir, getStatus, visitedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [candidates, currentStage, filter, statusFilter, dateFilter.start, dateFilter.end, search, sortDir, scoreSort, getStatus, visitedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filterCounts = useMemo((): Record<string, number> => {
     const total     = funnelCount ?? candidates.length;
@@ -573,7 +582,30 @@ export default function CandidateList() {
             />
           </div>
 
-          {/* Sort button */}
+          {/* Score sort button — only in scoring stages */}
+          {SCORING_STAGES.has(currentStage) && (
+            <button
+              onClick={() => setScoreSort((s) => s === 'desc' ? 'asc' : 'desc')}
+              onMouseEnter={(e) => { e.currentTarget.style.background = scoreSort !== 'none' ? 'var(--color-secondary-100)' : 'var(--color-surface-subtle)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = scoreSort !== 'none' ? 'var(--color-secondary-50)' : '#ffffff'; }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '0 14px', height: '36px',
+                border: scoreSort !== 'none' ? '1px solid var(--color-secondary-300)' : '1px solid var(--color-border-default)',
+                borderRadius: 'var(--radius-sm)',
+                background: scoreSort !== 'none' ? 'var(--color-secondary-50)' : '#ffffff',
+                fontFamily: 'var(--font-display)',
+                fontSize: '12px',
+                color: scoreSort !== 'none' ? 'var(--color-secondary-600)' : 'var(--color-text-muted)',
+                cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              <Trophy size={13} />
+              {scoreSort === 'desc' ? 'Mayor score primero' : 'Menor score primero'}
+            </button>
+          )}
+
+          {/* Date sort button */}
           <button
             onClick={() => setSortDir((d) => d === 'desc' ? 'asc' : 'desc')}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
