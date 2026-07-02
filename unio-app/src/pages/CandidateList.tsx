@@ -586,21 +586,17 @@ export default function CandidateList() {
           {SCORING_STAGES.has(currentStage) && (
             <button
               onClick={() => setScoreSort((s) => s === 'desc' ? 'asc' : 'desc')}
-              onMouseEnter={(e) => { e.currentTarget.style.background = scoreSort !== 'none' ? 'var(--color-secondary-100)' : 'var(--color-surface-subtle)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = scoreSort !== 'none' ? 'var(--color-secondary-50)' : '#ffffff'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-subtle)'; e.currentTarget.style.borderColor = 'var(--color-neutral-400)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = 'var(--color-border-default)'; }}
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '0 14px', height: '36px',
-                border: scoreSort !== 'none' ? '1px solid var(--color-secondary-300)' : '1px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-sm)',
-                background: scoreSort !== 'none' ? 'var(--color-secondary-50)' : '#ffffff',
-                fontFamily: 'var(--font-display)',
-                fontSize: '12px',
-                color: scoreSort !== 'none' ? 'var(--color-secondary-600)' : 'var(--color-text-muted)',
-                cursor: 'pointer', whiteSpace: 'nowrap',
+                border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-sm)',
+                background: '#ffffff', fontFamily: 'var(--font-display)',
+                fontSize: '12px', color: 'var(--color-text-muted)', cursor: 'pointer', whiteSpace: 'nowrap',
               }}
             >
-              <Trophy size={13} />
+              <ArrowUpDown size={13} />
               {scoreSort === 'desc' ? 'Mayor score primero' : 'Menor score primero'}
             </button>
           )}
