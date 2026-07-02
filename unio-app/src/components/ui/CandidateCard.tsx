@@ -443,7 +443,7 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
             </span>
           </div>
         );
-      })() : !candidate.veredictoEntrevista ? (
+      })() : (viewStage ?? candidate.currentStage) !== 'entrevistas' || !candidate.veredictoEntrevista ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
           <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Total</span>
           <div
