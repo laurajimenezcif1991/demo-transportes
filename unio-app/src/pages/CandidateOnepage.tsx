@@ -93,7 +93,7 @@ export default function CandidateOnepage() {
 
   const { candidate: apiCandidate, loading: candidateLoading, error: candidateError } = useCandidateDetail(candidateId);
   const reducedMotion = usePrefersReducedMotion();
-  const { isCandidatePending } = useMockStageState();
+  const { isCandidatePending, isContratado, marcarContratado } = useMockStageState();
   const { isCompleted: isWaCompleted, getResult: getWaResult, markCompleted: markWaCompleted } = useWaPrescreening();
   const isMockJob = jobId.startsWith('mock-');
   const openMockCv = () => {
@@ -530,10 +530,21 @@ export default function CandidateOnepage() {
                 {candidate.name}
               </h2>
 
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px', alignItems: 'center' }}>
                 <Badge variant="prescreening" small>{candidate.role}</Badge>
                 <span style={{ color: 'var(--color-neutral-300)', fontSize: '14px' }}>•</span>
                 <Badge variant="default" small>{candidate.sector.split(',')[0].trim()}</Badge>
+                {isContratado(candidateId ?? '') && (
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '5px',
+                    padding: '3px 10px', borderRadius: '999px',
+                    background: '#dcfce7', border: '1.5px solid #86efac',
+                    fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, color: '#15803d',
+                  }}>
+                    <CheckCircle2 size={12} color="#15803d" />
+                    Contratado
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '14px' }}>
@@ -950,22 +961,64 @@ export default function CandidateOnepage() {
               Agendar prueba de manejo
             </button>
           )}
-          {/* Solicitar docs de ingreso: visible en etapa finalistas */}
-          {stage === 'finalistas' && (
-            <button
-              onClick={() => setWaDoctosOpen(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                padding: '9px 16px', borderRadius: '10px',
-                background: '#25D366', border: 'none', cursor: 'pointer',
-                fontWeight: 700, fontSize: '13px', color: '#fff',
-                boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
-              }}
-            >
-              <WaIcon size={20} color="white" />
-              Solicitar docs. de ingreso
-            </button>
-          )}
+          {/* Finalistas: Marcar como contratado (docs recibidos) o Solicitar docs */}
+          {stage === 'finalistas' && (() => {
+            const n = parseInt((candidateId ?? '').replace(/\D/g, '') || '0', 10);
+            const docsRecibido = n % 3 === 2;
+            const yaContratado = isContratado(candidateId ?? '');
+            if (yaContratado) {
+              return (
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: '9px 16px', borderRadius: '10px',
+                  background: '#dcfce7', border: '1.5px solid #86efac',
+                  fontWeight: 700, fontSize: '13px', color: '#15803d',
+                }}>
+                  <CheckCircle2 size={16} color="#15803d" />
+                  Contratado
+                </div>
+              );
+            }
+            if (docsRecibido) {
+              return (
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => {
+                    if (!candidateId) return;
+                    marcarContratado([candidateId]);
+                    // Collapse all accordions
+                    setPrescreeningOpen(false);
+                    setPruebaManejoOpen(false);
+                    setEntrevistasOpen(false);
+                    setEvaluacionesOpen(false);
+                    setConocimientoOpen(false);
+                    setValidacionesOpen(false);
+                    setContrataciónOpen(false);
+                    showToast('¡Candidato marcado como contratado! ✓');
+                  }}
+                >
+                  <CheckCircle2 size={16} />
+                  Marcar como contratado
+                </Button>
+              );
+            }
+            return (
+              <button
+                onClick={() => setWaDoctosOpen(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '9px 16px', borderRadius: '10px',
+                  background: '#25D366', border: 'none', cursor: 'pointer',
+                  fontWeight: 700, fontSize: '13px', color: '#fff',
+                  boxShadow: '0 2px 8px rgba(37,211,102,0.35)',
+                }}
+              >
+                <WaIcon size={20} color="white" />
+                Solicitar docs. de ingreso
+              </button>
+            );
+          })()}
           {stage !== 'scoring' && stage !== 'prescreening' && stage !== 'finalistas' && stage !== 'estudios' && (
             <Button
                 variant="primary"

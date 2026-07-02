@@ -7,12 +7,12 @@
 
 ## [Sin commitear]
 
-### Fix definitivo: Prueba de conocimiento ahora es seleccionable
-- Sidebar: `getActiveId()` ahora detecta `/prueba_conocimiento` en la URL y resalta el item correctamente
-- Sidebar: `stageBase` deriva el `jobId` directamente de la URL como fallback (evita usar el default `v1` del contexto antes de que se inicialice)
-- Pipeline funnel: todos los stages mock (incluido `prueba_conocimiento`) ahora usan `stageBase` consistente para sus rutas, en lugar de rutas hardcoded sin `processId`
-- `prueba_conocimiento` ahora tiene `forceEnabled: true` para garantizar que el FunnelRow sea siempre clickeable
-- STORAGE_VERSION bumped a v16 para limpiar localStorage obsoleto
+### Acción "Marcar como contratado" — fase Aprobados
+- `useMockStageState`: nuevo Set `contratados` persistido en localStorage, con `marcarContratado(ids[])` e `isContratado(id)`
+- `CandidateCard`: prop `isContratado` — cuando activo en etapa `finalistas` muestra badge verde "Contratado" con check en lugar del stepper de docs
+- `CandidateList` (Aprobados): botón bulk "Marcar como contratado" que aparece cuando hay seleccionados con `docs_recibido` que no estén ya contratados; limpia selección y muestra toast
+- `CandidateOnepage` (Aprobados): bottom bar condicionado — candidatos con docs recibidos ven "Marcar como contratado" (primario) en vez de "Solicitar docs. de ingreso"; al confirmar se colapsan todos los accordions y se muestra toast; si ya está contratado muestra badge verde estático
+- Badge "Contratado" en la card de perfil superior del OnePager cuando el candidato ya fue contratado
 
 ---
 

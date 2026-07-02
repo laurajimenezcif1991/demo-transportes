@@ -162,5 +162,26 @@ export function useMockStageState() {
     [data],
   );
 
-  return { advanceCandidates, getPendingCandidates, getPassedCandidates, getMockProgressStage, isCandidatePending };
+  // ── Contratados ────────────────────────────────────────────────────────────
+  const [contratados, setContratados] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem(`${STORAGE_KEY}-contratados`);
+      return stored ? new Set(JSON.parse(stored) as string[]) : new Set<string>();
+    } catch { return new Set<string>(); }
+  });
+
+  const marcarContratado = useCallback((candidateIds: string[]) => {
+    setContratados((prev) => {
+      const next = new Set([...prev, ...candidateIds]);
+      try { localStorage.setItem(`${STORAGE_KEY}-contratados`, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }, []);
+
+  const isContratado = useCallback(
+    (candidateId: string): boolean => contratados.has(candidateId),
+    [contratados],
+  );
+
+  return { advanceCandidates, getPendingCandidates, getPassedCandidates, getMockProgressStage, isCandidatePending, marcarContratado, isContratado };
 }

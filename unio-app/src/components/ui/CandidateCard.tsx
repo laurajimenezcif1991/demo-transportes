@@ -104,7 +104,7 @@ const GRADIENT = 'linear-gradient(115deg, #9A7CF7, #FDD83F, #F05899, #3DAC56, #0
 const gradientBorderBg = (innerColor: string) =>
   `linear-gradient(${innerColor}, ${innerColor}) padding-box, ${GRADIENT} border-box`;
 
-export default function CandidateCard({ candidate, statusLabel, selected, onSelect, onClick, showStageChip = true, isPending = false, viewStage, appliedDate, isVisited }: CandidateCardProps) {
+export default function CandidateCard({ candidate, statusLabel, selected, onSelect, onClick, showStageChip = true, isPending = false, viewStage, appliedDate, isVisited, isContratado = false }: CandidateCardProps & { isContratado?: boolean }) {
   const { bg: scoreBg, fg: scoreFg } = getScoreColors(candidate.score);
   const isNoRealizada = candidate.prescreeningAI?.status === 'no_realizada';
   const [hovered, setHovered] = useState(false);
@@ -358,6 +358,25 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
 
       {/* Right-side widget: docs tracker for finalistas, validaciones for estudios, score otherwise */}
       {(viewStage ?? candidate.currentStage) === 'finalistas' ? (() => {
+        if (isContratado) {
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0, minWidth: '110px' }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '5px 12px', borderRadius: '999px',
+                background: '#dcfce7', border: '1.5px solid #86efac',
+              }}>
+                <CheckCircle2 size={13} color="#15803d" />
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', fontWeight: 700, color: '#15803d' }}>
+                  Contratado
+                </span>
+              </div>
+              <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', textAlign: 'right' }}>
+                Proceso completado
+              </span>
+            </div>
+          );
+        }
         const status = getDocsStatus(candidate.id);
         const cfg = DOCS_CONFIG[status];
         const STEP_LABELS = ['Solicitar', 'En progreso', 'Recibido'];

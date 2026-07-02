@@ -140,7 +140,7 @@ export default function CandidateList() {
   const isEliminatedBefore = (candidateId: string, stage: string) =>
     priorStages(stage).some((s) => getStatus(candidateId, s) === 'descartado');
   const { setJobId, setSelectionProcessId, progressStage, setProgressStage } = usePipeline();
-  const { advanceCandidates, getPendingCandidates, getPassedCandidates, getMockProgressStage } = useMockStageState();
+  const { advanceCandidates, getPendingCandidates, getPassedCandidates, getMockProgressStage, marcarContratado, isContratado } = useMockStageState();
   const { markCompleted: markWaCompleted } = useWaPrescreening();
   const { vacantes } = useVacantes();
   const vacante = vacantes.find((v) => v.id === jobId);
@@ -684,6 +684,7 @@ export default function CandidateList() {
                 viewStage={currentStage}
                 appliedDate={getMockAppliedDate(candidate.id)}
                 isVisited={visited.has(candidate.id)}
+                isContratado={isContratado(candidate.id)}
                 onClick={() => {
                   markVisited(candidate.id);
                   const base = processId
@@ -814,6 +815,25 @@ export default function CandidateList() {
               <WaIcon size={22} color="white" />
               Solicitar docs. de ingreso
             </button>
+          )}
+          {/* Marcar como contratado: visible when in finalistas and at least one selected has docs recibido */}
+          {currentStage === 'finalistas' && Array.from(selected).some(id => getDocsStatusKey(id) === 'docs_recibido' && !isContratado(id)) && (
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                const ids = Array.from(selected).filter(id => getDocsStatusKey(id) === 'docs_recibido' && !isContratado(id));
+                marcarContratado(ids);
+                setToastMessage(`${ids.length === 1 ? '1 candidato marcado' : `${ids.length} candidatos marcados`} como contratado${ids.length !== 1 ? 's' : ''} ✓`);
+                setToastVisible(true);
+                setSelected(new Set());
+              }}
+            >
+              <CheckCircle2 size={18} />
+              {Array.from(selected).filter(id => getDocsStatusKey(id) === 'docs_recibido' && !isContratado(id)).length === 1
+                ? 'Marcar como contratado'
+                : `Marcar ${Array.from(selected).filter(id => getDocsStatusKey(id) === 'docs_recibido' && !isContratado(id)).length} como contratados`}
+            </Button>
           )}
           {currentStage === 'prescreening' && (
             <button
