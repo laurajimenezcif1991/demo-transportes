@@ -17,15 +17,16 @@ import { usePipeline } from '../context/PipelineContext';
 import { useVacantes } from '../hooks/useVacantes';
 import type { Phase } from '../types/dashboard';
 
-// Funnel bar colors — ordered by chromatic hue (orange → amber → green → cyan → violet → purple)
+// Funnel bar colors — ordered by chromatic hue (orange → amber → cyan → green → blue → violet → purple)
 const stageColors: Record<string, { bg: string; fg: string }> = {
-  scoring:      { bg: '#fff3e0', fg: '#ff9306' },
-  prescreening: { bg: '#fff3e0', fg: '#ff9306' },
-  prueba_manejo:{ bg: '#fff8eb', fg: '#fec76f' },
-  evaluaciones: { bg: '#edf7f2', fg: '#69bb8e' },
-  entrevistas:  { bg: '#e6f4fb', fg: '#29a3ce' },
-  estudios:     { bg: '#f1ecfe', fg: '#8851fa' },
-  finalistas:   { bg: '#f5eeff', fg: '#b052fc' },
+  scoring:             { bg: '#fff3e0', fg: '#ff9306' },
+  prescreening:        { bg: '#fff3e0', fg: '#ff9306' },
+  prueba_manejo:       { bg: '#fff8eb', fg: '#fec76f' },
+  entrevistas:         { bg: '#e6f4fb', fg: '#29a3ce' },
+  evaluaciones:        { bg: '#edf7f2', fg: '#69bb8e' },
+  prueba_conocimiento: { bg: '#eff6ff', fg: '#3b82f6' },
+  estudios:            { bg: '#f1ecfe', fg: '#8851fa' },
+  finalistas:          { bg: '#f5eeff', fg: '#b052fc' },
 };
 
 const stageBadgeVariants: Record<string, 'scoring' | 'prescreening' | 'entrevistas' | 'evaluaciones' | 'finalistas'> = {
@@ -39,13 +40,14 @@ const stageBadgeVariants: Record<string, 'scoring' | 'prescreening' | 'entrevist
 const AI_STAGES = new Set(['scoring', 'prescreening']);
 
 const STAGE_META: Record<string, { label: string; stageBadge: string }> = {
-  scoring:       { label: 'Scoring',          stageBadge: 'Scoring' },
-  prescreening:  { label: 'Prescreening',     stageBadge: 'Prescreening' },
-  prueba_manejo: { label: 'Prueba de manejo',    stageBadge: 'Prueba manejo' },
-  evaluaciones:  { label: 'Prueba Psicométrica', stageBadge: 'Psicométrica' },
-  entrevistas:   { label: 'Entrevista',          stageBadge: 'Entrevista' },
-  finalistas:    { label: 'Aprobados',           stageBadge: 'Aprobados' },
-  estudios:      { label: 'Validaciones',        stageBadge: 'Validaciones' },
+  scoring:             { label: 'Scoring',               stageBadge: 'Scoring' },
+  prescreening:        { label: 'Prescreening',          stageBadge: 'Prescreening' },
+  prueba_manejo:       { label: 'Prueba de manejo',      stageBadge: 'Prueba manejo' },
+  entrevistas:         { label: 'Entrevista',            stageBadge: 'Entrevista' },
+  evaluaciones:        { label: 'Prueba Psicométrica',   stageBadge: 'Psicométrica' },
+  prueba_conocimiento: { label: 'Prueba de conocimiento', stageBadge: 'Conocimiento' },
+  finalistas:          { label: 'Aprobados',             stageBadge: 'Aprobados' },
+  estudios:            { label: 'Validaciones',          stageBadge: 'Validaciones' },
 };
 
 function mapPhaseStatus(label?: string): 'completed' | 'in_progress' | 'not_started' {
@@ -56,7 +58,7 @@ function mapPhaseStatus(label?: string): 'completed' | 'in_progress' | 'not_star
   return 'not_started';
 }
 
-const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'estudios', 'finalistas'];
+const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'prueba_conocimiento', 'estudios', 'finalistas'];
 
 // Normalize API phase type keys to internal stage IDs
 function normalizePhaseType(raw: string): string {

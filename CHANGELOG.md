@@ -9,6 +9,20 @@
 
 ---
 
+## [pending] — 01 Jul 2026
+
+### Nueva fase: Prueba de conocimiento (pos. 5 en el pipeline)
+- Añadida entre Prueba Psicométrica y Validaciones en sidebar, pipeline y onepager
+- Nuevo componente `PruebaConocimientoContent`: score, correctas/incorrectas, desglose por categoría, lista de preguntas/respuestas, observaciones y botón a plataforma externa
+- 25 preguntas inventadas para perfil Conductor C2 (Normativa, Mantenimiento, Seguridad Vial, Carga, Mercancías Peligrosas)
+- Tipo `KnowledgeTestResult` + campo `knowledgeTest` en `Candidate`
+- Generador `_mkKnowledgeTest()` con variante hi/lo score según puntaje del candidato
+- Bulk arrays para `prueba_conocimiento` en las 3 vacantes de transporte
+- Filtro de scoring (Alto/Medio/Bajo) aplicado en `CandidateList`
+- `STORAGE_VERSION` bumped a v14 para limpiar localStorage
+
+---
+
 ## [ca39470] — 29 Jun 2026
 
 ### Listado de candidatos — Filtros reestructurados (dropdown Estado + Resultado)

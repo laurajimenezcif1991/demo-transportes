@@ -86,13 +86,13 @@ const SCORING_CHIPS: ChipDef[] = [
   { id: 'todos', label: 'Todos' }, { id: 'high', label: 'Alto' }, { id: 'mid', label: 'Medio' }, { id: 'low', label: 'Bajo' },
 ];
 const STAGE_CHIPS: Record<string, ChipDef[]> = {
-  scoring: SCORING_CHIPS, prescreening: SCORING_CHIPS, prueba_manejo: SCORING_CHIPS, evaluaciones: SCORING_CHIPS,
+  scoring: SCORING_CHIPS, prescreening: SCORING_CHIPS, prueba_manejo: SCORING_CHIPS, evaluaciones: SCORING_CHIPS, prueba_conocimiento: SCORING_CHIPS,
   entrevistas: [{ id: 'todos', label: '' }, { id: 'apto', label: '' }, { id: 'apto_reservas', label: '' }, { id: 'no_apto', label: '' }],
   estudios: [{ id: 'todos', label: '' }, { id: 'val_sin_iniciar', label: '' }, { id: 'val_en_progreso', label: '' }, { id: 'val_completo', label: '' }],
   finalistas: [{ id: 'todos', label: '' }, { id: 'docs_sin_solicitar', label: '' }, { id: 'docs_solicitado', label: '' }, { id: 'docs_recibido', label: '' }],
 };
 
-const SCORING_STAGES = new Set(['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones']);
+const SCORING_STAGES = new Set(['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'prueba_conocimiento']);
 
 // Deterministic mock date: spreads candidates over the last 90 days
 const DEMO_TODAY = new Date('2026-06-23');
@@ -130,7 +130,7 @@ export default function CandidateList() {
   const navigate = useNavigate();
   const { setStatuses, getStatus, seedStatuses } = useCandidateStatus();
 
-  const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'estudios', 'finalistas'] as const;
+  const STAGE_ORDER = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'prueba_conocimiento', 'estudios', 'finalistas'] as const;
 
   const priorStages = (stage: string) => {
     const idx = STAGE_ORDER.indexOf(stage as typeof STAGE_ORDER[number]);
@@ -155,7 +155,7 @@ export default function CandidateList() {
     if (path.includes('/estudios')) return 'estudios';
     if (path.includes('/finalistas')) return 'finalistas';
     return stage;
-  })() as 'scoring' | 'prescreening' | 'prueba_manejo' | 'evaluaciones' | 'entrevistas' | 'estudios' | 'finalistas';
+  })() as 'scoring' | 'prescreening' | 'prueba_manejo' | 'entrevistas' | 'evaluaciones' | 'prueba_conocimiento' | 'estudios' | 'finalistas';
 
   useEffect(() => {
     setJobId(jobId);
@@ -813,7 +813,9 @@ export default function CandidateList() {
             >
               <CheckCircle2 size={18} />
               {currentStage === 'prueba_manejo' ? 'Pasar a Entrevista'
-                : currentStage === 'evaluaciones' ? 'Pasar a Entrevista'
+                : currentStage === 'entrevistas' ? 'Pasar a Prueba Psicométrica'
+                : currentStage === 'evaluaciones' ? 'Pasar a Prueba de conocimiento'
+                : currentStage === 'prueba_conocimiento' ? 'Pasar a Validaciones'
                 : 'Pasar etapa'}
             </Button>
           )}

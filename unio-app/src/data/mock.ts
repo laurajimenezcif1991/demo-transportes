@@ -4,7 +4,7 @@ export type VacanteStatus = 'activa' | 'en_pausa' | 'cerrada';
 export type Priority = 'alta' | 'media' | 'baja';
 export type StageStatus = 'completed' | 'in_progress' | 'not_started';
 export type SalaryRange = 'en_rango' | 'fuera_de_rango';
-export type PipelineStageKey = 'scoring' | 'prescreening' | 'prueba_manejo' | 'evaluaciones' | 'entrevistas' | 'estudios' | 'finalistas';
+export type PipelineStageKey = 'scoring' | 'prescreening' | 'prueba_manejo' | 'entrevistas' | 'evaluaciones' | 'prueba_conocimiento' | 'estudios' | 'finalistas';
 
 export interface Vacante {
   id: string;
@@ -75,6 +75,7 @@ export interface Candidate {
     experienciaLaboral?: { empresa: string; rol: string; periodo: string; descripcion: string }[];
   };
   psychTest?: PsychTestResult;
+  knowledgeTest?: KnowledgeTestResult;
   hasCV?: boolean;
   applicationHistory?: { count: number; lastDate?: string; status: 'recurrente' | 'primera_vez' };
   rejectionType?: 'definitivo' | 'circunstancial' | null;
@@ -95,6 +96,26 @@ export interface Candidate {
 export interface NoNegociable {
   label: string;
   cumple: boolean;
+}
+
+export interface KnowledgeQuestion {
+  id: number;
+  category: string;
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+}
+
+export interface KnowledgeTestResult {
+  score: number;
+  totalQuestions: number;
+  correct: number;
+  incorrect: number;
+  observations: string;
+  externalUrl: string;
+  completedAt: string;
+  questions: KnowledgeQuestion[];
 }
 
 export interface EvalRow {
@@ -3024,21 +3045,22 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
     ({ id, label, stageBadge: badge, status, candidateCount: count, isAI, route: `/pipeline/${jobId}/${id}` });
 
   // ── Pipeline estándar Transporte & Logística ──
-  // counts: scoring, pre, manejo, ent, psicotech, estudios, fin
-  const transpPipeline = (scoring: number, pre: number, manejo: number, ent: number, psicotech: number, est = 0, fin = 0) => [
-    s('scoring',       'Verificación (RUNT/RNDC)', 'Verificación',     scoring > 0   ? (pre > 0       ? 'completed'    : 'in_progress') : 'not_started', scoring,   true),
-    s('prescreening',  'Pre-entrevista IA',         'Pre-entrevista',   pre > 0       ? (manejo > 0    ? 'completed'    : 'in_progress') : 'not_started', pre,       true),
-    s('prueba_manejo', 'Prueba de manejo',           'Prueba manejo',    manejo > 0    ? (ent > 0       ? 'completed'    : 'in_progress') : 'not_started', manejo,    false),
-    s('entrevistas',   'Entrevista',                 'Entrevista',       ent > 0       ? (psicotech > 0 ? 'completed'    : 'in_progress') : 'not_started', ent,       false),
-    s('evaluaciones',  'Prueba Psicométrica',        'Psicométrica',     psicotech > 0 ? (est > 0       ? 'completed'    : 'in_progress') : 'not_started', psicotech, false),
-    s('estudios',      'Validaciones',               'Validaciones',     est > 0       ? (fin > 0      ? 'in_progress'  : 'in_progress') : 'not_started', est,       false),
-    s('finalistas',    'Aprobados',                  'Aprobados',        fin > 0       ? 'in_progress'                                  : 'not_started', fin,       false),
+  // counts: scoring, pre, manejo, ent, psicotech, conocimiento, estudios, fin
+  const transpPipeline = (scoring: number, pre: number, manejo: number, ent: number, psicotech: number, conoc: number, est = 0, fin = 0) => [
+    s('scoring',              'Verificación (RUNT/RNDC)', 'Verificación',     scoring > 0   ? (pre > 0       ? 'completed'    : 'in_progress') : 'not_started', scoring,   true),
+    s('prescreening',         'Pre-entrevista IA',         'Pre-entrevista',   pre > 0       ? (manejo > 0    ? 'completed'    : 'in_progress') : 'not_started', pre,       true),
+    s('prueba_manejo',        'Prueba de manejo',           'Prueba manejo',    manejo > 0    ? (ent > 0       ? 'completed'    : 'in_progress') : 'not_started', manejo,    false),
+    s('entrevistas',          'Entrevista',                 'Entrevista',       ent > 0       ? (psicotech > 0 ? 'completed'    : 'in_progress') : 'not_started', ent,       false),
+    s('evaluaciones',         'Prueba Psicométrica',        'Psicométrica',     psicotech > 0 ? (conoc > 0     ? 'completed'    : 'in_progress') : 'not_started', psicotech, false),
+    s('prueba_conocimiento',  'Prueba de conocimiento',     'Conocimiento',     conoc > 0     ? (est > 0       ? 'completed'    : 'in_progress') : 'not_started', conoc,     false),
+    s('estudios',             'Validaciones',               'Validaciones',     est > 0       ? (fin > 0       ? 'in_progress'  : 'in_progress') : 'not_started', est,       false),
+    s('finalistas',           'Aprobados',                  'Aprobados',        fin > 0       ? 'in_progress'                                   : 'not_started', fin,       false),
   ];
 
   switch (jobId) {
-    case 'mock-transp-pub': return transpPipeline(0, 100, 60, 30, 40, 20, 15);
-    case 'mock-vigia':      return transpPipeline(0, 100, 60, 30, 40, 20, 15);
-    case 'mock-distrib':    return transpPipeline(0, 100, 60, 30, 40, 20, 15);
+    case 'mock-transp-pub': return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
+    case 'mock-vigia':      return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
+    case 'mock-distrib':    return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
     case 'mock-recep':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'in_progress', 15, true),
@@ -3244,6 +3266,88 @@ const _BULK_SIGNALS_NEG = [
   ['Referencias laborales pendientes de contacto'],
 ];
 
+// ── Knowledge test mock generator ─────────────────────────────────────────────
+const KNOWLEDGE_QUESTIONS_BANK: Omit<KnowledgeQuestion, 'id' | 'isCorrect' | 'selectedAnswer'>[] = [
+  // Normativa de Tránsito
+  { category: 'Normativa de Tránsito', question: '¿Cuál es la velocidad máxima permitida en zona urbana para vehículos de carga?', correctAnswer: '50 km/h' },
+  { category: 'Normativa de Tránsito', question: '¿Cada cuánto tiempo debe renovarse la licencia de conducción C2?', correctAnswer: 'Cada 3 años' },
+  { category: 'Normativa de Tránsito', question: '¿Qué indica la doble línea amarilla continua en la calzada?', correctAnswer: 'Prohibición de adelantar en ambos sentidos' },
+  { category: 'Normativa de Tránsito', question: '¿Cuál es el tiempo máximo de conducción continua para conductores profesionales de carga?', correctAnswer: '4 horas continuas, luego 30 min de descanso' },
+  { category: 'Normativa de Tránsito', question: '¿Cuál es el límite de peso máximo en eje trasero simple de un C2?', correctAnswer: '11,5 toneladas' },
+  { category: 'Normativa de Tránsito', question: '¿Qué documento ampara legalmente el transporte de carga por carretera?', correctAnswer: 'Manifiesto de carga' },
+  { category: 'Normativa de Tránsito', question: '¿Cuál es la distancia mínima de seguimiento recomendada a 80 km/h?', correctAnswer: '80 metros' },
+  // Mantenimiento Preventivo
+  { category: 'Mantenimiento Preventivo', question: '¿Con qué frecuencia deben revisarse los frenos en un vehículo de carga?', correctAnswer: 'Cada 20,000 km o mensualmente' },
+  { category: 'Mantenimiento Preventivo', question: '¿Cuál es la profundidad mínima de la banda de rodadura permitida?', correctAnswer: '1,6 mm' },
+  { category: 'Mantenimiento Preventivo', question: '¿Cuál es el rango de temperatura de operación normal del motor diésel?', correctAnswer: 'Entre 80 °C y 95 °C' },
+  { category: 'Mantenimiento Preventivo', question: '¿Cada cuánto se recomienda el cambio de aceite en un camión diésel de trabajo pesado?', correctAnswer: 'Cada 15,000 km o cada 6 meses' },
+  { category: 'Mantenimiento Preventivo', question: '¿Qué revela el humo negro en el escape de un motor diésel?', correctAnswer: 'Combustión incompleta; exceso de combustible o filtro de aire obstruido' },
+  // Seguridad Vial y Manejo Defensivo
+  { category: 'Seguridad Vial', question: '¿Cuál es la técnica correcta de frenado en descensos prolongados con carga?', correctAnswer: 'Freno motor con cambios reducidos, evitando frenos de servicio continuos' },
+  { category: 'Seguridad Vial', question: '¿Qué hacer si el vehículo derrapa en piso mojado?', correctAnswer: 'Soltar el acelerador y girar suavemente hacia el lado del derrape' },
+  { category: 'Seguridad Vial', question: '¿Cuándo se deben usar las luces de emergencia (hazard)?', correctAnswer: 'Solo ante detención forzada o avería en la vía' },
+  { category: 'Seguridad Vial', question: '¿Cuál es la distancia de visibilidad requerida antes de un cruce ferroviario?', correctAnswer: '100 metros en cada dirección' },
+  { category: 'Seguridad Vial', question: '¿Qué precaución adicional requiere el radio de giro de un C2 frente a vehículos livianos?', correctAnswer: 'Mayor espacio lateral y verificar ángulo muerto antes de girar' },
+  // Carga y Transporte
+  { category: 'Carga y Transporte', question: '¿Cuál es el método de amarre recomendado para cargas deslizables?', correctAnswer: 'Amarre directo con correas tensoras y topes antideslizantes' },
+  { category: 'Carga y Transporte', question: '¿Cuántos centímetros puede sobresalir una carga por la parte trasera sin señalización especial?', correctAnswer: '30 cm' },
+  { category: 'Carga y Transporte', question: '¿Cuál es la temperatura de cadena de frío para transporte de alimentos frescos?', correctAnswer: 'Entre 0 °C y 4 °C' },
+  { category: 'Carga y Transporte', question: '¿Qué debe verificar el conductor antes de iniciar una ruta con carga nueva?', correctAnswer: 'Aseguramiento de la carga, límites de peso, documentos y ruta autorizada' },
+  // Mercancías Peligrosas y Emergencias
+  { category: 'Mercancías Peligrosas', question: '¿A qué clase de peligrosidad pertenece el combustible diésel según la normativa IMDG?', correctAnswer: 'Clase 3 — Líquidos inflamables' },
+  { category: 'Mercancías Peligrosas', question: '¿Cuál es el número de emergencia para derrames de sustancias peligrosas en Colombia?', correctAnswer: 'CISPROQUIM: 01 8000 916012' },
+  { category: 'Mercancías Peligrosas', question: '¿Qué acción NO se debe realizar ante un incendio en la cabina del vehículo?', correctAnswer: 'No abrir el capó sin equipo adecuado; evacuar primero y llamar a emergencias' },
+  { category: 'Mercancías Peligrosas', question: '¿Qué información debe contener la tarjeta de emergencia de mercancías peligrosas?', correctAnswer: 'Nombre de la sustancia, riesgos, acciones de emergencia y teléfono de contacto' },
+];
+
+const WRONG_ANSWERS: Record<string, string> = {
+  '¿Cuál es el límite de peso máximo en eje trasero simple de un C2?': '8 toneladas',
+  '¿Cuál es la distancia de visibilidad requerida antes de un cruce ferroviario?': '50 metros en cada dirección',
+  '¿A qué clase de peligrosidad pertenece el combustible diésel según la normativa IMDG?': 'Clase 4 — Sólidos inflamables',
+  '¿Qué acción NO se debe realizar ante un incendio en la cabina del vehículo?': 'Apagar el motor inmediatamente',
+  '¿Cuántos centímetros puede sobresalir una carga por la parte trasera sin señalización especial?': '50 cm',
+};
+
+function _mkKnowledgeTest(name: string, hiScore: boolean, seed: number): KnowledgeTestResult {
+  const wrongIndices = hiScore
+    ? [4, 15, 21, 22]   // 4 wrong → 21/25 = 84
+    : [4, 7, 10, 13, 15, 18, 21, 22, 23];  // 9 wrong → 16/25 = 64
+
+  const questions: KnowledgeQuestion[] = KNOWLEDGE_QUESTIONS_BANK.map((q, i) => {
+    const isWrong = wrongIndices.includes(i);
+    const wrongAns = WRONG_ANSWERS[q.question] ?? 'No lo sabe con certeza';
+    return {
+      id: i + 1,
+      category: q.category,
+      question: q.question,
+      selectedAnswer: isWrong ? wrongAns : q.correctAnswer,
+      correctAnswer: q.correctAnswer,
+      isCorrect: !isWrong,
+    };
+  });
+
+  const correct = questions.filter((q) => q.isCorrect).length;
+  const incorrect = questions.length - correct;
+  const score = Math.round((correct / questions.length) * 100);
+
+  const hiObs = `${name} demostró buen dominio de normativa de tránsito y mantenimiento preventivo. Presentó dificultades puntuales en límites de peso por eje y visibilidad ferroviaria. Desempeño consistente con perfil de conductor experimentado. Se recomienda avanzar.`;
+  const loObs = `${name} mostró conocimientos básicos de normativa vial, pero presenta vacíos significativos en mantenimiento preventivo, carga segura y manejo de mercancías peligrosas. Se recomienda capacitación antes de asignar rutas de alto riesgo. Avanzar con reservas.`;
+
+  const day = 10 + (seed % 15);
+  const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'][seed % 6];
+
+  return {
+    score,
+    totalQuestions: questions.length,
+    correct,
+    incorrect,
+    observations: hiScore ? hiObs : loObs,
+    externalUrl: 'https://forms.gle/mock-prueba-conocimiento',
+    completedAt: `${day} ${month} 2026 — 09:${String(30 + (seed % 20)).padStart(2, '0')} a.m.`,
+    questions,
+  };
+}
+
 function _mkBulk(
   prefix: string,
   role: string,
@@ -3303,12 +3407,16 @@ function _mkBulk(
       currentStage: stage,
       hasCV: idx % 4 !== 0, // ~25% perfil por WhatsApp
       // Prueba Psicométrica: 2 PRIMA permutations, applied for evaluaciones+ stages
-      psychTest: (['evaluaciones','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      psychTest: (['evaluaciones','prueba_conocimiento','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
         ? (idx % 2 === 0 ? _primaTranspA(name, score) : _primaTranspB(name, score))
         : undefined,
-      // Interview verdict: score-based for entrevistas/estudios/finalistas
+      // Prueba de conocimiento: applied for prueba_conocimiento+ stages
+      knowledgeTest: (['prueba_conocimiento','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+        ? _mkKnowledgeTest(name, score >= 65, idx)
+        : undefined,
+      // Interview verdict: score-based for entrevistas/evaluaciones/estudios/finalistas
       // ≥78 = Apto (top ~8), 62–77 = Apto con reservas (~7), <62 = No apto (rest)
-      veredictoEntrevista: (['entrevistas','evaluaciones','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
+      veredictoEntrevista: (['entrevistas','evaluaciones','prueba_conocimiento','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
         ? (score >= 78 ? 'apto' : score >= 62 ? 'apto_reservas' : 'no_apto')
         : undefined,
       runtVerification: {
@@ -3359,36 +3467,39 @@ function _mkBulk(
 }
 
 // ── Bulk arrays per vacancy ────────────────────────────────────────────────────
-// Funnel: prescreening=100, prueba_manejo=60, evaluaciones=40, entrevistas=30, estudios=20, finalistas=15
+// Funnel: prescreening=100, prueba_manejo=60, entrevistas=30, evaluaciones=40, prueba_conocimiento=35, estudios=20, finalistas=15
 // Each vacancy uses a different startIdx offset (0, 500, 1000) to avoid name collisions.
 
 // ── Bulk arrays per vacancy (non-overlapping, indexed to avoid name collisions) ─
-// Funnel target: prescreening≈100, prueba_manejo≈60, evaluaciones≈40, entrevistas≈30, estudios≈20, finalistas≈15
+// Funnel target: prescreening≈100, prueba_manejo≈60, entrevistas≈30, evaluaciones≈40, prueba_conocimiento≈35, estudios≈20, finalistas≈15
 // Detailed candidates: pre=15, pm=15, eval=3, entrev=5 → bulk fills the remainder
 
 // mock-distrib (detailed: pre=15, pm=15, eval=3, entrev=5)
-const distribBulkPre   = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prescreening', 85,   0, [28,94]);
-const distribBulkPM    = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_manejo', 45,  85, [42,92]);
-const distribBulkEval  = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','evaluaciones',  37, 130, [50,91]);
-const distribBulkEntrev= _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','entrevistas',   25, 167, [58,93]);
-const distribBulkEstud = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','estudios',      20, 192, [60,94]);
-const distribBulkFinal = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','finalistas',    15, 212, [72,96]);
+const distribBulkPre   = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prescreening',        85,   0, [28,94]);
+const distribBulkPM    = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_manejo',        45,  85, [42,92]);
+const distribBulkEval  = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','evaluaciones',         37, 130, [50,91]);
+const distribBulkEntrev= _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','entrevistas',          25, 167, [58,93]);
+const distribBulkConoc = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_conocimiento',  35, 192, [60,92]);
+const distribBulkEstud = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','estudios',             20, 227, [60,94]);
+const distribBulkFinal = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','finalistas',           15, 247, [72,96]);
 
 // mock-transp-pub (detailed: pre=15, pm=13, eval=3, entrev=5)
-const tpBulkPre    = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prescreening', 85, 500, [28,94]);
-const tpBulkPM     = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_manejo', 47, 585, [42,92]);
-const tpBulkEval   = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','evaluaciones',  37, 632, [50,91]);
-const tpBulkEntrev = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','entrevistas',   25, 669, [58,93]);
-const tpBulkEstud  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','estudios',      20, 694, [60,94]);
-const tpBulkFinal  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','finalistas',    15, 714, [72,96]);
+const tpBulkPre    = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prescreening',       85, 500, [28,94]);
+const tpBulkPM     = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_manejo',       47, 585, [42,92]);
+const tpBulkEval   = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','evaluaciones',        37, 632, [50,91]);
+const tpBulkEntrev = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','entrevistas',         25, 669, [58,93]);
+const tpBulkConoc  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_conocimiento', 35, 694, [60,92]);
+const tpBulkEstud  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','estudios',            20, 729, [60,94]);
+const tpBulkFinal  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','finalistas',          15, 749, [72,96]);
 
 // mock-vigia (detailed: pre=15, pm=13, eval=3, entrev=5)
-const vigiaBulkPre    = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prescreening', 85,1000, [28,94]);
-const vigiaBulkPM     = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_manejo', 47,1085, [42,92]);
-const vigiaBulkEval   = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','evaluaciones',  37,1132, [50,91]);
-const vigiaBulkEntrev = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','entrevistas',   25,1169, [58,93]);
-const vigiaBulkEstud  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','estudios',      20,1194, [60,94]);
-const vigiaBulkFinal  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','finalistas',    15,1214, [72,96]);
+const vigiaBulkPre    = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prescreening',       85,1000, [28,94]);
+const vigiaBulkPM     = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_manejo',       47,1085, [42,92]);
+const vigiaBulkEval   = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','evaluaciones',        37,1132, [50,91]);
+const vigiaBulkEntrev = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','entrevistas',         25,1169, [58,93]);
+const vigiaBulkConoc  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_conocimiento', 35,1194, [60,92]);
+const vigiaBulkEstud  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','estudios',            20,1229, [60,94]);
+const vigiaBulkFinal  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','finalistas',          15,1249, [72,96]);
 
 export const mockCandidatesByStage: Record<string, Partial<Record<string, Candidate[]>>> = {
   // evaluaciones candidates (tp-e*, v-e*, d-e*) only appear in their own stage —
@@ -3396,31 +3507,34 @@ export const mockCandidatesByStage: Record<string, Partial<Record<string, Candid
   // Each stage contains ONLY its own candidates — no cross-stage duplicates.
   // The funnel is: prescreening≈100, prueba_manejo≈60, evaluaciones≈40, entrevistas≈30, estudios≈20, finalistas≈15
   'mock-transp-pub': {
-    scoring:      [...transpPubScoring],
-    prescreening: [...transpPubPrescreening, ...tpBulkPre],          // ≈100
-    prueba_manejo:[...transpPubPruebaManejo, ...tpBulkPM],           // ≈60
-    evaluaciones: [...transpPubEvaluaciones, ...tpBulkEval],         // ≈40
-    entrevistas:  [...transpPubEntrevistas, ...tpBulkEntrev],        // ≈30
-    estudios:     [...tpBulkEstud],                                  // ≈20
-    finalistas:   [...transpPubEntrevistas.slice(0,2), ...tpBulkFinal], // ≈15 (2 detailed as top approved)
+    scoring:              [...transpPubScoring],
+    prescreening:         [...transpPubPrescreening, ...tpBulkPre],          // ≈100
+    prueba_manejo:        [...transpPubPruebaManejo, ...tpBulkPM],           // ≈60
+    entrevistas:          [...transpPubEntrevistas, ...tpBulkEntrev],        // ≈30
+    evaluaciones:         [...transpPubEvaluaciones, ...tpBulkEval],         // ≈40
+    prueba_conocimiento:  [...tpBulkConoc],                                  // ≈35
+    estudios:             [...tpBulkEstud],                                  // ≈20
+    finalistas:           [...transpPubEntrevistas.slice(0,2), ...tpBulkFinal], // ≈15
   },
   'mock-vigia': {
-    scoring:      [...vigiaScoring],
-    prescreening: [...vigiaPrescreening, ...vigiaBulkPre],           // ≈100
-    prueba_manejo:[...vigiaPruebaManejo, ...vigiaBulkPM],            // ≈60
-    evaluaciones: [...vigiaEvaluaciones, ...vigiaBulkEval],          // ≈40
-    entrevistas:  [...vigiaEntrevistas, ...vigiaBulkEntrev],         // ≈30
-    estudios:     [...vigiaBulkEstud],                               // ≈20
-    finalistas:   [...vigiaEntrevistas.slice(0,2), ...vigiaBulkFinal], // ≈15
+    scoring:              [...vigiaScoring],
+    prescreening:         [...vigiaPrescreening, ...vigiaBulkPre],           // ≈100
+    prueba_manejo:        [...vigiaPruebaManejo, ...vigiaBulkPM],            // ≈60
+    entrevistas:          [...vigiaEntrevistas, ...vigiaBulkEntrev],         // ≈30
+    evaluaciones:         [...vigiaEvaluaciones, ...vigiaBulkEval],          // ≈40
+    prueba_conocimiento:  [...vigiaBulkConoc],                               // ≈35
+    estudios:             [...vigiaBulkEstud],                               // ≈20
+    finalistas:           [...vigiaEntrevistas.slice(0,2), ...vigiaBulkFinal], // ≈15
   },
   'mock-distrib': {
-    scoring:      [...distribScoring],
-    prescreening: [...distribPrescreening, ...distribBulkPre],       // ≈100
-    prueba_manejo:[...distribPruebaManejo, ...distribBulkPM],        // ≈60
-    evaluaciones: [...distribEvaluaciones, ...distribBulkEval],     // ≈40
-    entrevistas:  [...distribEntrevistas, ...distribBulkEntrev],     // ≈30
-    estudios:     [...distribBulkEstud],                             // ≈20
-    finalistas:   [...distribEntrevistas.slice(0,2), ...distribBulkFinal], // ≈15
+    scoring:              [...distribScoring],
+    prescreening:         [...distribPrescreening, ...distribBulkPre],       // ≈100
+    prueba_manejo:        [...distribPruebaManejo, ...distribBulkPM],        // ≈60
+    entrevistas:          [...distribEntrevistas, ...distribBulkEntrev],     // ≈30
+    evaluaciones:         [...distribEvaluaciones, ...distribBulkEval],      // ≈40
+    prueba_conocimiento:  [...distribBulkConoc],                             // ≈35
+    estudios:             [...distribBulkEstud],                             // ≈20
+    finalistas:           [...distribEntrevistas.slice(0,2), ...distribBulkFinal], // ≈15
   },
   'mock-recep':    { scoring: recepCandidates },
   'mock-bodega':   { scoring: [...bodegaPreCandidates, ...bodegaScoreOnly], prescreening: bodegaPreCandidates },

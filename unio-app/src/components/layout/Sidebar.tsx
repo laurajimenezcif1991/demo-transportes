@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Car,
   BrainCircuit,
+  BookOpen,
 } from 'lucide-react';
 import { usePipeline } from '../../context/PipelineContext';
 import { useMockStageState } from '../../hooks/useMockStageState';
@@ -35,7 +36,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     : true;
   const finalistasLocked = finalistaLocked || (isMockJob && !mockHasFinalists);
 
-  const PIPELINE_STAGES = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones'] as const;
+  const PIPELINE_STAGES = ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'prueba_conocimiento'] as const;
   const progressIdx = PIPELINE_STAGES.indexOf(progressStage as typeof PIPELINE_STAGES[number]);
 
   const getActiveId = (): string => {
@@ -46,7 +47,7 @@ export default function Sidebar({ activeItem }: SidebarProps) {
     if (path.includes('/candidate/') || path.includes('/finalist/')) {
       const params = new URLSearchParams(location.search);
       const stage = params.get('stage');
-      if (stage && ['scoring', 'prescreening', 'prueba_manejo', 'evaluaciones', 'entrevistas', 'estudios', 'finalistas'].includes(stage)) return stage;
+      if (stage && ['scoring', 'prescreening', 'prueba_manejo', 'entrevistas', 'evaluaciones', 'prueba_conocimiento', 'estudios', 'finalistas'].includes(stage)) return stage;
       if (path.includes('/finalist/')) return 'finalistas';
       return 'pipeline';
     }
@@ -113,6 +114,13 @@ export default function Sidebar({ activeItem }: SidebarProps) {
       label: 'Prueba Psicométrica',
       Icon: BrainCircuit,
       path: `${stageBase}/evaluaciones`,
+      locked: false,
+    },
+    {
+      id: 'prueba_conocimiento',
+      label: 'Prueba de conocimiento',
+      Icon: BookOpen,
+      path: `${stageBase}/prueba_conocimiento`,
       locked: false,
     },
     {

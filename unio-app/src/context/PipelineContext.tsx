@@ -42,8 +42,8 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string>(assetUrl('/logo-demo-transportes.png'));
   const [companyName, setCompanyName] = useState<string>('');
 
-  // Finalistas unlocks when Entrevistas or later is the progress stage
-  const finalistaLocked = !['entrevistas', 'evaluaciones'].includes(progressStage);
+  // Finalistas unlocks when Entrevistas or any later stage is the progress stage
+  const finalistaLocked = !(['entrevistas', 'evaluaciones', 'prueba_conocimiento', 'estudios', 'finalistas'] as PipelineStageKey[]).includes(progressStage);
 
   return (
     <PipelineContext.Provider value={{ activeStage, setActiveStage, progressStage, setProgressStage, finalistaLocked, jobId, setJobId, selectionProcessId, setSelectionProcessId, companyLogoUrl, setCompanyLogoUrl, companyName, setCompanyName }}>

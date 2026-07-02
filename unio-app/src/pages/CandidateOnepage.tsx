@@ -38,6 +38,7 @@ import Button from '../components/ui/Button';
 import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
+import PruebaConocimientoContent from '../components/ui/PruebaConocimientoContent';
 import VoiceInterviewSection from '../components/ui/VoiceInterviewSection';
 import PruebaManejoContent, { PREFILLED, PREFILLED_NO_APTO, calcManejoScore } from '../components/ui/PruebaManejoContent';
 import ValidacionAntecedentes from '../components/ui/ValidacionAntecedentes';
@@ -73,6 +74,7 @@ const ONEPAGE_PIPELINE_STAGES: PipelineStageKey[] = [
   'prueba_manejo',
   'entrevistas',
   'evaluaciones',
+  'prueba_conocimiento',
   'estudios',
   'finalistas',
 ];
@@ -206,13 +208,14 @@ export default function CandidateOnepage() {
     const url  = URL.createObjectURL(blob);
     window.open(url, '_blank');
   };
-  const isPendingPrescreening = isMockJob && isCandidatePending(jobId, 'prescreening', candidateId);
-  const isPendingEntrevistas  = isMockJob && isCandidatePending(jobId, 'entrevistas',  candidateId);
-  const isPendingEvaluaciones = isMockJob && isCandidatePending(jobId, 'evaluaciones', candidateId);
+  const isPendingPrescreening   = isMockJob && isCandidatePending(jobId, 'prescreening',       candidateId);
+  const isPendingEntrevistas    = isMockJob && isCandidatePending(jobId, 'entrevistas',         candidateId);
+  const isPendingEvaluaciones   = isMockJob && isCandidatePending(jobId, 'evaluaciones',        candidateId);
+  const isPendingConocimiento   = isMockJob && isCandidatePending(jobId, 'prueba_conocimiento', candidateId);
   const candidate = apiCandidate ?? { id: candidateId, name: '', role: '', sector: '', years: '', location: '', bio: '', score: 0, avatarInitials: candidateId.slice(0, 2).toUpperCase(), avatarColor: '#8750F6', hasCurrentJob: false, superpoder: '', aspiration: '', budget: '', salaryRange: 'en_rango' as const, currentStage: stage, scoringAI: { score: 0, status: 'pendiente' as const, resumen: '', noNegociables: [], logros: [], senales: [] } };
 
   // Cumulative unlock order: each stage unlocks all accordions up to and including it
-  const UNLOCK_ORDER = ['prescreening','prueba_manejo','entrevistas','evaluaciones','estudios','finalistas'] as const;
+  const UNLOCK_ORDER = ['prescreening','prueba_manejo','entrevistas','evaluaciones','prueba_conocimiento','estudios','finalistas'] as const;
   const effectiveStage = (candidate.currentStage && UNLOCK_ORDER.includes(candidate.currentStage as typeof UNLOCK_ORDER[number]))
     ? candidate.currentStage
     : stage;
@@ -293,6 +296,7 @@ export default function CandidateOnepage() {
   const [descartarModalOpen, setDescartarModalOpen] = useState(false);
   const [entrevistasOpen, setEntrevistasOpen] = useState(() => stage === 'entrevistas');
   const [evaluacionesOpen, setEvaluacionesOpen] = useState(() => stage === 'evaluaciones');
+  const [conocimientoOpen, setConocimientoOpen] = useState(() => stage === 'prueba_conocimiento');
   const [waModalOpen, setWaModalOpen] = useState(false);
   const [waAgendarOpen, setWaAgendarOpen] = useState(false);
 
@@ -829,10 +833,37 @@ export default function CandidateOnepage() {
             </AccordionSection>
           </div>
 
-          {/* 5. Validaciones — always rendered, locked until estudios */}
+          {/* 5. Prueba de conocimiento */}
           <div style={{ scrollMarginTop: 24 }}>
             <AccordionSection
               number={5}
+              title="Prueba de conocimiento"
+              score={candidate.knowledgeTest?.score}
+              statusText={
+                !stageReached('prueba_conocimiento') ? 'Sin iniciar'
+                : candidate.knowledgeTest && !isPendingConocimiento ? 'Completado'
+                : isPendingConocimiento ? 'En proceso'
+                : 'Sin iniciar'
+              }
+              statusOk={!!candidate.knowledgeTest && !isPendingConocimiento}
+              isOpen={conocimientoOpen}
+              onToggle={() => setConocimientoOpen(!conocimientoOpen)}
+              isLocked={!stageReached('prueba_conocimiento')}
+            >
+              {candidate.knowledgeTest ? (
+                <PruebaConocimientoContent data={candidate.knowledgeTest} />
+              ) : (
+                <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                  Pendiente: la prueba de conocimiento aún no ha sido completada por el candidato.
+                </div>
+              )}
+            </AccordionSection>
+          </div>
+
+          {/* 6. Validaciones — always rendered, locked until estudios */}
+          <div style={{ scrollMarginTop: 24 }}>
+            <AccordionSection
+              number={6}
               title="Validaciones"
               statusText={
                 !stageReached('estudios') ? 'Sin iniciar'
@@ -849,10 +880,10 @@ export default function CandidateOnepage() {
             </AccordionSection>
           </div>
 
-          {/* 6. Contratación — always rendered, locked until finalistas */}
+          {/* 7. Contratación — always rendered, locked until finalistas */}
           <div style={{ scrollMarginTop: 24 }}>
             <AccordionSection
-              number={6}
+              number={7}
               title="Contratación"
               statusText={
                 !stageReached('finalistas') ? 'Sin iniciar'
@@ -951,7 +982,8 @@ export default function CandidateOnepage() {
                 <CheckCircle2 size={16} />
                 {stage === 'prueba_manejo' ? 'Pasar a Entrevista'
                   : stage === 'entrevistas' ? 'Pasar a Prueba Psicométrica'
-                  : stage === 'evaluaciones' ? 'Pasar a Validaciones'
+                  : stage === 'evaluaciones' ? 'Pasar a Prueba de conocimiento'
+                  : stage === 'prueba_conocimiento' ? 'Pasar a Validaciones'
                   : 'Pasar etapa'}
               </Button>
           )}
