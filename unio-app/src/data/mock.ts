@@ -3419,7 +3419,8 @@ function _mkBulk(
       veredictoEntrevista: (['entrevistas','evaluaciones','prueba_conocimiento','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
         ? (score >= 78 ? 'apto' : score >= 62 ? 'apto_reservas' : 'no_apto')
         : undefined,
-      runtVerification: {
+      // Low-score candidates failed a non-negotiable before RUNT — no verification available
+      runtVerification: score >= 48 ? {
         cc: `${10000000 + idx * 137}`,
         totalManifiestos: yrs * 80 + (idx % 50),
         licenseCategories: [
@@ -3429,7 +3430,7 @@ function _mkBulk(
         vigencia: `Vigente hasta ${2028 + (idx % 3)}-03-14`,
         vehiculosExperiencia: ['Camión rígido 2 ejes', 'Tractocamión'],
         anosExperiencia: yrs,
-      },
+      } : undefined,
       scoringAI: {
         score: Math.round(score * 0.96),
         status: score >= 60 ? 'continua' : score >= 40 ? 'pendiente' : 'rechazado',

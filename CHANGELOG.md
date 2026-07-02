@@ -7,12 +7,8 @@
 
 ## [Sin commitear]
 
-### Acción "Marcar como contratado" — fase Aprobados
-- `useMockStageState`: nuevo Set `contratados` persistido en localStorage, con `marcarContratado(ids[])` e `isContratado(id)`
-- `CandidateCard`: prop `isContratado` — cuando activo en etapa `finalistas` muestra badge verde "Contratado" con check en lugar del stepper de docs
-- `CandidateList` (Aprobados): botón bulk "Marcar como contratado" que aparece cuando hay seleccionados con `docs_recibido` que no estén ya contratados; limpia selección y muestra toast
-- `CandidateOnepage` (Aprobados): bottom bar condicionado — candidatos con docs recibidos ven "Marcar como contratado" (primario) en vez de "Solicitar docs. de ingreso"; al confirmar se colapsan todos los accordions y se muestra toast; si ya está contratado muestra badge verde estático
-- Badge "Contratado" en la card de perfil superior del OnePager cuando el candidato ya fue contratado
+### Mock data: Sin Validar RUNT visible en candidatos de score bajo
+- `_mkBulk`: `runtVerification` ahora es `undefined` para candidatos con score < 48 (fallaron un no-negociable antes de llegar a la consulta RUNT), activando "Sin Validar" en filas RUNT/RNDC y Antecedentes del Prescreening
 
 ---
 
