@@ -3551,9 +3551,9 @@ export const mockCandidatesById: Record<string, Candidate> = [
   ...distribEvaluaciones,
   ...distribCandidates,
   // Bulk arrays (all three vacancies, all stages)
-  ...distribBulkPre, ...distribBulkPM, ...distribBulkEval, ...distribBulkEntrev, ...distribBulkEstud, ...distribBulkFinal,
-  ...tpBulkPre, ...tpBulkPM, ...tpBulkEval, ...tpBulkEntrev, ...tpBulkEstud, ...tpBulkFinal,
-  ...vigiaBulkPre, ...vigiaBulkPM, ...vigiaBulkEval, ...vigiaBulkEntrev, ...vigiaBulkEstud, ...vigiaBulkFinal,
+  ...distribBulkPre, ...distribBulkPM, ...distribBulkEntrev, ...distribBulkEval, ...distribBulkConoc, ...distribBulkEstud, ...distribBulkFinal,
+  ...tpBulkPre, ...tpBulkPM, ...tpBulkEntrev, ...tpBulkEval, ...tpBulkConoc, ...tpBulkEstud, ...tpBulkFinal,
+  ...vigiaBulkPre, ...vigiaBulkPM, ...vigiaBulkEntrev, ...vigiaBulkEval, ...vigiaBulkConoc, ...vigiaBulkEstud, ...vigiaBulkFinal,
   ...recepCandidates,
   ...bodegaPreCandidates, ...bodegaScoreOnly,
   ...thEntrevistasCandidates, ...thPreCandidates, ...thScoreOnly,
