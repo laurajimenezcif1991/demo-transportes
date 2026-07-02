@@ -11,6 +11,19 @@
 
 ## [pending] — 01 Jul 2026
 
+### Ajuste de candidatos mock y compactación del funnel
+- Entrevista: 30 → 50 candidatos (45 bulk + 5 detallados)
+- Prueba Psicométrica: 40 → 35 candidatos (32 bulk + 3 detallados)
+- Prueba de conocimiento: 35 → 28 candidatos
+- Rangos de score ajustados por etapa para mayor coherencia (entrev ≥56, eval ≥58, conoc ≥62, est ≥65)
+- StartIdx de bulk arrays recalculados para evitar colisiones de nombre
+- Funnel visual compactado: barra 20px, padding 5px, fuente 17px → todo visible sin scroll
+- STORAGE_VERSION bumped a v15
+
+---
+
+## [pending] — 01 Jul 2026
+
 ### Nueva fase: Prueba de conocimiento (pos. 5 en el pipeline)
 - Añadida entre Prueba Psicométrica y Validaciones en sidebar, pipeline y onepager
 - Nuevo componente `PruebaConocimientoContent`: score, correctas/incorrectas, desglose por categoría, lista de preguntas/respuestas, observaciones y botón a plataforma externa

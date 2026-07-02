@@ -3058,9 +3058,9 @@ export function getMockPipelineStages(jobId: string): PipelineStage[] {
   ];
 
   switch (jobId) {
-    case 'mock-transp-pub': return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
-    case 'mock-vigia':      return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
-    case 'mock-distrib':    return transpPipeline(0, 100, 60, 30, 40, 35, 20, 15);
+    case 'mock-transp-pub': return transpPipeline(0, 100, 60, 50, 35, 28, 20, 15);
+    case 'mock-vigia':      return transpPipeline(0, 100, 60, 50, 35, 28, 20, 15);
+    case 'mock-distrib':    return transpPipeline(0, 100, 60, 50, 35, 28, 20, 15);
     case 'mock-recep':
       return [
         s('scoring',      'Scoring IA',        'Scoring',       'in_progress', 15, true),
@@ -3472,69 +3472,68 @@ function _mkBulk(
 
 // ── Bulk arrays per vacancy (non-overlapping, indexed to avoid name collisions) ─
 // Funnel target: prescreening≈100, prueba_manejo≈60, entrevistas≈30, evaluaciones≈40, prueba_conocimiento≈35, estudios≈20, finalistas≈15
-// Detailed candidates: pre=15, pm=15, eval=3, entrev=5 → bulk fills the remainder
+// Funnel: pre=100, manejo=60, entrev=50(5+45bulk), eval=35(3+32bulk), conoc=28(28bulk), est=20, fin=15
+// StartIdx blocks (non-overlapping): d=0..270, tp=500..772, vc=1000..1272
 
 // mock-distrib (detailed: pre=15, pm=15, eval=3, entrev=5)
 const distribBulkPre   = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prescreening',        85,   0, [28,94]);
 const distribBulkPM    = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_manejo',        45,  85, [42,92]);
-const distribBulkEval  = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','evaluaciones',         37, 130, [50,91]);
-const distribBulkEntrev= _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','entrevistas',          25, 167, [58,93]);
-const distribBulkConoc = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_conocimiento',  35, 192, [60,92]);
-const distribBulkEstud = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','estudios',             20, 227, [60,94]);
-const distribBulkFinal = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','finalistas',           15, 247, [72,96]);
+const distribBulkEntrev= _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','entrevistas',          45, 130, [56,94]);
+const distribBulkEval  = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','evaluaciones',         32, 175, [58,93]);
+const distribBulkConoc = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','prueba_conocimiento',  28, 207, [62,93]);
+const distribBulkEstud = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','estudios',             20, 235, [65,94]);
+const distribBulkFinal = _mkBulk('d','Conductor C2 Distribución Urbana','Logística / Última Milla','finalistas',           15, 255, [72,96]);
 
 // mock-transp-pub (detailed: pre=15, pm=13, eval=3, entrev=5)
 const tpBulkPre    = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prescreening',       85, 500, [28,94]);
 const tpBulkPM     = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_manejo',       47, 585, [42,92]);
-const tpBulkEval   = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','evaluaciones',        37, 632, [50,91]);
-const tpBulkEntrev = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','entrevistas',         25, 669, [58,93]);
-const tpBulkConoc  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_conocimiento', 35, 694, [60,92]);
-const tpBulkEstud  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','estudios',            20, 729, [60,94]);
-const tpBulkFinal  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','finalistas',          15, 749, [72,96]);
+const tpBulkEntrev = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','entrevistas',         45, 632, [56,94]);
+const tpBulkEval   = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','evaluaciones',        32, 677, [58,93]);
+const tpBulkConoc  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','prueba_conocimiento', 28, 709, [62,93]);
+const tpBulkEstud  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','estudios',            20, 737, [65,94]);
+const tpBulkFinal  = _mkBulk('tp','Conductor C2 Transporte Público','Transporte Público','finalistas',          15, 757, [72,96]);
 
 // mock-vigia (detailed: pre=15, pm=13, eval=3, entrev=5)
 const vigiaBulkPre    = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prescreening',       85,1000, [28,94]);
 const vigiaBulkPM     = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_manejo',       47,1085, [42,92]);
-const vigiaBulkEval   = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','evaluaciones',        37,1132, [50,91]);
-const vigiaBulkEntrev = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','entrevistas',         25,1169, [58,93]);
-const vigiaBulkConoc  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_conocimiento', 35,1194, [60,92]);
-const vigiaBulkEstud  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','estudios',            20,1229, [60,94]);
-const vigiaBulkFinal  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','finalistas',          15,1249, [72,96]);
+const vigiaBulkEntrev = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','entrevistas',         45,1132, [56,94]);
+const vigiaBulkEval   = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','evaluaciones',        32,1177, [58,93]);
+const vigiaBulkConoc  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','prueba_conocimiento', 28,1209, [62,93]);
+const vigiaBulkEstud  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','estudios',            20,1237, [65,94]);
+const vigiaBulkFinal  = _mkBulk('vc','Conductor C2 Carga Refrigerada','Logística / Cadena de Frío','finalistas',          15,1257, [72,96]);
 
 export const mockCandidatesByStage: Record<string, Partial<Record<string, Candidate[]>>> = {
-  // evaluaciones candidates (tp-e*, v-e*, d-e*) only appear in their own stage —
-  // keeping them out of scoring/prescreening/entrevistas prevents duplicate cards.
   // Each stage contains ONLY its own candidates — no cross-stage duplicates.
-  // The funnel is: prescreening≈100, prueba_manejo≈60, evaluaciones≈40, entrevistas≈30, estudios≈20, finalistas≈15
+  // Funnel: pre=100, manejo=60, entrev=50, eval=35, conoc=28, est=20, fin=15
   'mock-transp-pub': {
     scoring:              [...transpPubScoring],
-    prescreening:         [...transpPubPrescreening, ...tpBulkPre],          // ≈100
-    prueba_manejo:        [...transpPubPruebaManejo, ...tpBulkPM],           // ≈60
-    entrevistas:          [...transpPubEntrevistas, ...tpBulkEntrev],        // ≈30
-    evaluaciones:         [...transpPubEvaluaciones, ...tpBulkEval],         // ≈40
-    prueba_conocimiento:  [...tpBulkConoc],                                  // ≈35
-    estudios:             [...tpBulkEstud],                                  // ≈20
-    finalistas:           [...transpPubEntrevistas.slice(0,2), ...tpBulkFinal], // ≈15
+    prescreening:         [...transpPubPrescreening, ...tpBulkPre],          // 100
+    prueba_manejo:        [...transpPubPruebaManejo, ...tpBulkPM],           //  60
+    entrevistas:          [...transpPubEntrevistas, ...tpBulkEntrev],        //  50 (5+45)
+    evaluaciones:         [...transpPubEvaluaciones, ...tpBulkEval],         //  35 (3+32)
+    prueba_conocimiento:  [...tpBulkConoc],                                  //  28
+    estudios:             [...tpBulkEstud],                                  //  20
+    finalistas:           [...transpPubEntrevistas.slice(0,2), ...tpBulkFinal], // 15
   },
   'mock-vigia': {
     scoring:              [...vigiaScoring],
-    prescreening:         [...vigiaPrescreening, ...vigiaBulkPre],           // ≈100
-    prueba_manejo:        [...vigiaPruebaManejo, ...vigiaBulkPM],            // ≈60
-    entrevistas:          [...vigiaEntrevistas, ...vigiaBulkEntrev],         // ≈30
-    evaluaciones:         [...vigiaEvaluaciones, ...vigiaBulkEval],          // ≈40
-    prueba_conocimiento:  [...vigiaBulkConoc],                               // ≈35
-    estudios:             [...vigiaBulkEstud],                               // ≈20
-    finalistas:           [...vigiaEntrevistas.slice(0,2), ...vigiaBulkFinal], // ≈15
+    prescreening:         [...vigiaPrescreening, ...vigiaBulkPre],           // 100
+    prueba_manejo:        [...vigiaPruebaManejo, ...vigiaBulkPM],            //  60
+    entrevistas:          [...vigiaEntrevistas, ...vigiaBulkEntrev],         //  50 (5+45)
+    evaluaciones:         [...vigiaEvaluaciones, ...vigiaBulkEval],          //  35 (3+32)
+    prueba_conocimiento:  [...vigiaBulkConoc],                               //  28
+    estudios:             [...vigiaBulkEstud],                               //  20
+    finalistas:           [...vigiaEntrevistas.slice(0,2), ...vigiaBulkFinal], // 15
   },
   'mock-distrib': {
     scoring:              [...distribScoring],
-    prescreening:         [...distribPrescreening, ...distribBulkPre],       // ≈100
-    prueba_manejo:        [...distribPruebaManejo, ...distribBulkPM],        // ≈60
-    entrevistas:          [...distribEntrevistas, ...distribBulkEntrev],     // ≈30
-    evaluaciones:         [...distribEvaluaciones, ...distribBulkEval],      // ≈40
-    prueba_conocimiento:  [...distribBulkConoc],                             // ≈35
-    estudios:             [...distribBulkEstud],                             // ≈20
-    finalistas:           [...distribEntrevistas.slice(0,2), ...distribBulkFinal], // ≈15
+    prescreening:         [...distribPrescreening, ...distribBulkPre],       // 100
+    prueba_manejo:        [...distribPruebaManejo, ...distribBulkPM],        //  60
+    entrevistas:          [...distribEntrevistas, ...distribBulkEntrev],     //  50 (5+45)
+    evaluaciones:         [...distribEvaluaciones, ...distribBulkEval],      //  35 (3+32)
+    prueba_conocimiento:  [...distribBulkConoc],                             //  28
+    estudios:             [...distribBulkEstud],                             //  20
+    finalistas:           [...distribEntrevistas.slice(0,2), ...distribBulkFinal], // 15
   },
   'mock-recep':    { scoring: recepCandidates },
   'mock-bodega':   { scoring: [...bodegaPreCandidates, ...bodegaScoreOnly], prescreening: bodegaPreCandidates },

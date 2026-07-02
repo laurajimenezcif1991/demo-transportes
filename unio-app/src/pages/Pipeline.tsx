@@ -150,8 +150,8 @@ function FunnelRow({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        padding: '10px 16px',
+        gap: '12px',
+        padding: '5px 12px',
         borderRadius: 'var(--radius-md)',
         cursor: isNotStarted ? 'default' : 'pointer',
         opacity: isNotStarted ? 0.45 : 1,
@@ -192,7 +192,7 @@ function FunnelRow({
       <div
         style={{
           flex: 1,
-          height: '28px',
+          height: '20px',
           background: 'var(--color-neutral-100)',
           borderRadius: '9999px',
           overflow: 'hidden',
@@ -210,12 +210,12 @@ function FunnelRow({
       </div>
 
       {/* Count + conversion */}
-      <div style={{ flexShrink: 0, textAlign: 'right', minWidth: '180px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-          <Users size={18} color="var(--color-text-muted)" />
+      <div style={{ flexShrink: 0, textAlign: 'right', minWidth: '160px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+          <Users size={14} color="var(--color-text-muted)" />
           <span
             style={{
-              fontSize: '22px',
+              fontSize: '17px',
               fontWeight: 800,
               color: 'var(--color-text-primary)',
               fontFamily: 'var(--font-display)',
@@ -225,7 +225,7 @@ function FunnelRow({
             {stage.candidateCount.toLocaleString('es-CO')}
           </span>
         </div>
-        <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
           {convPct !== null
             ? idx === 0
               ? '100% · inicio del funnel'
@@ -484,7 +484,7 @@ export default function Pipeline() {
             background: '#ffffff',
             border: '1px solid var(--color-border-default)',
             borderRadius: 'var(--radius-lg)',
-            padding: '24px',
+            padding: '20px 24px 16px',
             maxWidth: '900px',
           }}
         >
@@ -502,21 +502,21 @@ export default function Pipeline() {
           >
             Funnel de candidatos
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '10px' }}>
             Haz click en una etapa para ver los candidatos
           </div>
 
           {/* Skeleton */}
           {loading && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '5px 12px' }}>
                   <Skeleton width={8} height={8} borderRadius={4} />
-                  <Skeleton width={148} height={14} />
+                  <Skeleton width={148} height={12} />
                   <div style={{ flex: 1 }}>
-                    <Skeleton height={28} borderRadius={9999} />
+                    <Skeleton height={20} borderRadius={9999} />
                   </div>
-                  <Skeleton width={100} height={32} />
+                  <Skeleton width={100} height={26} />
                 </div>
               ))}
             </div>
