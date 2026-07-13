@@ -7,13 +7,11 @@
 
 ## [Sin commitear]
 
-### Prescreening: revisión de HV + pre-entrevista WhatsApp como dos pasos visibles
-- `mock.ts`: nuevas interfaces `PrescreeningProgress`, `ResumeValidationStatus`, `WaPrescreeningStatus`; campo `prescreeningProgress` en `Candidate`; `_mkBulk` genera los 6 casos del spec (passed/pending/failed/not_available × wa_completed/in_progress/not_started) con `failReason` y `matchedCriteria`
-- `PrescreeningProgress.tsx`: nuevo componente reutilizable con variantes `table`, `card` y `onePager`; lenguaje de reclutador (sin referencias a IA/score/algoritmo); íconos consistentes con el sistema existente
-- `CandidateCard.tsx`: para `viewStage === 'prescreening'` muestra el widget `PrescreeningProgress variant="card"` en lugar del cuadro de score
-- `CandidateList.tsx`: nuevos filtros de Resultado para prescreening (HV cumple / en revisión / no cumple / sin HV / pre-entrevista completada / en progreso); tipo `StageFilter` extendido; conteos por estado para los chips
-- `CandidateOnepage.tsx`: acordeón renombrado de "Pre-entrevista IA" a "Prescreening"; `PrescreeningProgress variant="onePager"` inyectado sobre el contenido de no-negociables; textos de "scoring" reemplazados por lenguaje de reclutador
-- Pipeline.tsx: eliminado el tag IA del funnel (commit anterior)
+### Prescreening OnePager: 3 escenarios de flujo condicional
+- `CandidateOnepage.tsx`: cuando `resumeValidation.status !== 'passed'` ya no se renderiza `PrescreeningContent`; se muestra mensaje contextual diferenciado para `failed` vs `pending`/`not_available`
+- `CandidateOnepage.tsx`: nueva prop `prescreeningRechazado` en `PrescreeningContent`; cuando el prescreening está rechazado, la fila "mínimo 2 años de experiencia" muestra "No cumple" en rojo con `XCircle`
+- `CandidateOnepage.tsx`: fila de antecedentes ahora refleja correctamente el resultado — si `antVar === 'alto_riesgo'` muestra "No cumple" en rojo con `XCircle` en lugar de "Cumple"; fondo rojo suave en la celda
+- Importado `XCircle` de lucide-react
 
 ---
 
