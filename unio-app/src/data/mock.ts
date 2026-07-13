@@ -3410,9 +3410,9 @@ function _mkBulk(
       'Los años de experiencia no alcanzan el mínimo requerido para el cargo.',
       'La HV no refleja tiempo mínimo en el último cargo registrado.',
     ];
+    // All prescreening candidates have a HV (PDF upload or WhatsApp builder) — no 'not_available'
     const _rvStatus: ResumeValidationStatus =
-      !hasCV          ? 'not_available'
-      : preStatus === 'rechazado' ? (idx % 5 === 0 ? 'pending' : 'failed')
+      preStatus === 'rechazado' ? (idx % 5 === 0 ? 'pending' : 'failed')
       : preStatus === 'pendiente' ? (idx % 12 === 0 ? 'pending' : 'passed')
       : 'passed';
     const _matchedCriteria =
