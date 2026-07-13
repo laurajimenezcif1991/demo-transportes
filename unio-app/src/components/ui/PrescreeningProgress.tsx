@@ -204,8 +204,10 @@ function OnePagerVariant({ resumeValidation: rv, whatsappPrescreening: wa }: Omi
               {rv.status === 'failed' && rv.failReason ? rv.failReason : rvCfg.explanation}
             </p>
             {rv.matchedCriteria !== undefined && rv.totalCriteria !== undefined && (
-              <p style={{ margin: '0 0 2px', fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-                {rv.matchedCriteria} de {rv.totalCriteria} criterios básicos validados
+              <p style={{ margin: '0 0 2px', fontSize: '11px', color: rv.status === 'failed' ? '#b91c1c' : 'var(--color-text-muted)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+                {rv.status === 'failed'
+                  ? `No cumple ${rv.totalCriteria - rv.matchedCriteria} de ${rv.totalCriteria} criterios no negociables`
+                  : `${rv.matchedCriteria} de ${rv.totalCriteria} criterios básicos validados`}
                 {rv.validatedAt ? ` · ${new Date(rv.validatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
               </p>
             )}
