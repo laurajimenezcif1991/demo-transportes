@@ -6,6 +6,23 @@ export type StageStatus = 'completed' | 'in_progress' | 'not_started';
 export type SalaryRange = 'en_rango' | 'fuera_de_rango';
 export type PipelineStageKey = 'scoring' | 'prescreening' | 'prueba_manejo' | 'entrevistas' | 'evaluaciones' | 'prueba_conocimiento' | 'estudios' | 'finalistas';
 
+// ── Prescreening two-step progress ───────────────────────────────────────────
+export type ResumeValidationStatus = 'pending' | 'passed' | 'failed' | 'not_available';
+export type WaPrescreeningStatus   = 'not_started' | 'in_progress' | 'completed';
+
+export interface PrescreeningProgress {
+  resumeValidation: {
+    status: ResumeValidationStatus;
+    validatedAt?: string;
+    matchedCriteria?: number;
+    totalCriteria?: number;
+    failReason?: string;
+  };
+  whatsappPrescreening: {
+    status: WaPrescreeningStatus;
+  };
+}
+
 export interface Vacante {
   id: string;
   status: VacanteStatus;
@@ -91,6 +108,8 @@ export interface Candidate {
   pruebaManejo?: { status: 'agendada'; fecha: string; hora: string; lugar: string } | { status: 'pendiente' };
   /** Interview verdict — shown as chip on candidate cards in entrevistas/estudios/finalistas */
   veredictoEntrevista?: 'apto' | 'apto_reservas' | 'no_apto';
+  /** Two-step prescreening progress: resume validation → WA prescreening */
+  prescreeningProgress?: PrescreeningProgress;
 }
 
 export interface NoNegociable {
@@ -3382,6 +3401,38 @@ function _mkBulk(
       score >= 68 ? 'continua' : score >= 45 ? 'pendiente' : 'rechazado';
     const logros  = _BULK_LOGROS[idx % _BULK_LOGROS.length] ?? [];
     const senales = score < 60 ? (_BULK_SIGNALS_NEG[idx % _BULK_SIGNALS_NEG.length] ?? []) : [];
+    const hasCV   = idx % 4 !== 0; // ~25% built via WhatsApp, no uploaded résumé
+
+    // ── Prescreening progress ──────────────────────────────────────────────
+    const _failReasons = [
+      'La experiencia en conducción C2 requerida no fue identificada en la HV.',
+      'La HV no acredita licencia de conducción categoría C2 vigente.',
+      'Los años de experiencia no alcanzan el mínimo requerido para el cargo.',
+      'La HV no refleja tiempo mínimo en el último cargo registrado.',
+    ];
+    const _rvStatus: ResumeValidationStatus =
+      !hasCV          ? 'not_available'
+      : preStatus === 'rechazado' ? (idx % 5 === 0 ? 'pending' : 'failed')
+      : preStatus === 'pendiente' ? (idx % 12 === 0 ? 'pending' : 'passed')
+      : 'passed';
+    const _matchedCriteria =
+      _rvStatus === 'passed' ? (preStatus === 'continua' ? 5 + (idx % 2) : 5)
+      : _rvStatus === 'failed' ? (1 + (idx % 3))
+      : undefined;
+    const _waStatus: WaPrescreeningStatus =
+      _rvStatus !== 'passed' ? 'not_started'
+      : preStatus === 'continua' ? 'completed'
+      : (idx % 8 === 0 ? 'not_started' : 'in_progress');
+    const _prescreeningProgress: PrescreeningProgress = {
+      resumeValidation: {
+        status: _rvStatus,
+        validatedAt: (_rvStatus === 'passed' || _rvStatus === 'failed') ? '2026-06-15' : undefined,
+        matchedCriteria: _matchedCriteria,
+        totalCriteria: _rvStatus !== 'not_available' ? 6 : undefined,
+        failReason: _rvStatus === 'failed' ? (_failReasons[idx % _failReasons.length] ?? _failReasons[0]) : undefined,
+      },
+      whatsappPrescreening: { status: _waStatus },
+    };
 
     return {
       id: `${prefix}-blk-${idx}`,
@@ -3405,7 +3456,8 @@ function _mkBulk(
       budget:     salary,
       salaryRange,
       currentStage: stage,
-      hasCV: idx % 4 !== 0, // ~25% perfil por WhatsApp
+      hasCV,
+      prescreeningProgress: _prescreeningProgress,
       // Prueba Psicométrica: 2 PRIMA permutations, applied for evaluaciones+ stages
       psychTest: (['evaluaciones','prueba_conocimiento','estudios','finalistas'] as PipelineStageKey[]).includes(stage)
         ? (idx % 2 === 0 ? _primaTranspA(name, score) : _primaTranspB(name, score))

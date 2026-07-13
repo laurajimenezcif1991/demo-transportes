@@ -7,8 +7,13 @@
 
 ## [Sin commitear]
 
-### Mock data: Sin Validar RUNT visible en candidatos de score bajo
-- `_mkBulk`: `runtVerification` ahora es `undefined` para candidatos con score < 48 (fallaron un no-negociable antes de llegar a la consulta RUNT), activando "Sin Validar" en filas RUNT/RNDC y Antecedentes del Prescreening
+### Prescreening: revisión de HV + pre-entrevista WhatsApp como dos pasos visibles
+- `mock.ts`: nuevas interfaces `PrescreeningProgress`, `ResumeValidationStatus`, `WaPrescreeningStatus`; campo `prescreeningProgress` en `Candidate`; `_mkBulk` genera los 6 casos del spec (passed/pending/failed/not_available × wa_completed/in_progress/not_started) con `failReason` y `matchedCriteria`
+- `PrescreeningProgress.tsx`: nuevo componente reutilizable con variantes `table`, `card` y `onePager`; lenguaje de reclutador (sin referencias a IA/score/algoritmo); íconos consistentes con el sistema existente
+- `CandidateCard.tsx`: para `viewStage === 'prescreening'` muestra el widget `PrescreeningProgress variant="card"` en lugar del cuadro de score
+- `CandidateList.tsx`: nuevos filtros de Resultado para prescreening (HV cumple / en revisión / no cumple / sin HV / pre-entrevista completada / en progreso); tipo `StageFilter` extendido; conteos por estado para los chips
+- `CandidateOnepage.tsx`: acordeón renombrado de "Pre-entrevista IA" a "Prescreening"; `PrescreeningProgress variant="onePager"` inyectado sobre el contenido de no-negociables; textos de "scoring" reemplazados por lenguaje de reclutador
+- Pipeline.tsx: eliminado el tag IA del funnel (commit anterior)
 
 ---
 

@@ -39,6 +39,8 @@ import Button from '../components/ui/Button';
 import Gauge from '../components/ui/Gauge';
 import StarRating from '../components/ui/StarRating';
 import PruebaPsicologicaContent from '../components/ui/PruebaPsicologicaContent';
+import PrescreeningProgressComponent from '../components/ui/PrescreeningProgress';
+import type { PrescreeningProgress } from '../data/mock';
 import PruebaConocimientoContent from '../components/ui/PruebaConocimientoContent';
 import VoiceInterviewSection from '../components/ui/VoiceInterviewSection';
 import PruebaManejoContent, { PREFILLED, PREFILLED_NO_APTO, calcManejoScore } from '../components/ui/PruebaManejoContent';
@@ -680,7 +682,7 @@ export default function CandidateOnepage() {
               <div ref={prescreeningSectionRef} style={{ scrollMarginTop: 24 }}>
                 <AccordionSection
                   number={1}
-                  title="Pre-entrevista IA"
+                  title="Prescreening"
                   score={prescreeningScore}
                   statusText={
                     hasPrescreeningData
@@ -741,21 +743,48 @@ export default function CandidateOnepage() {
                               maxWidth: '380px',
                             }}
                           >
-                            Este candidato no superó los filtros de scoring requeridos para iniciar la pre-entrevista IA. La validación de prescreening no fue ejecutada.
+                            La revisión de HV no fue completada, por lo que la pre-entrevista por WhatsApp no pudo iniciarse.
                           </div>
                         </div>
                       </div>
-                    ) : prescreeningData ? (
-                      <PrescreeningContent
-                        prescreening={prescreeningData}
-                        hasCV={candidate.hasCV}
-                        runt={candidate.runtVerification}
-                        candidateScore={candidate.score}
-                        isPendingEvaluaciones={isPendingEvaluaciones}
-                      />
-                    ) : (
+                    ) : prescreeningData ? (() => {
+                      // Derive prescreening progress — use explicit data if present,
+                      // otherwise derive from prescreeningAI + hasCV
+                      const derivedProgress: PrescreeningProgress = candidate.prescreeningProgress ?? (() => {
+                        const rvStatus =
+                          !candidate.hasCV ? 'not_available'
+                          : prescreeningStatus === 'continua' || prescreeningStatus === 'pendiente' ? 'passed'
+                          : prescreeningStatus === 'rechazado' ? 'failed'
+                          : 'pending';
+                        const waStatus =
+                          rvStatus !== 'passed' ? 'not_started'
+                          : prescreeningStatus === 'continua' ? 'completed'
+                          : prescreeningStatus === 'pendiente' ? 'in_progress'
+                          : 'not_started';
+                        return {
+                          resumeValidation: { status: rvStatus as PrescreeningProgress['resumeValidation']['status'] },
+                          whatsappPrescreening: { status: waStatus as PrescreeningProgress['whatsappPrescreening']['status'] },
+                        };
+                      })();
+                      return (
+                        <>
+                          <PrescreeningProgressComponent
+                            resumeValidation={derivedProgress.resumeValidation}
+                            whatsappPrescreening={derivedProgress.whatsappPrescreening}
+                            variant="onePager"
+                          />
+                          <PrescreeningContent
+                            prescreening={prescreeningData}
+                            hasCV={candidate.hasCV}
+                            runt={candidate.runtVerification}
+                            candidateScore={candidate.score}
+                            isPendingEvaluaciones={isPendingEvaluaciones}
+                          />
+                        </>
+                      );
+                    })() : (
                       <div style={{ padding: '8px 0', color: 'var(--color-text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
-                        Pendiente: la pre-entrevista IA aún no ha sido procesada para este candidato.
+                        Pendiente: la pre-entrevista por WhatsApp aún no ha sido procesada para este candidato.
                       </div>
                     )
                   )}

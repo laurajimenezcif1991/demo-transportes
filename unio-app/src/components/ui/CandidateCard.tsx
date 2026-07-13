@@ -3,6 +3,7 @@ import { type CandidateStatus } from '../../context/CandidateStatusContext';
 import Avatar from './Avatar';
 import { getScoreColors } from './ScorePill';
 import Badge from './Badge';
+import PrescreeningProgressComponent from './PrescreeningProgress';
 import { useState } from 'react';
 import { MapPin, Clock, HelpCircle, CheckCircle2, XCircle, CheckCheck, AlertTriangle, Circle, FileText, Send, FolderCheck, Eye, EyeOff, CalendarDays } from 'lucide-react';
 
@@ -462,7 +463,15 @@ export default function CandidateCard({ candidate, statusLabel, selected, onSele
             </span>
           </div>
         );
-      })() : (viewStage ?? candidate.currentStage) !== 'entrevistas' || !candidate.veredictoEntrevista ? (
+      })() : (viewStage ?? candidate.currentStage) === 'prescreening' ? (
+        candidate.prescreeningProgress ? (
+          <PrescreeningProgressComponent
+            resumeValidation={candidate.prescreeningProgress.resumeValidation}
+            whatsappPrescreening={candidate.prescreeningProgress.whatsappPrescreening}
+            variant="card"
+          />
+        ) : null
+      ) : (viewStage ?? candidate.currentStage) !== 'entrevistas' || !candidate.veredictoEntrevista ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
           <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Total</span>
           <div
