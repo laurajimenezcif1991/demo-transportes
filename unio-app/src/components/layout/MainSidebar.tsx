@@ -102,6 +102,7 @@ export default function MainSidebar() {
         <img
           src={companyLogoUrl || assetUrl('/logo-demo-transportes.png')}
           alt={companyName || 'Demo Transportes'}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = assetUrl('/logo-demo-transportes.png'); }}
           style={{
             maxHeight: '110px',
             maxWidth: '300px',
